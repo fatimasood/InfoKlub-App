@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/viewmodels/profile_setup/finishprofile_viewmodel.dart';
 import 'package:infoklub/views/home_view/main_home.dart';
 import 'package:provider/provider.dart';
-import '../../viewmodels/finishprofile_viewmodel.dart';
 
 class FinishScreen extends StatefulWidget {
   const FinishScreen({super.key});

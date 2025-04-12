@@ -12,7 +12,7 @@ class NavigationViewModel with ChangeNotifier {
   PageController get pageController => _pageController;
 
   final List<Widget> pages = const [
-    HomeContent(),
+    HomeScreen(),
     RecordsPage(),
     CVPage(),
     SettingsPage(),

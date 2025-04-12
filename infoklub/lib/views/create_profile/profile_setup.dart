@@ -5,7 +5,7 @@ import 'package:country_picker/country_picker.dart';
 
 import '../../app/constants.dart';
 import '../../app/theme.dart';
-import '../../viewmodels/profilesetup_viewmodel.dart';
+import '../../viewmodels/profile_setup/profilesetup_viewmodel.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 
