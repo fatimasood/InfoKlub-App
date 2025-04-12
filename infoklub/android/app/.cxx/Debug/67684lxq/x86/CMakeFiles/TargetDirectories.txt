@@ -1,0 +1,2 @@
+C:/Flutter Apps/InfoKlub App/infoklub/android/app/.cxx/Debug/67684lxq/x86/CMakeFiles/edit_cache.dir
+C:/Flutter Apps/InfoKlub App/infoklub/android/app/.cxx/Debug/67684lxq/x86/CMakeFiles/rebuild_cache.dir
