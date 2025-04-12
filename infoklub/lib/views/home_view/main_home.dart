@@ -40,7 +40,7 @@ class MainHome extends StatelessWidget {
           ),
         ],
       ),
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
       body: Consumer<NavigationViewModel>(
         builder: (context, viewModel, child) {
           return PageView(

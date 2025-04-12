@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:infoklub/viewmodels/finishprofile_viewmodel.dart';
+import 'package:infoklub/viewmodels/profile_setup/finishprofile_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-import '../app/routes.dart';
+import '../../app/routes.dart';
 
 class ProfileSetupViewModel with ChangeNotifier {
   File? _selectedImage;

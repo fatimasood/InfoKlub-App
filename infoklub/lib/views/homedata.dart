@@ -1,15 +1,6 @@
 // Placeholder pages for navigation
 import 'package:flutter/material.dart';
 
-class HomeContent extends StatelessWidget {
-  const HomeContent({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text("Home Content"));
-  }
-}
-
 class CVPage extends StatelessWidget {
   const CVPage({super.key});
 

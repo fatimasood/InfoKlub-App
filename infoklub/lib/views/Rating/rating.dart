@@ -44,11 +44,10 @@ class RatingScreenLayout extends StatelessWidget {
     return Column(
       children: [
         // Expanded makes this part take all available space except what's needed for the button
-        Expanded(
+        const Expanded(
           child: SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-            child: const RatingScreenContent(),
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            child: RatingScreenContent(),
           ),
         ),
 

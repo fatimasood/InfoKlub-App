@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../views/Goals/all_goals.dart';
 import '../../views/Record Screens/record_home_screen.dart';
 import '../../views/homedata.dart';
 
