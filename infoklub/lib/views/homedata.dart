@@ -9,12 +9,3 @@ class CVPage extends StatelessWidget {
     return const Center(child: Text("CV Page"));
   }
 }
-
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text("Settings Page"));
-  }
-}

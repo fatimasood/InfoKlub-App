@@ -17,7 +17,7 @@ class MainHome extends StatelessWidget {
         elevation: 0,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black),
+            icon: const Icon(Icons.menu, color: AppTheme.primaryColor),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -25,7 +25,7 @@ class MainHome extends StatelessWidget {
           builder: (context, viewModel, child) {
             return Text(
               viewModel.appBarTitles[viewModel.currentIndex],
-              style: const TextStyle(color: Colors.black),
+              style: const TextStyle(color: AppTheme.primaryColor),
             );
           },
         ),

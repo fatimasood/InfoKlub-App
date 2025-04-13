@@ -10,7 +10,7 @@ class SearchBarWidget extends StatelessWidget {
       child: TextField(
         decoration: InputDecoration(
           hintText: "Search your goals...",
-          prefixIcon: Icon(Icons.search),
+          prefixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infoklub/views/Reminders/reminders_home.dart';
 
 import '../../views/Goals/all_goals.dart';
 import '../../views/Record Screens/record_home_screen.dart';
@@ -15,7 +16,7 @@ class NavigationViewModel with ChangeNotifier {
     HomeScreen(),
     RecordsPage(),
     CVPage(),
-    SettingsPage(),
+    RemindersHome(),
   ];
 
   final List<String> appBarTitles = const [
@@ -29,7 +30,7 @@ class NavigationViewModel with ChangeNotifier {
     {'icon': Icons.home_outlined, 'label': 'Home'},
     {'icon': Icons.assignment_outlined, 'label': 'Record'},
     {'icon': Icons.description_outlined, 'label': 'CV Builder'},
-    {'icon': Icons.notifications_outlined, 'label': 'Reminders'},
+    {'icon': Icons.alarm_outlined, 'label': 'Reminders'},
   ];
 
   void changePage(int index) {
