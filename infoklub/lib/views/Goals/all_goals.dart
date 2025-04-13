@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/models/goals/goal_model.dart';
 import 'package:infoklub/viewmodels/goal_viewmodel/goal_viemodel.dart';
+import 'package:infoklub/views/Goals/add_goal.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
@@ -36,9 +37,7 @@ class HomeScreen extends StatelessWidget {
                     Icons.add_circle_outline,
                     color: AppTheme.whiteColor,
                   ),
-                  onPressed: () {
-                    _showAddGoalDialog(context);
-                  },
+                  onPressed: () => _showAddGoalDialog(context),
                 ),
                 const SizedBox(height: 20),
                 const _GoalsList(),
@@ -51,47 +50,10 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _showAddGoalDialog(BuildContext context) {
-    final viewModel = Provider.of<HomeViewModel>(context, listen: false);
-    final TextEditingController controller = TextEditingController();
-
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add New Goal'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(
-              hintText: 'Enter goal name',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (controller.text.isNotEmpty) {
-                  final newGoal = Goal(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                    title: controller.text,
-                    currentStreak: 0,
-                    longestStreak: 0,
-                    completedToday: false,
-                    color: Colors.primaries[
-                        viewModel.goals.length % Colors.primaries.length],
-                  );
-                  viewModel.addNewGoal(newGoal);
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
+      barrierColor: Colors.transparent,
+      builder: (context) => const AddGoal(),
     );
   }
 }

@@ -18,30 +18,40 @@ class HomeViewModel extends ChangeNotifier {
 
   HomeViewModel() {
     // Initialize with some dummy data
+    final now = DateTime.now();
     _goals = [
       Goal(
         id: '1',
         title: 'Morning Run',
+        description: 'Run for at least 30 minutes every morning',
         currentStreak: 7,
         longestStreak: 10,
         completedToday: true,
         color: Colors.blue,
+        startDate: now.subtract(const Duration(days: 10)),
+        endDate: now.add(const Duration(days: 20)),
       ),
       Goal(
         id: '2',
         title: 'Meditation',
+        description: 'Meditate for 15 minutes daily',
         currentStreak: 3,
         longestStreak: 5,
         completedToday: false,
         color: Colors.green,
+        startDate: now.subtract(const Duration(days: 5)),
+        endDate: now.add(const Duration(days: 30)),
       ),
       Goal(
         id: '3',
         title: 'Reading',
+        description: 'Read at least 20 pages every day',
         currentStreak: 14,
         longestStreak: 14,
         completedToday: true,
         color: Colors.orange,
+        startDate: now.subtract(const Duration(days: 14)),
+        endDate: now.add(const Duration(days: 45)),
       ),
     ];
 
