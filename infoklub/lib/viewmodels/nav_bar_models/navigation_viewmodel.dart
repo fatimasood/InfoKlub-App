@@ -23,14 +23,14 @@ class NavigationViewModel with ChangeNotifier {
     "Home",
     "Record",
     "CV Builder",
-    "Reminders"
+    "Reminder"
   ];
 
   final List<Map<String, dynamic>> navItems = const [
     {'icon': Icons.home_outlined, 'label': 'Home'},
     {'icon': Icons.assignment_outlined, 'label': 'Record'},
     {'icon': Icons.description_outlined, 'label': 'CV Builder'},
-    {'icon': Icons.alarm_outlined, 'label': 'Reminders'},
+    {'icon': Icons.alarm_outlined, 'label': 'Reminder'},
   ];
 
   void changePage(int index) {
