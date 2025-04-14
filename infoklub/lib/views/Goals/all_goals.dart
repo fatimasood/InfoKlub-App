@@ -52,7 +52,7 @@ class HomeScreen extends StatelessWidget {
   void _showAddGoalDialog(BuildContext context) {
     showDialog(
       context: context,
-      barrierColor: Colors.transparent,
+      barrierColor: Colors.white.withOpacity(0.5),
       builder: (context) => const AddGoal(),
     );
   }

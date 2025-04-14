@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/models/goals/goal_model.dart';
-import 'package:infoklub/viewmodels/goal_viewmodel/goal_viemodel.dart';
+import 'package:infoklub/models/reminder/reminder_model.dart';
+import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-class AddGoal extends StatefulWidget {
-  const AddGoal({super.key});
+class AddReminder extends StatefulWidget {
+  const AddReminder({super.key});
 
   @override
-  State<AddGoal> createState() => _AddGoalState();
+  State<AddReminder> createState() => _AddReminderState();
 }
 
-class _AddGoalState extends State<AddGoal> {
+class _AddReminderState extends State<AddReminder> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _streakDaysController = TextEditingController();
-  DateTime? _startDate;
-  DateTime? _endDate;
+  final TextEditingController _notesController = TextEditingController();
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
+  List<int> _repeatDays = [];
   Color _selectedColor = Colors.blue;
 
   final List<Color> _colorOptions = [
@@ -32,52 +32,61 @@ class _AddGoalState extends State<AddGoal> {
   @override
   void dispose() {
     _titleController.dispose();
-    _descriptionController.dispose();
-    _streakDaysController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
+  Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
+      firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
     if (picked != null) {
       setState(() {
-        if (isStartDate) {
-          _startDate = picked;
-        } else {
-          _endDate = picked;
-        }
+        _selectedDate = picked;
       });
     }
   }
 
-  void _submitGoal() {
-    if (_formKey.currentState!.validate()) {
-      if (_startDate == null || _endDate == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Please select both start and end dates')),
-        );
-        return;
-      }
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
+  }
 
-      final newGoal = Goal(
+  void _toggleDay(int dayIndex) {
+    setState(() {
+      if (_repeatDays.contains(dayIndex)) {
+        _repeatDays.remove(dayIndex);
+      } else {
+        _repeatDays.add(dayIndex);
+      }
+    });
+  }
+
+  void _submitReminder() {
+    if (_formKey.currentState!.validate()) {
+      final vm = Provider.of<RemindersViewModel>(context, listen: false);
+
+      final newReminder = Reminder(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: _titleController.text,
-        description: _descriptionController.text,
-        currentStreak: 0,
-        longestStreak: int.parse(_streakDaysController.text),
-        completedToday: false,
+        notes: _notesController.text,
+        date: _selectedDate,
+        time: _selectedTime,
+        repeatDays: _repeatDays.isNotEmpty ? _repeatDays : null,
         color: _selectedColor,
-        startDate: _startDate!,
-        endDate: _endDate!,
       );
 
-      Provider.of<HomeViewModel>(context, listen: false).addNewGoal(newGoal);
+      vm.addReminder(newReminder);
       Navigator.pop(context);
     }
   }
@@ -101,7 +110,7 @@ class _AddGoalState extends State<AddGoal> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text(
-                'Add New Goal',
+                'Add New Reminder',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -114,7 +123,8 @@ class _AddGoalState extends State<AddGoal> {
                 style: TextStyle(color: Colors.black),
                 controller: _titleController,
                 decoration: InputDecoration(
-                  labelText: 'Goal Name',
+                  labelText: 'Title',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: const BorderSide(color: Colors.grey),
@@ -122,7 +132,7 @@ class _AddGoalState extends State<AddGoal> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a goal name';
+                    return 'Please enter a title';
                   }
                   return null;
                 },
@@ -130,44 +140,23 @@ class _AddGoalState extends State<AddGoal> {
               const SizedBox(height: 15),
               TextFormField(
                 style: TextStyle(color: Colors.black),
-                controller: _descriptionController,
+                controller: _notesController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  labelText: 'Description',
+                  labelText: 'Notes',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: const BorderSide(color: Colors.grey),
                   ),
                 ),
-              ),
-              const SizedBox(height: 15),
-              TextFormField(
-                style: TextStyle(color: Colors.black),
-                controller: _streakDaysController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Streak Challenge (days)',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.grey),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter number of days';
-                  }
-                  if (int.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 15),
               Row(
                 children: [
                   Expanded(
                     child: InkWell(
-                      onTap: () => _selectDate(context, true),
+                      onTap: () => _selectDate(context),
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
@@ -175,9 +164,9 @@ class _AddGoalState extends State<AddGoal> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          _startDate == null
-                              ? 'Select Start Date'
-                              : 'Start: ${_startDate!.toLocal().toString().split(' ')[0]}',
+                          _selectedDate == null
+                              ? 'Select Date'
+                              : 'Date: ${_selectedDate!.toLocal().toString().split(' ')[0]}',
                           style: const TextStyle(color: Colors.black),
                         ),
                       ),
@@ -186,7 +175,7 @@ class _AddGoalState extends State<AddGoal> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: InkWell(
-                      onTap: () => _selectDate(context, false),
+                      onTap: () => _selectTime(context),
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
@@ -194,15 +183,59 @@ class _AddGoalState extends State<AddGoal> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          _endDate == null
-                              ? 'Select End Date'
-                              : 'End: ${_endDate!.toLocal().toString().split(' ')[0]}',
+                          _selectedTime == null
+                              ? 'Select Time'
+                              : 'Time: ${_selectedTime!.format(context)}',
                           style: const TextStyle(color: Colors.black),
                         ),
                       ),
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 15),
+              const Text(
+                'Repeat on:',
+                style: TextStyle(color: Colors.black),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                height: 50,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(7, (index) {
+                      return GestureDetector(
+                        onTap: () => _toggleDay(index),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: _repeatDays.contains(index)
+                                ? AppTheme.secondaryColor
+                                : Colors.transparent,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppTheme.secondaryColor,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _getDayAbbreviation(index),
+                              style: TextStyle(
+                                color: _repeatDays.contains(index)
+                                    ? Colors.white
+                                    : AppTheme.secondaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
               ),
               const SizedBox(height: 15),
               const Text(
@@ -249,9 +282,9 @@ class _AddGoalState extends State<AddGoal> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
-                onPressed: _submitGoal,
+                onPressed: _submitReminder,
                 child: const Text(
-                  'Add Goal',
+                  'Add Reminder',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -260,5 +293,10 @@ class _AddGoalState extends State<AddGoal> {
         ),
       ),
     );
+  }
+
+  String _getDayAbbreviation(int dayIndex) {
+    const abbreviations = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    return abbreviations[dayIndex];
   }
 }

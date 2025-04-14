@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/models/reminder/reminder_model.dart';
 import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
+import 'package:infoklub/views/Reminders/add_reminder.dart';
 import 'package:provider/provider.dart';
 
 class RemindersHome extends StatelessWidget {
@@ -10,25 +12,19 @@ class RemindersHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => RemindersViewModel(),
-      child: const Scaffold(
+      child: Scaffold(
         backgroundColor: AppTheme.halfwhite,
         body: SafeArea(
           child: Column(
             children: [
-              //const SizedBox(height: 20),
-              // Stats Row
-              _ReminderStatsRow(),
-              SizedBox(height: 10),
-              // All Reminders Card
-              _AllRemindersCard(),
-              SizedBox(height: 15),
-              // My List Heading
-              _ListHeading(),
-              SizedBox(height: 10),
-              // Reminders List
-              Expanded(child: _RemindersList()),
-              // Bottom Action Bar
-              _BottomActionBar(),
+              const _ReminderStatsRow(),
+              const SizedBox(height: 10),
+              const _AllRemindersCard(),
+              const SizedBox(height: 15),
+              const _ListHeading(),
+              const SizedBox(height: 10),
+              const Expanded(child: _RemindersList()),
+              const _BottomActionBar(),
             ],
           ),
         ),
@@ -176,9 +172,7 @@ class _AllRemindersCard extends StatelessWidget {
                   ),
                   child: const Icon(Icons.list, color: Colors.white, size: 20),
                 ),
-                const SizedBox(
-                  height: 5,
-                ),
+                const SizedBox(height: 5),
                 Text(
                   'All',
                   style: TextStyle(
@@ -211,16 +205,19 @@ class _ListHeading extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          'My List',
-          style: TextStyle(
-            fontSize: 26,
-            color: AppTheme.secondaryColor,
-            fontWeight: FontWeight.bold,
+      child: Row(
+        children: [
+          Text(
+            'My List',
+            style: TextStyle(
+              fontSize: 26,
+              color: AppTheme.secondaryColor,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
+          Spacer(),
+          Icon(Icons.filter_list, color: AppTheme.secondaryColor),
+        ],
       ),
     );
   }
@@ -250,19 +247,54 @@ class _RemindersList extends StatelessWidget {
             ),
           ],
         ),
-        child: ListView.separated(
-          padding: const EdgeInsets.all(8.0),
-          itemCount: vm.reminders.length,
-          separatorBuilder: (context, index) => Divider(
-            height: 1,
-            thickness: 1,
-            color: Colors.grey.withOpacity(0.2),
+        child: vm.reminders.isEmpty
+            ? const _EmptyState()
+            : ListView.separated(
+                padding: const EdgeInsets.all(8.0),
+                itemCount: vm.reminders.length,
+                separatorBuilder: (context, index) => Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey.withOpacity(0.2),
+                ),
+                itemBuilder: (context, index) {
+                  final reminder = vm.reminders[index];
+                  return _ReminderItem(reminder: reminder);
+                },
+              ),
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.notifications_off,
+              size: 60, color: Colors.grey.withOpacity(0.5)),
+          const SizedBox(height: 16),
+          Text(
+            'No reminders yet',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey.withOpacity(0.7),
+            ),
           ),
-          itemBuilder: (context, index) {
-            final reminder = vm.reminders[index];
-            return _ReminderItem(reminder: reminder);
-          },
-        ),
+          const SizedBox(height: 8),
+          Text(
+            'Tap + to add your first reminder',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.withOpacity(0.5),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -321,13 +353,24 @@ class _ReminderItem extends StatelessWidget {
                         : AppTheme.secondaryColor,
                   ),
                 ),
-                if (reminder.dateTime != null) ...[
+                if (reminder.notes != null && reminder.notes!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
-                    _formatDateTime(reminder.dateTime!),
+                    reminder.notes!,
                     style: TextStyle(
-                        fontSize: 12,
-                        color: AppTheme.secondaryColor.withOpacity(0.8)),
+                      fontSize: 12,
+                      color: AppTheme.secondaryColor.withOpacity(0.6),
+                    ),
+                  ),
+                ],
+                if (reminder.date != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    _formatDateTime(reminder.date!, reminder.time),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.secondaryColor.withOpacity(0.8),
+                    ),
                   ),
                 ],
               ],
@@ -347,8 +390,11 @@ class _ReminderItem extends StatelessWidget {
     );
   }
 
-  String _formatDateTime(DateTime dt) {
-    return '${dt.hour}:${dt.minute.toString().padLeft(2, '0')} • ${dt.day}/${dt.month}/${dt.year}';
+  String _formatDateTime(DateTime date, TimeOfDay? time) {
+    final timeStr = time != null
+        ? '${time.hour}:${time.minute.toString().padLeft(2, '0')} • '
+        : '';
+    return '$timeStr${date.day}/${date.month}/${date.year}';
   }
 }
 
@@ -361,41 +407,45 @@ class _BottomActionBar extends StatelessWidget {
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
       child: Row(
         children: [
-          Container(
-            // padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Icon(
-                Icons.add,
-                size: 18,
-                color: Theme.of(context).primaryColor,
+          GestureDetector(
+            onTap: () => _showAddReminderDialog(context),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.secondaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Icon(
+                  Icons.add,
+                  size: 24,
+                  color: AppTheme.secondaryColor,
+                ),
               ),
             ),
           ),
           const SizedBox(width: 12),
-          const Text(
-            'New Reminder',
-            style: TextStyle(
-              color: AppTheme.secondaryColor,
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
-            ),
-          ),
-          const Spacer(),
-          const Text(
-            'Add List',
-            style: TextStyle(
-              color: AppTheme.secondaryColor,
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
+          GestureDetector(
+            onTap: () => _showAddReminderDialog(context),
+            child: Text(
+              'New Reminder',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.secondaryColor,
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  void _showAddReminderDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.white.withOpacity(0.5),
+      builder: (context) => const AddReminder(),
     );
   }
 }
