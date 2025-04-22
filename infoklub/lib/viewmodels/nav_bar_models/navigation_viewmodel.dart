@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:infoklub/views/CV/cv_main_screen.dart';
 import 'package:infoklub/views/Reminders/reminders_home.dart';
-
 import '../../views/Goals/all_goals.dart';
 import '../../views/Record Screens/record_home_screen.dart';
-import '../../views/homedata.dart';
 
 class NavigationViewModel with ChangeNotifier {
   int _currentIndex = 0;
@@ -29,7 +28,7 @@ class NavigationViewModel with ChangeNotifier {
   final List<Map<String, dynamic>> navItems = const [
     {'icon': Icons.home_outlined, 'label': 'Home'},
     {'icon': Icons.assignment_outlined, 'label': 'Record'},
-    {'icon': Icons.description_outlined, 'label': 'CV Builder'},
+    {'icon': Icons.description_outlined, 'label': 'Create CV'},
     {'icon': Icons.alarm_outlined, 'label': 'Reminder'},
   ];
 
