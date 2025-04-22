@@ -38,7 +38,7 @@ class RemindersViewModel extends ChangeNotifier {
         title: 'Team Meeting',
         notes: 'Weekly sprint planning',
         date: DateTime(now.year, now.month, now.day, 14, 30),
-        time: TimeOfDay(hour: 14, minute: 30),
+        time: const TimeOfDay(hour: 14, minute: 30),
         color: Colors.blue,
         repeatDays: [2], // Every Tuesday
       ),
@@ -46,7 +46,7 @@ class RemindersViewModel extends ChangeNotifier {
         id: '2',
         title: 'Buy Groceries',
         date: DateTime(now.year, now.month, now.day + 1, 18, 0),
-        time: TimeOfDay(hour: 18, minute: 0),
+        time: const TimeOfDay(hour: 18, minute: 0),
         color: Colors.green,
       ),
       Reminder(

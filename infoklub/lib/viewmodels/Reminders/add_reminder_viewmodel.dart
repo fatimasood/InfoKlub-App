@@ -20,16 +20,16 @@ class ReminderViewModel extends ChangeNotifier {
         id: '1',
         title: 'Morning Meditation',
         notes: '15 minutes of mindfulness',
-        date: DateTime.now().add(Duration(days: 1)),
-        time: TimeOfDay(hour: 7, minute: 30),
+        date: DateTime.now().add(const Duration(days: 1)),
+        time: const TimeOfDay(hour: 7, minute: 30),
         repeatDays: [1, 2, 3, 4, 5], // Weekdays
       ),
       Reminder(
         id: '2',
         title: 'Weekly Review',
         notes: 'Plan for next week',
-        date: DateTime.now().add(Duration(days: 7)),
-        time: TimeOfDay(hour: 18, minute: 0),
+        date: DateTime.now().add(const Duration(days: 7)),
+        time: const TimeOfDay(hour: 18, minute: 0),
         repeatDays: [6], // Saturday
       ),
     ];

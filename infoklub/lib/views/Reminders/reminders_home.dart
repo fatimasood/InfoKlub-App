@@ -12,19 +12,19 @@ class RemindersHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => RemindersViewModel(),
-      child: Scaffold(
+      child: const Scaffold(
         backgroundColor: AppTheme.halfwhite,
         body: SafeArea(
           child: Column(
             children: [
-              const _ReminderStatsRow(),
-              const SizedBox(height: 10),
-              const _AllRemindersCard(),
-              const SizedBox(height: 15),
-              const _ListHeading(),
-              const SizedBox(height: 10),
-              const Expanded(child: _RemindersList()),
-              const _BottomActionBar(),
+              _ReminderStatsRow(),
+              SizedBox(height: 10),
+              _AllRemindersCard(),
+              SizedBox(height: 15),
+              _ListHeading(),
+              SizedBox(height: 10),
+              Expanded(child: _RemindersList()),
+              _BottomActionBar(),
             ],
           ),
         ),
@@ -414,8 +414,8 @@ class _BottomActionBar extends StatelessWidget {
                 color: AppTheme.secondaryColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
+              child: const Padding(
+                padding: EdgeInsets.all(5.0),
                 child: Icon(
                   Icons.add,
                   size: 24,
@@ -427,7 +427,7 @@ class _BottomActionBar extends StatelessWidget {
           const SizedBox(width: 12),
           GestureDetector(
             onTap: () => _showAddReminderDialog(context),
-            child: Text(
+            child: const Text(
               'New Reminder',
               style: TextStyle(
                 fontSize: 16,

@@ -111,7 +111,7 @@ class _AddGoalState extends State<AddGoal> {
               ),
               const SizedBox(height: 20),
               TextFormField(
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 controller: _titleController,
                 decoration: InputDecoration(
                   labelText: 'Goal Name',
@@ -129,7 +129,7 @@ class _AddGoalState extends State<AddGoal> {
               ),
               const SizedBox(height: 15),
               TextFormField(
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 controller: _descriptionController,
                 maxLines: 3,
                 decoration: InputDecoration(
@@ -142,7 +142,7 @@ class _AddGoalState extends State<AddGoal> {
               ),
               const SizedBox(height: 15),
               TextFormField(
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 controller: _streakDaysController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(

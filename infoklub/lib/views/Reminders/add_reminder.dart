@@ -17,7 +17,7 @@ class _AddReminderState extends State<AddReminder> {
   final TextEditingController _notesController = TextEditingController();
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
-  List<int> _repeatDays = [];
+  final List<int> _repeatDays = [];
   Color _selectedColor = Colors.blue;
 
   final List<Color> _colorOptions = [
@@ -120,7 +120,7 @@ class _AddReminderState extends State<AddReminder> {
               ),
               const SizedBox(height: 20),
               TextFormField(
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 controller: _titleController,
                 decoration: InputDecoration(
                   labelText: 'Title',
@@ -139,7 +139,7 @@ class _AddReminderState extends State<AddReminder> {
               ),
               const SizedBox(height: 15),
               TextFormField(
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 controller: _notesController,
                 maxLines: 3,
                 decoration: InputDecoration(
@@ -199,7 +199,7 @@ class _AddReminderState extends State<AddReminder> {
                 style: TextStyle(color: Colors.black),
               ),
               const SizedBox(height: 10),
-              Container(
+              SizedBox(
                 height: 50,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
