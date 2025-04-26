@@ -15,43 +15,57 @@ class CVPage extends StatelessWidget {
       backgroundColor: AppTheme.halfwhite,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(left: 10, right: 10),
+          padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            //mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 20),
               Text(
-                "Create a unique resume with your phone!",
+                "Create a unique resume\n with your phone!",
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.primaryColor,
+                      fontWeight: FontWeight.normal,
+                      color: AppTheme.blackColor,
                     ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
               Image.asset(
-                "lib/assets/Images/cv_welcome.png",
-                height: 150,
+                "lib/assets/Images/cvwelcome.png",
+                height: 270,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(height: 40),
-              CustomButton(
-                text: "Import from LinkedIn",
-                onPressed: () => _importFromLinkedIn(context),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(left: 75, right: 75),
+                child: CustomButton(
+                  text: "Import from LinkedIn",
+                  color: AppTheme.skyBlue,
+                  borderRadius: 9.86,
+                  onPressed: () => _importFromLinkedIn(context),
+                ),
               ),
               const SizedBox(height: 15),
-              CustomButton(
-                text: "Create a new CV",
-                onPressed: () => _createNewCV(context),
+              Padding(
+                padding: const EdgeInsets.only(left: 75, right: 75),
+                child: CustomButton(
+                  text: "Create a new CV",
+                  borderRadius: 9.86,
+                  color: AppTheme.tealAccent,
+                  onPressed: () => _createNewCV(context),
+                ),
               ),
               const SizedBox(height: 15),
-              CustomButton(
-                text: "View Templates",
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const TemplateSelectionScreen(),
+              Padding(
+                padding: const EdgeInsets.only(left: 75, right: 75),
+                child: CustomButton(
+                  text: "View Templates",
+                  color: AppTheme.coralAccent,
+                  borderRadius: 9.86,
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const TemplateSelectionScreen(),
+                    ),
                   ),
                 ),
               ),
