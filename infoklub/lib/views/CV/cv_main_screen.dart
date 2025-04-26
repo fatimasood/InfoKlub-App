@@ -15,7 +15,7 @@ class CVPage extends StatelessWidget {
       backgroundColor: AppTheme.halfwhite,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.only(left: 10, right: 10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -31,7 +31,7 @@ class CVPage extends StatelessWidget {
               ),
               const SizedBox(height: 30),
               Image.asset(
-                "lib/assets/icon",
+                "lib/assets/Images/cv_welcome.png",
                 height: 150,
                 fit: BoxFit.contain,
               ),
