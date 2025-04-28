@@ -22,7 +22,10 @@ class WorkInfoScreen extends StatelessWidget {
             Icons.arrow_back_ios,
             color: AppTheme.primaryColor,
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            viewModel.previousStep();
+            Navigator.pop(context);
+          },
         ),
         title: const Text(
           'Create CV',
@@ -71,6 +74,266 @@ class WorkInfoScreen extends StatelessWidget {
                       ),
                       onChanged: (value) =>
                           viewModel.updateContactInfo(firstName: value),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Start Date",
+                                style: TextStyle(
+                                  color: AppTheme.blackColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const SizedBox(height: 3.0),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: DropdownButtonFormField<String>(
+                                      isExpanded: true,
+                                      value: null,
+                                      hint: const Text('Month'),
+                                      items: [
+                                        'Jan',
+                                        'Feb',
+                                        'Mar',
+                                        'Apr',
+                                        'May',
+                                        'Jun',
+                                        'Jul',
+                                        'Aug',
+                                        'Sep',
+                                        'Oct',
+                                        'Nov',
+                                        'Dec'
+                                      ]
+                                          .map((month) => DropdownMenuItem(
+                                                value: month,
+                                                child: Text(month),
+                                              ))
+                                          .toList(),
+                                      onChanged: (value) {
+                                        // Handle start month selection
+                                      },
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                      ),
+                                      dropdownColor: AppTheme.whiteColor,
+                                      menuMaxHeight: 200,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: DropdownButtonFormField<String>(
+                                      isExpanded: true,
+                                      value: null,
+                                      hint: const Text('Year'),
+                                      items: List.generate(
+                                              50,
+                                              (index) =>
+                                                  (DateTime.now().year - index)
+                                                      .toString())
+                                          .map((year) => DropdownMenuItem(
+                                                value: year,
+                                                child: Text(year),
+                                              ))
+                                          .toList(),
+                                      onChanged: (value) {
+                                        // Handle start year selection
+                                      },
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                      ),
+                                      dropdownColor: Colors.white,
+                                      icon: Icon(Icons.arrow_drop_down,
+                                          color: Colors.grey),
+                                      style: TextStyle(color: Colors.black),
+                                      menuMaxHeight:
+                                          200, // Limits dropdown height
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "End Date",
+                                style: TextStyle(
+                                  color: AppTheme.blackColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const SizedBox(height: 3.0),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: DropdownButtonFormField<String>(
+                                      isExpanded: true,
+                                      value: null,
+                                      hint: const Text('Month'),
+                                      items: [
+                                        'Jan',
+                                        'Feb',
+                                        'Mar',
+                                        'Apr',
+                                        'May',
+                                        'Jun',
+                                        'Jul',
+                                        'Aug',
+                                        'Sep',
+                                        'Oct',
+                                        'Nov',
+                                        'Dec'
+                                      ]
+                                          .map((month) => DropdownMenuItem(
+                                                value: month,
+                                                child: Text(month),
+                                              ))
+                                          .toList(),
+                                      onChanged: (value) {
+                                        // Handle end month selection
+                                      },
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                      ),
+                                      dropdownColor: Colors.white,
+                                      icon: Icon(Icons.arrow_drop_down,
+                                          color: Colors.grey),
+                                      style: TextStyle(color: Colors.black),
+                                      menuMaxHeight:
+                                          200, // Limits dropdown height
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: DropdownButtonFormField<String>(
+                                      isExpanded: true,
+                                      value: null,
+                                      hint: const Text('Year'),
+                                      items: List.generate(
+                                              50,
+                                              (index) =>
+                                                  (DateTime.now().year - index)
+                                                      .toString())
+                                          .map((year) => DropdownMenuItem(
+                                                value: year,
+                                                child: Text(year),
+                                              ))
+                                          .toList(),
+                                      onChanged: (value) {
+                                        // Handle end year selection
+                                      },
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15.0),
+                                          ),
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                      ),
+
+                                      dropdownColor: Colors.white,
+                                      icon: Icon(Icons.arrow_drop_down,
+                                          color: Colors.grey),
+                                      style: TextStyle(color: Colors.black),
+                                      menuMaxHeight:
+                                          200, // Limits dropdown height
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 10),
                     const Text(
@@ -159,6 +422,21 @@ class WorkInfoScreen extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            width: 130,
+            //height: 50,
+            child: CustomButton(
+              icon: const Icon(
+                Icons.add_circle_outline,
+                color: AppTheme.skyBlue,
+              ),
+              borderRadius: 15,
+              color: AppTheme.primaryColor,
+              text: "Add new",
+              textColor: AppTheme.skyBlue,
+              onPressed: () {},
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: CustomButton(
@@ -173,7 +451,7 @@ class WorkInfoScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EducationInfoScreen(),
+                      builder: (context) => const EducationInfoScreen(),
                     ),
                   );
                 }

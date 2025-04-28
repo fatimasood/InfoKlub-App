@@ -1,17 +1,56 @@
 import 'dart:io' show File;
 
+class WorkExperience {
+  final String company;
+  final String position;
+  final String duration;
+  final String? location;
+  final String? description;
+
+  WorkExperience({
+    required this.company,
+    required this.position,
+    required this.duration,
+    this.location,
+    this.description,
+  });
+}
+
+class Education {
+  final String institution;
+  final String degree;
+  final String year;
+  final String? fieldOfStudy;
+
+  Education({
+    required this.institution,
+    required this.degree,
+    required this.year,
+    this.fieldOfStudy,
+  });
+}
+
 class CVModel {
+  // Personal Info
   String? firstName;
   String? lastName;
   String? email;
   String? phone;
   String? address;
-  String? city;
-  String? zipCode;
   File? profileImage;
+
+  // Work Experience
   List<WorkExperience> workExperience = [];
+
+  // Education
   List<Education> education = [];
+
+  // Skills
   List<String> skills = [];
+
+  // Other Info
+  String? summary;
+  String? references;
 
   // Default constructor
   CVModel({
@@ -20,12 +59,12 @@ class CVModel {
     this.email,
     this.phone,
     this.address,
-    this.city,
-    this.zipCode,
     this.profileImage,
     List<WorkExperience>? workExperience,
     List<Education>? education,
     List<String>? skills,
+    this.summary,
+    this.references,
   })  : workExperience = workExperience ?? [],
         education = education ?? [],
         skills = skills ?? [];
@@ -39,45 +78,28 @@ class CVModel {
   CVModel copyWith({
     String? firstName,
     String? lastName,
-    // ... include all other fields
+    String? email,
+    String? phone,
+    String? address,
+    File? profileImage,
+    List<WorkExperience>? workExperience,
+    List<Education>? education,
+    List<String>? skills,
+    String? summary,
+    String? references,
   }) {
     return CVModel(
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
-      email: email ?? email,
-      phone: phone ?? phone,
-      address: address ?? address,
-      city: city ?? city,
-      zipCode: zipCode ?? zipCode,
-      profileImage: profileImage ?? profileImage,
-      workExperience: workExperience,
-      education: education,
-      skills: skills,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      address: address ?? this.address,
+      profileImage: profileImage ?? this.profileImage,
+      workExperience: workExperience ?? this.workExperience,
+      education: education ?? this.education,
+      skills: skills ?? this.skills,
+      summary: summary ?? this.summary,
+      references: references ?? this.references,
     );
   }
-}
-
-// Supporting models
-class WorkExperience {
-  final String company;
-  final String position;
-  final String duration;
-
-  WorkExperience({
-    required this.company,
-    required this.position,
-    required this.duration,
-  });
-}
-
-class Education {
-  final String institution;
-  final String degree;
-  final String year;
-
-  Education({
-    required this.institution,
-    required this.degree,
-    required this.year,
-  });
 }

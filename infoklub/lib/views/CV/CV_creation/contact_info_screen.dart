@@ -22,7 +22,10 @@ class ContactInfoScreen extends StatelessWidget {
             Icons.arrow_back_ios,
             color: AppTheme.primaryColor,
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            viewModel.previousStep();
+            Navigator.pop(context);
+          },
         ),
         title: const Text(
           'Create CV',

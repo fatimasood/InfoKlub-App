@@ -22,6 +22,7 @@ class CvCreationViewModel extends ChangeNotifier {
     }
   }
 
+  // Contact Info
   void updateContactInfo({
     String? firstName,
     String? lastName,
@@ -34,6 +35,36 @@ class CvCreationViewModel extends ChangeNotifier {
     _cvData.email = email ?? _cvData.email;
     _cvData.phone = phone ?? _cvData.phone;
     _cvData.address = address ?? _cvData.address;
+    notifyListeners();
+  }
+
+  // Work Experience
+  void addWorkExperience({
+    required String company,
+    required String position,
+    required String duration,
+    String? location,
+    String? description,
+  }) {
+    _cvData.workExperience.add(WorkExperience(
+      company: company,
+      position: position,
+      duration: duration,
+    ));
+    notifyListeners();
+  }
+
+  // Education
+  void addEducation({
+    required String institution,
+    required String degree,
+    required String year,
+  }) {
+    _cvData.education.add(Education(
+      institution: institution,
+      degree: degree,
+      year: year,
+    ));
     notifyListeners();
   }
 }

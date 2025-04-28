@@ -133,6 +133,7 @@ class AppTheme {
         color: AppTheme.blackColor,
         //size: 20,
       ),
+      focusColor: AppTheme.primaryColor,
     );
   }
 }
