@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
-import 'package:infoklub/views/CV/CV_creation/work_info_screen.dart';
+import 'package:infoklub/views/CV/CV_creation/education_info_screen.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 
 import 'package:provider/provider.dart';
 
-class ContactInfoScreen extends StatelessWidget {
+class WorkInfoScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
-  ContactInfoScreen({super.key});
+  WorkInfoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,91 +42,13 @@ class ContactInfoScreen extends StatelessWidget {
                   children: [
                     Center(
                       child: Text(
-                        'Contact Information',
+                        'Work Experience',
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Image container with rounded corners
-                    Row(
-                      children: [
-                        //image
-                        Container(
-                          height: 140,
-                          width: 120,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.grey[200],
-                          ),
-                          child: const Icon(Icons.camera_enhance_rounded,
-                              size: 40),
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "First Name",
-                                style: TextStyle(
-                                  color: AppTheme.blackColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(height: 3.0),
-                              TextFormField(
-                                cursorColor: AppTheme.blackColor,
-                                decoration: const InputDecoration(
-                                  hintText: 'Fatema',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(10.0),
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.grey),
-                                  ),
-                                ),
-                                onChanged: (value) => viewModel
-                                    .updateContactInfo(firstName: value),
-                              ),
-                              const SizedBox(height: 10),
-                              const Text(
-                                "Last Name",
-                                style: TextStyle(
-                                  color: AppTheme.blackColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(height: 3.0),
-                              TextFormField(
-                                cursorColor: AppTheme.blackColor,
-                                decoration: const InputDecoration(
-                                  hintText: 'Noor',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(10.0),
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.grey),
-                                  ),
-                                ),
-                                onChanged: (value) => viewModel
-                                    .updateContactInfo(lastName: value),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
                     const Text(
-                      "Email",
+                      "Employer",
                       style: TextStyle(
                         color: AppTheme.blackColor,
                         fontWeight: FontWeight.w500,
@@ -137,7 +59,59 @@ class ContactInfoScreen extends StatelessWidget {
                     TextFormField(
                       cursorColor: AppTheme.blackColor,
                       decoration: const InputDecoration(
-                        hintText: 'noor12@gmail.com',
+                        hintText: 'Company Name',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10.0),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                      ),
+                      onChanged: (value) =>
+                          viewModel.updateContactInfo(firstName: value),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Job Title",
+                      style: TextStyle(
+                        color: AppTheme.blackColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 3.0),
+                    TextFormField(
+                      cursorColor: AppTheme.blackColor,
+                      decoration: const InputDecoration(
+                        hintText: 'Sales Manager',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10.0),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                      ),
+                      onChanged: (value) =>
+                          viewModel.updateContactInfo(lastName: value),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Location",
+                      style: TextStyle(
+                        color: AppTheme.blackColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 3.0),
+                    TextFormField(
+                      cursorColor: AppTheme.blackColor,
+                      decoration: const InputDecoration(
+                        hintText: 'xyz city, Bangladesh',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(10.0),
@@ -153,7 +127,7 @@ class ContactInfoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      "Phone Number",
+                      "Description",
                       style: TextStyle(
                         color: AppTheme.blackColor,
                         fontWeight: FontWeight.w500,
@@ -162,9 +136,11 @@ class ContactInfoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 3.0),
                     TextFormField(
+                      maxLines: 5,
                       cursorColor: AppTheme.blackColor,
                       decoration: const InputDecoration(
-                        hintText: '+44 456 7890',
+                        hintText:
+                            'Describe your tasks, responsibilities related to this work experience',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
                             Radius.circular(10.0),
@@ -174,36 +150,9 @@ class ContactInfoScreen extends StatelessWidget {
                           borderSide: BorderSide(color: Colors.grey),
                         ),
                       ),
-                      keyboardType: TextInputType.phone,
+                      keyboardType: TextInputType.text,
                       onChanged: (value) =>
                           viewModel.updateContactInfo(phone: value),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Home Address",
-                      style: TextStyle(
-                        color: AppTheme.blackColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 3.0),
-                    TextFormField(
-                      cursorColor: AppTheme.blackColor,
-                      decoration: const InputDecoration(
-                        hintText: 'Street, City, Country',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10.0),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                      ),
-                      keyboardType: TextInputType.streetAddress,
-                      onChanged: (value) =>
-                          viewModel.updateContactInfo(address: value),
                     ),
                   ],
                 ),
@@ -220,17 +169,17 @@ class ContactInfoScreen extends StatelessWidget {
                   // Proceed to next step
                   viewModel.nextStep();
 
-                  // Navigate to work screen
+                  // Navigate to education screen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => WorkInfoScreen(),
+                      builder: (context) => EducationInfoScreen(),
                     ),
                   );
                 }
               },
             ),
-          )
+          ),
         ],
       ),
     );

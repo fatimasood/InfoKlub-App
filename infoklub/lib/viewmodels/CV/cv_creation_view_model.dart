@@ -27,11 +27,13 @@ class CvCreationViewModel extends ChangeNotifier {
     String? lastName,
     String? email,
     String? phone,
+    String? address,
   }) {
     _cvData.firstName = firstName ?? _cvData.firstName;
     _cvData.lastName = lastName ?? _cvData.lastName;
     _cvData.email = email ?? _cvData.email;
     _cvData.phone = phone ?? _cvData.phone;
+    _cvData.address = address ?? _cvData.address;
     notifyListeners();
   }
 }
