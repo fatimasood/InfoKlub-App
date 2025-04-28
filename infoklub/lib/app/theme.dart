@@ -9,6 +9,7 @@ class AppTheme {
   // Additional frequently used colors
   static const Color redAccent = Color(0xFFE50026);
   static const Color mintGreen = Color(0xFFA3E4D7);
+  static const Color lightsecondary = Color(0xFF98C1D9);
   static const Color skyBlue = Color(0xFFC6E7FF);
   static const Color lavender = Color(0xFFD9C6FB);
   static const Color purpleAccent = Color(0xFF6B3EB8);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';
 import 'package:infoklub/viewmodels/authentication/phone_viewmodel.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FinishprofileViewmodel()),
         ChangeNotifierProvider(create: (_) => HomeViewModel()),
         ChangeNotifierProvider(create: (_) => CvViewModel()),
+        ChangeNotifierProvider(create: (_) => CvCreationViewModel()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

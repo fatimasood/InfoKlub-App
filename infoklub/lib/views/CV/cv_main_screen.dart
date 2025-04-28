@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
-import 'package:infoklub/views/CV/cv_editor_screen.dart';
+import 'package:infoklub/views/CV/CV_creation/contact_info_screen.dart';
 import 'package:infoklub/views/CV/template_selection_screen.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +31,7 @@ class CVPage extends StatelessWidget {
               const SizedBox(height: 15),
               Image.asset(
                 "lib/assets/Images/cvwelcome.png",
-                height: 270,
+                height: 290,
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 20),
@@ -39,28 +39,31 @@ class CVPage extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 75, right: 75),
                 child: CustomButton(
                   text: "Import from LinkedIn",
-                  color: AppTheme.skyBlue,
+                  color: AppTheme.purpleAccent,
                   borderRadius: 9.86,
+                  height: 40.0,
                   onPressed: () => _importFromLinkedIn(context),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 5.0),
               Padding(
                 padding: const EdgeInsets.only(left: 75, right: 75),
                 child: CustomButton(
                   text: "Create a new CV",
                   borderRadius: 9.86,
+                  height: 40.0,
                   color: AppTheme.tealAccent,
                   onPressed: () => _createNewCV(context),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 5.0),
               Padding(
                 padding: const EdgeInsets.only(left: 75, right: 75),
                 child: CustomButton(
                   text: "View Templates",
                   color: AppTheme.coralAccent,
                   borderRadius: 9.86,
+                  height: 40.0,
                   onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -81,7 +84,11 @@ class CVPage extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(
+          color: AppTheme.primaryColor,
+        ),
+      ),
     );
 
     // 2. Call ViewModel method
@@ -90,7 +97,7 @@ class CVPage extends StatelessWidget {
       Navigator.pop(context); // Close loading dialog
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const CvEditorScreen()),
+        MaterialPageRoute(builder: (_) => ContactInfoScreen()),
       );
     }).catchError((error) {
       // 4. Show error if fails
@@ -106,7 +113,7 @@ class CVPage extends StatelessWidget {
     context.read<CvViewModel>().createNewCV();
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const CvEditorScreen()),
+      MaterialPageRoute(builder: (_) => ContactInfoScreen()),
     );
   }
 }
