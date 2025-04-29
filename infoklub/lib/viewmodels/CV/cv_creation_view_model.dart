@@ -67,4 +67,56 @@ class CvCreationViewModel extends ChangeNotifier {
     ));
     notifyListeners();
   }
+
+  // Activities
+  void addActivity({required String name, String description = ''}) {
+    _cvData.activities.add(Activity(name: name, description: description));
+    notifyListeners();
+  }
+
+  void removeActivity(Activity activity) {
+    _cvData.activities.remove(activity);
+    notifyListeners();
+  }
+
+  // Languages
+  void addLanguage({required String language, required String level}) {
+    _cvData.languages.add(Language(language: language, level: level));
+    notifyListeners();
+  }
+
+  void removeLanguage(Language language) {
+    _cvData.languages.remove(language);
+    notifyListeners();
+  }
+
+  // Skills
+  void addSkills(List<String> skills) {
+    _cvData.skills.addAll(skills);
+    notifyListeners();
+  }
+
+  void removeSkill(String skill) {
+    _cvData.skills.remove(skill);
+    notifyListeners();
+  }
+
+  // Certificates
+  void addCertificate({required String name, String url = ''}) {
+    _cvData.certificates.add(Certificate(name: name, url: url));
+    notifyListeners();
+  }
+
+  void removeCertificate(Certificate certificate) {
+    _cvData.certificates.remove(certificate);
+    notifyListeners();
+  }
+
+  // Summary
+  void updateSummary(String summary) {
+    _cvData.summary = summary;
+    notifyListeners();
+  }
+
+  void aActivity({required String name, required String description}) {}
 }

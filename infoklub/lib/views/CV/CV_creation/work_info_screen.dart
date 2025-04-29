@@ -97,7 +97,7 @@ class WorkInfoScreen extends StatelessWidget {
                                     child: DropdownButtonFormField<String>(
                                       isExpanded: true,
                                       value: null,
-                                      hint: const Text('Month'),
+                                      hint: const Text('Jan'),
                                       items: [
                                         'Jan',
                                         'Feb',
@@ -187,9 +187,10 @@ class WorkInfoScreen extends StatelessWidget {
                                             horizontal: 10, vertical: 5),
                                       ),
                                       dropdownColor: Colors.white,
-                                      icon: Icon(Icons.arrow_drop_down,
+                                      icon: const Icon(Icons.arrow_drop_down,
                                           color: Colors.grey),
-                                      style: TextStyle(color: Colors.black),
+                                      style:
+                                          const TextStyle(color: Colors.black),
                                       menuMaxHeight:
                                           200, // Limits dropdown height
                                     ),
@@ -219,7 +220,7 @@ class WorkInfoScreen extends StatelessWidget {
                                     child: DropdownButtonFormField<String>(
                                       isExpanded: true,
                                       value: null,
-                                      hint: const Text('Month'),
+                                      hint: const Text('Jan'),
                                       items: [
                                         'Jan',
                                         'Feb',
@@ -268,9 +269,10 @@ class WorkInfoScreen extends StatelessWidget {
                                             horizontal: 10, vertical: 5),
                                       ),
                                       dropdownColor: Colors.white,
-                                      icon: Icon(Icons.arrow_drop_down,
+                                      icon: const Icon(Icons.arrow_drop_down,
                                           color: Colors.grey),
-                                      style: TextStyle(color: Colors.black),
+                                      style:
+                                          const TextStyle(color: Colors.black),
                                       menuMaxHeight:
                                           200, // Limits dropdown height
                                     ),
@@ -321,9 +323,10 @@ class WorkInfoScreen extends StatelessWidget {
                                       ),
 
                                       dropdownColor: Colors.white,
-                                      icon: Icon(Icons.arrow_drop_down,
+                                      icon: const Icon(Icons.arrow_drop_down,
                                           color: Colors.grey),
-                                      style: TextStyle(color: Colors.black),
+                                      style:
+                                          const TextStyle(color: Colors.black),
                                       menuMaxHeight:
                                           200, // Limits dropdown height
                                     ),
@@ -451,7 +454,7 @@ class WorkInfoScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const EducationInfoScreen(),
+                      builder: (context) => EducationInfoScreen(),
                     ),
                   );
                 }

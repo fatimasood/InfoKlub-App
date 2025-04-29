@@ -1,5 +1,27 @@
 import 'dart:io' show File;
 
+// Define these classes outside of CVModel
+class Activity {
+  final String name;
+  final String description;
+
+  Activity({required this.name, required this.description});
+}
+
+class Language {
+  final String language;
+  final String level;
+
+  Language({required this.language, required this.level});
+}
+
+class Certificate {
+  final String name;
+  final String url;
+
+  Certificate({required this.name, required this.url});
+}
+
 class WorkExperience {
   final String company;
   final String position;
@@ -52,6 +74,15 @@ class CVModel {
   String? summary;
   String? references;
 
+  // Activities
+  List<Activity> activities = [];
+
+  // Languages
+  List<Language> languages = [];
+
+  // Certificates
+  List<Certificate> certificates = [];
+
   // Default constructor
   CVModel({
     this.firstName,
@@ -65,9 +96,15 @@ class CVModel {
     List<String>? skills,
     this.summary,
     this.references,
+    List<Activity>? activities,
+    List<Language>? languages,
+    List<Certificate>? certificates,
   })  : workExperience = workExperience ?? [],
         education = education ?? [],
-        skills = skills ?? [];
+        skills = skills ?? [],
+        activities = activities ?? [],
+        languages = languages ?? [],
+        certificates = certificates ?? [];
 
   // Factory constructor for empty CV
   factory CVModel.empty() {
@@ -87,6 +124,9 @@ class CVModel {
     List<String>? skills,
     String? summary,
     String? references,
+    List<Activity>? activities,
+    List<Language>? languages,
+    List<Certificate>? certificates,
   }) {
     return CVModel(
       firstName: firstName ?? this.firstName,
@@ -100,6 +140,9 @@ class CVModel {
       skills: skills ?? this.skills,
       summary: summary ?? this.summary,
       references: references ?? this.references,
+      activities: activities ?? this.activities,
+      languages: languages ?? this.languages,
+      certificates: certificates ?? this.certificates,
     );
   }
 }
