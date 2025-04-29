@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
+import 'package:infoklub/views/CV/CV_creation/cv_widgets/cv_other_details.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
@@ -77,20 +78,15 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                     Center(
                       child: Text(
                         'Other Details',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: AppTheme.primaryColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
                     const SizedBox(height: 20),
 
                     // Extracurricular Activities
-                    _buildSectionButton(
-                      context,
-                      icon: Icons.sports_soccer,
+                    AddDetailsbtn(
                       text: "Extracurricular Activities",
+                      icon: const Icon(Icons.arrow_forward_ios),
                       isExpanded: showActivities,
                       onPressed: () {
                         setState(() {
@@ -98,71 +94,65 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                         });
                       },
                     ),
-                    _buildExpandableSection(
-                      visible: showActivities,
-                      child: Column(
-                        children: [
-                          _buildTextField(
-                            controller: _activityNameController,
-                            label: "Activity Name",
-                            hint: "e.g., Football Team Captain",
-                          ),
-                          const SizedBox(height: 10),
-                          _buildTextField(
-                            controller: _activityDescController,
-                            label: "Description",
-                            hint:
-                                "Brief description of your role and achievements",
-                            maxLines: 3,
-                          ),
-                          const SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppTheme.secondaryColor,
-                                backgroundColor:
-                                    AppTheme.secondaryColor.withOpacity(0.1),
-                              ),
-                              onPressed: () {
-                                if (_activityNameController.text.isNotEmpty) {
-                                  viewModel.addActivity(
-                                    name: _activityNameController.text,
-                                    description: _activityDescController.text,
-                                  );
-                                  _activityNameController.clear();
-                                  _activityDescController.clear();
-                                  setState(() {});
-                                }
-                              },
-                              child: const Text('Add Activity'),
-                            ),
-                          ),
-                          _buildAddedItemsList(
-                            items: viewModel.cvData.activities,
-                            itemBuilder: (activity) => ListTile(
-                              title: Text(activity.name),
-                              subtitle: activity.description.isNotEmpty
-                                  ? Text(activity.description)
-                                  : null,
-                              trailing: IconButton(
-                                icon:
-                                    const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  viewModel.removeActivity(activity);
-                                  setState(() {});
-                                },
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: _buildExpandableSection(
+                        visible: showActivities,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  _buildTextField(
+                                    controller: _activityNameController,
+                                    label: "Activity Name",
+                                    hint: "e.g., Football Team Captain",
+                                  ),
+                                  Icon(
+                                    Icons.add_circle_outline_rounded,
+                                    color: AppTheme.primaryColor,
+                                    size: 20,
+                                  )
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 10),
+                            _buildTextField(
+                              controller: _activityDescController,
+                              label: "Description",
+                              hint:
+                                  "Brief description of your role and achievements",
+                              maxLines: 3,
+                            ),
+                            _buildAddedItemsList(
+                              items: viewModel.cvData.activities,
+                              itemBuilder: (activity) => ListTile(
+                                title: Text(activity.name),
+                                subtitle: activity.description.isNotEmpty
+                                    ? Text(activity.description)
+                                    : null,
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.red),
+                                  onPressed: () {
+                                    viewModel.removeActivity(activity);
+                                    setState(() {});
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-
+                    const SizedBox(
+                      height: 5.0,
+                    ),
                     // Languages
-                    _buildSectionButton(
-                      context,
-                      icon: Icons.language,
+                    AddDetailsbtn(
+                      icon: const Icon(Icons.arrow_forward_ios),
                       text: "Languages",
                       isExpanded: showLanguages,
                       onPressed: () {
@@ -250,12 +240,13 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                         ],
                       ),
                     ),
-
+                    const SizedBox(
+                      height: 5.0,
+                    ),
                     // Skills
-                    _buildSectionButton(
-                      context,
-                      icon: Icons.star,
+                    AddDetailsbtn(
                       text: "Skills",
+                      icon: const Icon(Icons.arrow_forward_ios),
                       isExpanded: showSkills,
                       onPressed: () {
                         setState(() {
@@ -325,11 +316,12 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                         ],
                       ),
                     ),
-
+                    const SizedBox(
+                      height: 5.0,
+                    ),
                     // Certificates
-                    _buildSectionButton(
-                      context,
-                      icon: Icons.card_membership,
+                    AddDetailsbtn(
+                      icon: const Icon(Icons.arrow_forward_ios),
                       text: "Certificates",
                       isExpanded: showCertificates,
                       onPressed: () {
@@ -420,8 +412,6 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                         focusedBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: AppTheme.primaryColor),
                         ),
-                        filled: true,
-                        fillColor: Colors.grey[100],
                       ),
                       onChanged: (value) => viewModel.updateSummary(value),
                     ),
@@ -449,45 +439,6 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSectionButton(
-    BuildContext context, {
-    required IconData icon,
-    required String text,
-    required bool isExpanded,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color:
-            isExpanded ? AppTheme.primaryColor.withOpacity(0.1) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isExpanded ? AppTheme.primaryColor : Colors.grey[300]!,
-          width: 1.5,
-        ),
-      ),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: isExpanded ? AppTheme.primaryColor : Colors.grey[700],
-        ),
-        title: Text(
-          text,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: isExpanded ? AppTheme.primaryColor : Colors.grey[700],
-          ),
-        ),
-        trailing: Icon(
-          isExpanded ? Icons.expand_less : Icons.expand_more,
-          color: isExpanded ? AppTheme.primaryColor : Colors.grey,
-        ),
-        onTap: onPressed,
       ),
     );
   }
@@ -554,11 +505,9 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
           cursorColor: AppTheme.primaryColor,
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: const TextStyle(color: Colors.black),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.primaryColor),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -606,17 +555,6 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
       builder: (context, viewModel, _) {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 3,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
           child: Column(
             children: [
               // Progress line with circles
@@ -628,36 +566,22 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                     Positioned(
                       left: 0,
                       right: 0,
-                      top: 15,
+                      top: 10,
                       child: Container(
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                        height: 2,
+                        color: Colors.grey[300],
                       ),
                     ),
                     // Progress line (colored part)
                     Positioned(
                       left: 0,
-                      top: 15,
+                      top: 10,
                       child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
+                        duration: const Duration(milliseconds: 300),
                         width: (MediaQuery.of(context).size.width - 40) *
                             (viewModel.currentStep / (steps.length - 1)),
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryColor,
-                          borderRadius: BorderRadius.circular(2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primaryColor.withOpacity(0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
+                        height: 2,
+                        color: Theme.of(context).primaryColor,
                       ),
                     ),
                     // Circles and labels
@@ -665,41 +589,20 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: steps.asMap().entries.map((entry) {
                         final index = entry.key;
-                        final isActive = index <= viewModel.currentStep;
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              width: 30,
-                              height: 30,
+                              width: 20,
+                              height: 20,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: isActive
-                                    ? AppTheme.primaryColor
+                                color: index <= viewModel.currentStep
+                                    ? Theme.of(context).primaryColor
                                     : Colors.grey[300],
                                 border: Border.all(
                                   color: Colors.white,
-                                  width: 3,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.3),
-                                    spreadRadius: 1,
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${index + 1}',
-                                  style: TextStyle(
-                                    color: isActive
-                                        ? Colors.white
-                                        : Colors.grey[700],
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
+                                  width: 2,
                                 ),
                               ),
                             ),
@@ -708,9 +611,8 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                               entry.value,
                               style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: isActive
-                                    ? AppTheme.primaryColor
+                                color: index <= viewModel.currentStep
+                                    ? Theme.of(context).primaryColor
                                     : Colors.grey,
                               ),
                             ),

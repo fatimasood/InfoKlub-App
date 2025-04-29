@@ -8,6 +8,7 @@ class AddDetailsbtn extends StatelessWidget {
   final Color textColor;
   final double borderRadius;
   final double height;
+  final bool? isExpanded;
   final double width;
   final Color? borderColor;
   final Widget? icon;
@@ -22,6 +23,7 @@ class AddDetailsbtn extends StatelessWidget {
     this.height = 45.0,
     this.width = double.infinity,
     this.borderColor,
+    this.isExpanded,
     this.icon,
   });
 
