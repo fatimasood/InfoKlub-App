@@ -16,6 +16,9 @@ dependencies:
   country_picker: ^2.0.27
   country_pickers: ^3.0.1
   image_picker: ^1.1.2
+  path_provider: ^2.1.5
+  pdf: ^3.11.3
+  open_file: ^3.5.10
   
 
 dev_dependencies:

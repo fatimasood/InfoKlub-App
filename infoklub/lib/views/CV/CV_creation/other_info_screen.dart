@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/views/CV/CV_creation/cv_widgets/cv_other_details.dart';
+import 'package:infoklub/views/CV/CV_download/cv_download.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
@@ -94,57 +95,65 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                         });
                       },
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: _buildExpandableSection(
-                        visible: showActivities,
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  _buildTextField(
-                                    controller: _activityNameController,
-                                    label: "Activity Name",
-                                    hint: "e.g., Football Team Captain",
-                                  ),
-                                  Icon(
-                                    Icons.add_circle_outline_rounded,
-                                    color: AppTheme.primaryColor,
-                                    size: 20,
-                                  )
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            _buildTextField(
-                              controller: _activityDescController,
-                              label: "Description",
-                              hint:
-                                  "Brief description of your role and achievements",
-                              maxLines: 3,
-                            ),
-                            _buildAddedItemsList(
-                              items: viewModel.cvData.activities,
-                              itemBuilder: (activity) => ListTile(
-                                title: Text(activity.name),
-                                subtitle: activity.description.isNotEmpty
-                                    ? Text(activity.description)
-                                    : null,
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.red),
-                                  onPressed: () {
-                                    viewModel.removeActivity(activity);
+                    _buildExpandableSection(
+                      visible: showActivities,
+                      child: Column(
+                        children: [
+                          _buildTextField(
+                            controller: _activityNameController,
+                            label: "Activity Name",
+                            hint: "e.g., Football Team Captain",
+                          ),
+                          const SizedBox(height: 10),
+                          _buildTextField(
+                            controller: _activityDescController,
+                            label: "Description",
+                            hint:
+                                "Brief description of your role and achievements",
+                            maxLines: 3,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5.0),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: CustomButton(
+                                text: "Add Activity",
+                                height: 45,
+                                borderRadius: 15,
+                                color: AppTheme.primaryColor,
+                                textColor: AppTheme.skyBlue,
+                                onPressed: () {
+                                  if (_activityNameController.text.isNotEmpty) {
+                                    viewModel.addActivity(
+                                      name: _activityNameController.text,
+                                      description: _activityDescController.text,
+                                    );
+                                    _activityNameController.clear();
+                                    _activityDescController.clear();
                                     setState(() {});
-                                  },
-                                ),
+                                  }
+                                },
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                          _buildAddedItemsList(
+                            items: viewModel.cvData.activities,
+                            itemBuilder: (activity) => ListTile(
+                              title: Text(activity.name),
+                              subtitle: activity.description.isNotEmpty
+                                  ? Text(activity.description)
+                                  : null,
+                              trailing: IconButton(
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  viewModel.removeActivity(activity);
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(
@@ -200,15 +209,15 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                               });
                             },
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 5.0),
                           Align(
                             alignment: Alignment.centerRight,
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppTheme.secondaryColor,
-                                backgroundColor:
-                                    AppTheme.secondaryColor.withOpacity(0.1),
-                              ),
+                            child: CustomButton(
+                              text: "Add Language",
+                              height: 45,
+                              borderRadius: 15,
+                              color: AppTheme.primaryColor,
+                              textColor: AppTheme.skyBlue,
                               onPressed: () {
                                 if (_languageController.text.isNotEmpty) {
                                   viewModel.addLanguage(
@@ -219,7 +228,6 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                                   setState(() {});
                                 }
                               },
-                              child: const Text('Add Language'),
                             ),
                           ),
                           _buildAddedItemsList(
@@ -275,12 +283,12 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                           const SizedBox(height: 10),
                           Align(
                             alignment: Alignment.centerRight,
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppTheme.secondaryColor,
-                                backgroundColor:
-                                    AppTheme.secondaryColor.withOpacity(0.1),
-                              ),
+                            child: CustomButton(
+                              text: "Add Skill",
+                              height: 45,
+                              borderRadius: 15,
+                              color: AppTheme.primaryColor,
+                              textColor: AppTheme.skyBlue,
                               onPressed: () {
                                 if (_skillsController.text.isNotEmpty) {
                                   final skills = _skillsController.text
@@ -296,7 +304,6 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                                   }
                                 }
                               },
-                              child: const Text('Add Skills'),
                             ),
                           ),
                           _buildAddedItemsList(
@@ -348,12 +355,12 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                           const SizedBox(height: 10),
                           Align(
                             alignment: Alignment.centerRight,
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppTheme.secondaryColor,
-                                backgroundColor:
-                                    AppTheme.secondaryColor.withOpacity(0.1),
-                              ),
+                            child: CustomButton(
+                              text: "Add Certificate",
+                              height: 45,
+                              borderRadius: 15,
+                              color: AppTheme.primaryColor,
+                              textColor: AppTheme.skyBlue,
                               onPressed: () {
                                 if (_certificateNameController
                                     .text.isNotEmpty) {
@@ -366,7 +373,6 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                                   setState(() {});
                                 }
                               },
-                              child: const Text('Add Certificate'),
                             ),
                           ),
                           _buildAddedItemsList(
@@ -403,6 +409,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                       controller: _summaryController,
                       maxLines: 8,
                       cursorColor: AppTheme.primaryColor,
+                      style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         hintText:
                             'Having recently graduated with an MSc in International Business Management, with expertise in client communication, managing inquiries, and administrative duties, I am seeking a role as a Paralegal at HFIS Limited. I have the right to work in the UK.',
@@ -431,7 +438,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const OtherInfoScreen(),
+                      builder: (context) => const CvDownload(),
                     ),
                   );
                 }
@@ -500,14 +507,17 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
         ),
         const SizedBox(height: 6),
         TextFormField(
+          style: const TextStyle(color: Colors.black),
           controller: controller,
           maxLines: maxLines,
-          cursorColor: AppTheme.primaryColor,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.black),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: AppTheme.primaryColor),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
