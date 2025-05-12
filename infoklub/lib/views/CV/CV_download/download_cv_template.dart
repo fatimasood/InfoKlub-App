@@ -289,7 +289,7 @@ class _PdfDownloadScreenState extends State<PdfDownloadScreen> {
             children: [
               const Icon(Icons.picture_as_pdf, size: 100, color: Colors.red),
               const SizedBox(height: 20),
-              Text('Generate and Download Resume PDF',
+              const Text('Generate and Download Resume PDF',
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
