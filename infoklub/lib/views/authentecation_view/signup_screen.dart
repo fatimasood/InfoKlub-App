@@ -1,6 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:infoklub/main.dart';
+import 'package:infoklub/utils/utils.dart';
+import 'package:infoklub/views/create_profile/profile_setup.dart';
 //import 'package:country_pickers/country.dart';
 import '../../app/routes.dart';
 import '../../app/theme.dart';
@@ -9,8 +14,6 @@ import '../../widgets/custom_divider.dart';
 import '../../widgets/custom_textfield.dart';
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
-
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
@@ -20,6 +23,47 @@ class _SignupScreenState extends State<SignupScreen> {
   bool isChecked = false;
   String _selectedFlag = '🇧🇩';
   String _selectedCode = '880';
+
+  bool loading = false;
+  final _formKey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final phoneNumberController = TextEditingController();
+  final dateBirthController = TextEditingController();
+
+  final _auth = FirebaseAuth.instance; //initialize firebase
+
+  @override
+  void dispose() {
+    super.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
+    phoneNumberController.dispose();
+    dateBirthController.dispose();
+  }
+
+  void signUp() {
+    _auth
+        .createUserWithEmailAndPassword(
+            email: emailController.text.toString(),
+            password: passwordController.text.toString())
+        .then((value) {
+      Utils().toastMessage(value.user!.email.toString());
+      userMail = emailController.text;
+      if (kDebugMode) {
+        print(userMail);
+      }
+      Navigator.pushNamed(context, AppRoutes.profile);
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      Utils().toastMessage(error.toString());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -117,162 +161,219 @@ class _SignupScreenState extends State<SignupScreen> {
                   right: screenWidth * 0.05,
                 ),
                 child: Center(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomTextField(
-                            hintText: "First Name",
-                            width: screenWidth * 0.33,
-                            backgroundColor: AppTheme.whiteColor,
-                            textColor: AppTheme.blackColor,
-                            hintTextColor: AppTheme.greyColor,
-                          ),
-                          CustomTextField(
-                            hintText: "Last Name",
-                            width: screenWidth * 0.33,
-                            backgroundColor: AppTheme.whiteColor,
-                            textColor: AppTheme.blackColor,
-                            hintTextColor: AppTheme.greyColor,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      const CustomTextField(
-                        hintText: "Email",
-                        backgroundColor: AppTheme.whiteColor,
-                        textColor: AppTheme.blackColor,
-                        hintTextColor: AppTheme.greyColor,
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      CustomTextField(
-                        hintText: "$_selectedCode 726-0592",
-                        backgroundColor: Colors.white,
-                        textColor: Colors.black,
-                        hintTextColor: Colors.grey,
-                        leftWidget: GestureDetector(
-                          onTap: () {
-                            showCountryPicker(
-                              context: context,
-                              showPhoneCode: true,
-                              onSelect: (Country country) {
-                                if (kDebugMode) {
-                                  print(
-                                      'Selected country: ${country.displayName}');
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomTextField(
+                              hintText: "First Name",
+                              width: screenWidth * 0.33,
+                              backgroundColor: AppTheme.whiteColor,
+                              textColor: AppTheme.blackColor,
+                              hintTextColor: AppTheme.greyColor,
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  Fluttertoast.showToast(msg: 'Enter Name');
                                 }
-                                setState(() {
-                                  _selectedFlag = country.flagEmoji;
-                                  _selectedCode =
-                                      '+${country.phoneCode}'; // Set the country code
-                                });
+                                return null;
                               },
-                            );
+                            ),
+                            CustomTextField(
+                              hintText: "Last Name",
+                              width: screenWidth * 0.33,
+                              backgroundColor: AppTheme.whiteColor,
+                              textColor: AppTheme.blackColor,
+                              hintTextColor: AppTheme.greyColor,
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  Fluttertoast.showToast(
+                                      msg: 'Enter Full Name');
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: screenHeight * 0.01),
+                        CustomTextField(
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              Fluttertoast.showToast(
+                                  msg: 'Enter email address');
+                            }
+                            if (!value.endsWith('@gmail.com')) {
+                              Fluttertoast.showToast(
+                                  msg: 'Enter proper gmail address');
+                            }
+                            return null;
                           },
-                          child: Text(
-                            _selectedFlag, // Display emoji directly
-                            style: const TextStyle(fontSize: 24), // Adjust size
-                          ),
+                          hintText: "Email",
+                          backgroundColor: AppTheme.whiteColor,
+                          textColor: AppTheme.blackColor,
+                          hintTextColor: AppTheme.greyColor,
                         ),
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      CustomTextField(
-                        hintText: "Date of Birth",
-                        backgroundColor: AppTheme.whiteColor,
-                        textColor: AppTheme.blackColor,
-                        hintTextColor: AppTheme.greyColor,
-                        leftWidget: Icon(
-                          Icons.calendar_month,
-                          color: AppTheme.greyColor,
-                          size: screenHeight * 0.02,
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      CustomTextField(
-                        hintText: "***********",
-                        backgroundColor: AppTheme.whiteColor,
-                        textColor: AppTheme.blackColor,
-                        hintTextColor: AppTheme.greyColor,
-                        obscureText: _isPasswordHidden,
-                        rightWidget: IconButton(
-                          icon: Icon(
-                            _isPasswordHidden
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          color: AppTheme.greyColor,
-                          iconSize: screenHeight * 0.02,
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordHidden = !_isPasswordHidden;
-                            });
+                        SizedBox(height: screenHeight * 0.01),
+                        CustomTextField(
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              Fluttertoast.showToast(msg: 'Enter phone number');
+                            }
+
+                            return null;
                           },
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.02),
-                      CustomButton(
-                        text: "Sign Up",
-                        onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.profile);
-                        },
-                        color: AppTheme.secondaryColor,
-                        textColor: AppTheme.whiteColor,
-                        borderRadius: 10.0,
-                        height: screenHeight * 0.055,
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: CustomDivider(
-                              thickness: 1,
-                              height: 1.0,
-                              indent: 0,
-                              endIndent: 0,
-                              color: Colors.white,
+                          hintText: "$_selectedCode 726-0592",
+                          backgroundColor: Colors.white,
+                          textColor: Colors.black,
+                          hintTextColor: Colors.grey,
+                          leftWidget: GestureDetector(
+                            onTap: () {
+                              showCountryPicker(
+                                context: context,
+                                showPhoneCode: true,
+                                onSelect: (Country country) {
+                                  if (kDebugMode) {
+                                    print(
+                                        'Selected country: ${country.displayName}');
+                                  }
+                                  setState(() {
+                                    _selectedFlag = country.flagEmoji;
+                                    _selectedCode =
+                                        '+${country.phoneCode}'; // Set the country code
+                                  });
+                                },
+                              );
+                            },
+                            child: Text(
+                              _selectedFlag, // Display emoji directly
+                              style:
+                                  const TextStyle(fontSize: 24), // Adjust size
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.01),
-                            child: const Text(
-                              "Or login with",
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                color: AppTheme.whiteColor,
-                                fontSize: 14.0,
-                                fontStyle: FontStyle.normal,
-                                fontWeight: FontWeight.w400,
+                        ),
+                        SizedBox(height: screenHeight * 0.01),
+                        CustomTextField(
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              Fluttertoast.showToast(
+                                  msg: 'Enter your Date of Birth');
+                            }
+                            return null;
+                          },
+                          hintText: "Date of Birth",
+                          backgroundColor: AppTheme.whiteColor,
+                          textColor: AppTheme.blackColor,
+                          hintTextColor: AppTheme.greyColor,
+                          leftWidget: Icon(
+                            Icons.calendar_month,
+                            color: AppTheme.greyColor,
+                            size: screenHeight * 0.02,
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.01),
+                        CustomTextField(
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              Fluttertoast.showToast(
+                                  msg: 'Kindly set any password');
+                            }
+                            if (value.length < 6) {
+                              Fluttertoast.showToast(
+                                msg:
+                                    'Password should be at least 6 characters long',
+                              );
+                            }
+                            return null;
+                          },
+                          hintText: "***********",
+                          backgroundColor: AppTheme.whiteColor,
+                          textColor: AppTheme.blackColor,
+                          hintTextColor: AppTheme.greyColor,
+                          obscureText: _isPasswordHidden,
+                          rightWidget: IconButton(
+                            icon: Icon(
+                              _isPasswordHidden
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            color: AppTheme.greyColor,
+                            iconSize: screenHeight * 0.02,
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordHidden = !_isPasswordHidden;
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        CustomButton(
+                          text: "Sign Up",
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              signUp();
+                            }
+                          },
+                          color: AppTheme.secondaryColor,
+                          textColor: AppTheme.whiteColor,
+                          borderRadius: 10.0,
+                          height: screenHeight * 0.055,
+                        ),
+                        SizedBox(height: screenHeight * 0.01),
+                        Row(
+                          children: [
+                            const Expanded(
+                              child: CustomDivider(
+                                thickness: 1,
+                                height: 1.0,
+                                indent: 0,
+                                endIndent: 0,
+                                color: Colors.white,
                               ),
                             ),
-                          ),
-                          const Expanded(
-                            child: CustomDivider(
-                              thickness: 1,
-                              height: 1.0,
-                              indent: 0,
-                              endIndent: 0,
-                              color: Colors.white,
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.01),
+                              child: const Text(
+                                "Or login with",
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  color: AppTheme.whiteColor,
+                                  fontSize: 14.0,
+                                  fontStyle: FontStyle.normal,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: screenHeight * 0.01),
-                      CustomButton(
-                        icon: const Icon(
-                          Icons.phone,
-                          color: AppTheme.blackColor,
+                            const Expanded(
+                              child: CustomDivider(
+                                thickness: 1,
+                                height: 1.0,
+                                indent: 0,
+                                endIndent: 0,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
-                        text: 'Sign up with Phone',
-                        onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.phone);
-                        },
-                        color: AppTheme.whiteColor,
-                        textColor: AppTheme.blackColor,
-                        borderRadius: 10.0,
-                        height: screenHeight * 0.055,
-                      ),
-                    ],
+                        SizedBox(height: screenHeight * 0.01),
+                        CustomButton(
+                          icon: const Icon(
+                            Icons.phone,
+                            color: AppTheme.blackColor,
+                          ),
+                          text: 'Sign up with Phone',
+                          onPressed: () {
+                            Navigator.pushNamed(context, AppRoutes.phone);
+                          },
+                          color: AppTheme.whiteColor,
+                          textColor: AppTheme.blackColor,
+                          borderRadius: 10.0,
+                          height: screenHeight * 0.055,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

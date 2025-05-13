@@ -135,6 +135,17 @@ class CustomTextField extends StatelessWidget {
             ],
           ),
         ),
+        if (errorText != null && errorText!.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0, top: 4.0),
+            child: Text(
+              errorText!,
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 12,
+              ),
+            ),
+          ),
       ],
     );
   }

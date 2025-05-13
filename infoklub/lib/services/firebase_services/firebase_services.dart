@@ -13,13 +13,13 @@ class SplashServices {
     if (user != null) {
       Timer(
           const Duration(seconds: 3),
-          () => Navigator.push(
-              context, MaterialPageRoute(builder: (context) => OnboardOne())));
+          () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const OnboardOne())));
     } else {
       Timer(
           const Duration(seconds: 3),
-          () => Navigator.push(
-              context, MaterialPageRoute(builder: (context) => LoginScreen())));
+          () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const LoginScreen())));
     }
   }
 }
