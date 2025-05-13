@@ -20,6 +20,11 @@ dependencies:
   pdf: ^3.11.3
   open_file: ^3.5.10
   firebase_core: 
+  firebase_storage: 
+  firebase_auth:
+  cloud_firestore: 
+  flutter_toastr: 
+  fluttertoast: ^8.2.12
   
 
 dev_dependencies:

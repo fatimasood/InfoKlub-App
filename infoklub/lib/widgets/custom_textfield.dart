@@ -16,6 +16,10 @@ class CustomTextField extends StatelessWidget {
   final Color? hintTextColor;
   final List<Map<String, String>>? countryDropdownData;
   final Function(String)? onCountrySelected;
+  final String? errorText;
+  final FormFieldValidator<String>? validator;
+  final ValueChanged<String>? onChanged;
+  final bool autovalidate;
 
   const CustomTextField({
     super.key,
@@ -34,87 +38,104 @@ class CustomTextField extends StatelessWidget {
     this.countryDropdownData,
     this.onCountrySelected,
     this.textAlign = TextAlign.start,
+    this.errorText,
+    this.validator,
+    this.onChanged,
+    this.autovalidate = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      width: width,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 5.0,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-      child: Row(
-        children: [
-          // Left Widget (Optional, could be Icon or Dropdown)
-          if (leftWidget != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: leftWidget!,
-            ),
-
-          // Country Dropdown (Optional)
-          if (countryDropdownData != null && leftWidget == null) ...[
-            DropdownButton<String>(
-              value: countryDropdownData?.first['code'], // Default value
-              icon: const Icon(Icons.arrow_drop_down),
-              underline: const SizedBox(), // Removes underline
-              onChanged: (value) {
-                if (onCountrySelected != null) {
-                  onCountrySelected!(value!);
-                }
-              },
-              items: countryDropdownData?.map((country) {
-                return DropdownMenuItem<String>(
-                  value: country['code'],
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        country['flag']!,
-                        width: 24,
-                        height: 24,
-                      ),
-                      const SizedBox(width: 8.0),
-                      Text(
-                        country['name']!,
-                        style: TextStyle(color: textColor),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-
-          // Input Field
-          Expanded(
-            child: TextField(
-              controller: controller,
-              keyboardType: keyboardType,
-              obscureText: obscureText,
-              style: TextStyle(color: textColor),
-              textAlign: textAlign!,
-              decoration: InputDecoration(
-                hintText: hintText,
-                hintStyle: TextStyle(color: hintTextColor),
-                border: InputBorder.none,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          height: height,
+          width: width,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(10.0),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 5.0,
+                offset: Offset(0, 2),
               ),
-            ),
+            ],
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: Row(
+            children: [
+              // Left Widget (Optional, could be Icon or Dropdown)
+              if (leftWidget != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: leftWidget!,
+                ),
 
-          // Right Widget (Optional)
-          if (rightWidget != null) rightWidget!,
-        ],
-      ),
+              // Country Dropdown (Optional)
+              if (countryDropdownData != null && leftWidget == null) ...[
+                DropdownButton<String>(
+                  value: countryDropdownData?.first['code'], // Default value
+                  icon: const Icon(Icons.arrow_drop_down),
+                  underline: const SizedBox(), // Removes underline
+                  onChanged: (value) {
+                    if (onCountrySelected != null) {
+                      onCountrySelected!(value!);
+                    }
+                  },
+                  items: countryDropdownData?.map((country) {
+                    return DropdownMenuItem<String>(
+                      value: country['code'],
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            country['flag']!,
+                            width: 24,
+                            height: 24,
+                          ),
+                          const SizedBox(width: 8.0),
+                          Text(
+                            country['name']!,
+                            style: TextStyle(color: textColor),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+
+              // Input Field
+              Expanded(
+                child: TextFormField(
+                  controller: controller,
+                  keyboardType: keyboardType,
+                  obscureText: obscureText,
+                  style: TextStyle(color: textColor),
+                  textAlign: textAlign!,
+                  autovalidateMode: autovalidate
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled,
+                  validator: validator,
+                  onChanged: onChanged,
+                  decoration: InputDecoration(
+                    hintText: hintText,
+                    hintStyle: TextStyle(color: hintTextColor),
+                    border: InputBorder.none,
+                    errorStyle: const TextStyle(height: 0),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+
+              // Right Widget (Optional)
+              if (rightWidget != null) rightWidget!,
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
