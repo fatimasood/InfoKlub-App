@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:infoklub/main.dart';
+import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';
+import 'package:infoklub/views/Goals/all_goals.dart';
+import 'package:infoklub/views/create_profile/profile_setup.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import '../../app/theme.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_divider.dart';
 import '../../widgets/custom_textfield.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,19 +20,49 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _auth = FirebaseAuth.instance;
+
   bool _isPasswordHidden = true; // State to toggle password visibility
   bool isChecked = false;
 
   bool loading = false;
 
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+  }
+
+  void login() {
+    _auth
+        .signInWithEmailAndPassword(
+            email: emailController.text.toString(),
+            password: passwordController.text.toString())
+        .then((value) {
+      Utils().toastMessage(value.user!.email.toString());
+      userMail = emailController.text;
+
+      print('login user mail: $userMail');
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+        ),
+      );
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      Utils().toastMessage(error.toString());
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -165,21 +200,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Column(
                           children: [
                             CustomTextField(
-                              controller: _emailController,
+                              controller: emailController,
                               hintText: "person@gmail.com",
                               backgroundColor: AppTheme.whiteColor,
                               textColor: AppTheme.blackColor,
                               hintTextColor: AppTheme.greyColor,
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return 'Enter email';
+                                  Utils().toastMessage('Enter right email');
                                 }
                                 return null;
                               },
                             ),
                             SizedBox(height: screenHeight * 0.02),
                             CustomTextField(
-                              controller: _passwordController,
+                              controller: passwordController,
                               hintText: "***********",
                               backgroundColor: AppTheme.whiteColor,
                               textColor: AppTheme.blackColor,
@@ -187,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               obscureText: _isPasswordHidden,
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return 'Enter password';
+                                  Utils().toastMessage('Enter right password');
                                 }
                                 return null;
                               },
@@ -251,7 +286,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: "Log In",
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            // login();
+                            login();
                           }
                         },
                         color: AppTheme.secondaryColor,

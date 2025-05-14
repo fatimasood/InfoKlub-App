@@ -178,6 +178,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CustomTextField(
+                              controller: firstNameController,
                               hintText: "First Name",
                               width: screenWidth * 0.33,
                               backgroundColor: AppTheme.whiteColor,
@@ -191,6 +192,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               },
                             ),
                             CustomTextField(
+                              controller: lastNameController,
                               hintText: "Last Name",
                               width: screenWidth * 0.33,
                               backgroundColor: AppTheme.whiteColor,
@@ -207,6 +209,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         SizedBox(height: screenHeight * 0.01),
                         CustomTextField(
+                          controller: emailController,
                           validator: (value) {
                             if (value!.isEmpty) {
                               Utils().toastMessage('Enter email address');
@@ -224,6 +227,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         SizedBox(height: screenHeight * 0.01),
                         CustomTextField(
+                          controller: phoneNumberController,
                           validator: (value) {
                             if (value!.isEmpty) {
                               Utils().toastMessage('Enter phone number');
@@ -262,6 +266,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         SizedBox(height: screenHeight * 0.01),
                         CustomTextField(
+                          controller: dateBirthController,
                           validator: (value) {
                             if (value!.isEmpty) {
                               Utils().toastMessage('Enter your Date of Birth');
@@ -280,6 +285,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         SizedBox(height: screenHeight * 0.01),
                         CustomTextField(
+                          controller: passwordController,
                           validator: (value) {
                             if (value!.isEmpty) {
                               Utils().toastMessage('Kindly set any password');
