@@ -56,7 +56,7 @@ class AppRoutes {
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case signup:
-        return MaterialPageRoute(builder: (_) => SignupScreen());
+        return MaterialPageRoute(builder: (_) => const SignupScreen());
       case phone:
         return MaterialPageRoute(builder: (_) => const PhoneNumberScreen());
       case otp:

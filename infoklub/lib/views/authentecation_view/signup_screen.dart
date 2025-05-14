@@ -1,8 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:infoklub/main.dart';
 import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/views/create_profile/profile_setup.dart';
@@ -12,13 +10,18 @@ import '../../app/theme.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_divider.dart';
 import '../../widgets/custom_textfield.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  final _auth = FirebaseAuth.instance; //initialize firebase
+
   bool _isPasswordHidden = true; // State to toggle password visibility
   bool isChecked = false;
   String _selectedFlag = '🇧🇩';
@@ -33,8 +36,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final phoneNumberController = TextEditingController();
   final dateBirthController = TextEditingController();
 
-  final _auth = FirebaseAuth.instance; //initialize firebase
-
   @override
   void dispose() {
     super.dispose();
@@ -46,7 +47,7 @@ class _SignupScreenState extends State<SignupScreen> {
     dateBirthController.dispose();
   }
 
-  void signUp() {
+  void signup() {
     _auth
         .createUserWithEmailAndPassword(
             email: emailController.text.toString(),
@@ -54,14 +55,22 @@ class _SignupScreenState extends State<SignupScreen> {
         .then((value) {
       Utils().toastMessage(value.user!.email.toString());
       userMail = emailController.text;
-      if (kDebugMode) {
-        print(userMail);
-      }
-      Navigator.pushNamed(context, AppRoutes.profile);
+      print(userMail);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfileSetup(),
+        ),
+      );
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
       Utils().toastMessage(error.toString());
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -176,7 +185,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               hintTextColor: AppTheme.greyColor,
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  Fluttertoast.showToast(msg: 'Enter Name');
+                                  Utils().toastMessage('Enter Name');
                                 }
                                 return null;
                               },
@@ -189,8 +198,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               hintTextColor: AppTheme.greyColor,
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  Fluttertoast.showToast(
-                                      msg: 'Enter Full Name');
+                                  Utils().toastMessage('Enter Full Name');
                                 }
                                 return null;
                               },
@@ -201,12 +209,11 @@ class _SignupScreenState extends State<SignupScreen> {
                         CustomTextField(
                           validator: (value) {
                             if (value!.isEmpty) {
-                              Fluttertoast.showToast(
-                                  msg: 'Enter email address');
+                              Utils().toastMessage('Enter email address');
                             }
                             if (!value.endsWith('@gmail.com')) {
-                              Fluttertoast.showToast(
-                                  msg: 'Enter proper gmail address');
+                              Utils()
+                                  .toastMessage('Enter proper gmail address');
                             }
                             return null;
                           },
@@ -219,7 +226,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         CustomTextField(
                           validator: (value) {
                             if (value!.isEmpty) {
-                              Fluttertoast.showToast(msg: 'Enter phone number');
+                              Utils().toastMessage('Enter phone number');
                             }
 
                             return null;
@@ -257,8 +264,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         CustomTextField(
                           validator: (value) {
                             if (value!.isEmpty) {
-                              Fluttertoast.showToast(
-                                  msg: 'Enter your Date of Birth');
+                              Utils().toastMessage('Enter your Date of Birth');
                             }
                             return null;
                           },
@@ -276,13 +282,11 @@ class _SignupScreenState extends State<SignupScreen> {
                         CustomTextField(
                           validator: (value) {
                             if (value!.isEmpty) {
-                              Fluttertoast.showToast(
-                                  msg: 'Kindly set any password');
+                              Utils().toastMessage('Kindly set any password');
                             }
                             if (value.length < 6) {
-                              Fluttertoast.showToast(
-                                msg:
-                                    'Password should be at least 6 characters long',
+                              Utils().toastMessage(
+                                'Password should be at least 6 characters long',
                               );
                             }
                             return null;
@@ -312,7 +316,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           text: "Sign Up",
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              signUp();
+                              signup();
                             }
                           },
                           color: AppTheme.secondaryColor,

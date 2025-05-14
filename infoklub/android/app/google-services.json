@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "588343803358",
-    "project_id": "info-klub",
-    "storage_bucket": "info-klub.firebasestorage.app"
+    "project_number": "277696133181",
+    "project_id": "infoklub-46446",
+    "storage_bucket": "infoklub-46446.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:588343803358:android:385f13d8027988b3a8f14f",
+        "mobilesdk_app_id": "1:277696133181:android:35711214c6209d9bb09254",
         "android_client_info": {
           "package_name": "com.example.infoklub"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAR2AMFSOHeYFafzyu9CJdVUFGVjxMP9kc"
+          "current_key": "AIzaSyCeasTJlN3oM2cIJOVmz9XcJxMVUKm0Ook"
         }
       ],
       "services": {

@@ -1,10 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';
-import 'package:infoklub/views/Goals/all_goals.dart';
-import 'package:provider/provider.dart' show Provider;
+import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import '../../app/theme.dart';
 import '../../widgets/custom_button.dart';
@@ -23,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isChecked = false;
 
   bool loading = false;
-  final _auth = FirebaseAuth.instance;
+
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -32,30 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-  }
-
-  void login() {
-    setState(() {
-      loading = true;
-    });
-    _auth
-        .signInWithEmailAndPassword(
-            email: _emailController.text,
-            password: _passwordController.text.toString())
-        .then((value) {
-      Utils().toastMessage(value.user!.email.toString());
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-      setState(() {
-        loading = false;
-      });
-    }).onError((error, stackTrace) {
-      debugPrint(error.toString());
-      Utils().toastMessage(error.toString());
-      setState(() {
-        loading = false;
-      });
-    });
   }
 
   @override
@@ -279,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: "Log In",
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            login();
+                            // login();
                           }
                         },
                         color: AppTheme.secondaryColor,
