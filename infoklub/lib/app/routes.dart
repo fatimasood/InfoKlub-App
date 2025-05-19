@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/views/Rating/rating.dart';
 import 'package:infoklub/views/authentecation_view/forgot_password.dart';
-import 'package:infoklub/views/authentecation_view/otp.dart';
 import 'package:infoklub/views/authentecation_view/phone_number_screen.dart';
 import 'package:infoklub/views/authentecation_view/signup_screen.dart';
 import 'package:infoklub/views/career_screens/finish_screen.dart';
@@ -28,7 +27,7 @@ class AppRoutes {
   static const String login = '/login';
   static const String signup = '/signup';
   static const String phone = '/phone';
-  static const String otp = '/otp';
+
   static const String forgotpsd = '/forgotpsd';
   static const String onboardfirst = '/onboardfirst';
   static const String addlinks = '/addlinks';
@@ -59,8 +58,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const SignupScreen());
       case phone:
         return MaterialPageRoute(builder: (_) => const PhoneNumberScreen());
-      case otp:
-        return MaterialPageRoute(builder: (_) => const OtpScreen());
+
       case forgotpsd:
         return MaterialPageRoute(builder: (_) => const ForgotPassword());
       case onboardfirst:

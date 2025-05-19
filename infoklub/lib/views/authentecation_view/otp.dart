@@ -5,7 +5,8 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
 
 class OtpScreen extends StatefulWidget {
-  const OtpScreen({super.key});
+  final String verificationId;
+  const OtpScreen({super.key, required this.verificationId});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();

@@ -1,6 +1,9 @@
 import 'package:country_picker/country_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:infoklub/utils/utils.dart';
+import 'package:infoklub/views/authentecation_view/otp.dart';
 import '../../app/routes.dart';
 import '../../app/theme.dart';
 import '../../widgets/custom_button.dart';
@@ -17,6 +20,10 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
   bool isChecked = false;
   String _selectedFlag = '🇧🇩';
   String _selectedCode = '880';
+
+  final phoneNumberController = TextEditingController();
+  final auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -84,6 +91,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
                       SizedBox(height: screenHeight * 0.02),
                       CustomTextField(
                         hintText: "$_selectedCode 726-0592",
+                        controller: phoneNumberController,
                         backgroundColor: Colors.white,
                         textColor: Colors.black,
                         hintTextColor: Colors.grey,
@@ -107,7 +115,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
                           },
                           child: Text(
                             _selectedFlag, // Display emoji directly
-                            style: const TextStyle(fontSize: 24), // Adjust size
+                            style: const TextStyle(fontSize: 24),
                           ),
                         ),
                       ),
@@ -115,7 +123,25 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
                       CustomButton(
                         text: "Send OTP",
                         onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.otp);
+                          auth.verifyPhoneNumber(
+                              phoneNumber: phoneNumberController.text,
+                              verificationCompleted: (_) {},
+                              verificationFailed: (e) {
+                                Utils().toastMessage(e.toString());
+                              },
+                              codeSent: (String verificationId, int? token) {
+                                //code
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OtpScreen(
+                                        verificationId: verificationId),
+                                  ),
+                                );
+                              },
+                              codeAutoRetrievalTimeout: (e) {
+                                Utils().toastMessage(e.toString());
+                              });
                         },
                         color: AppTheme.secondaryColor,
                         textColor: AppTheme.whiteColor,

@@ -3,7 +3,6 @@ import 'package:infoklub/main.dart';
 import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';
 import 'package:infoklub/views/Goals/all_goals.dart';
-import 'package:infoklub/views/create_profile/profile_setup.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import '../../app/theme.dart';
@@ -51,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => HomeScreen(),
+          builder: (context) => const HomeScreen(),
         ),
       );
     }).onError((error, stackTrace) {
