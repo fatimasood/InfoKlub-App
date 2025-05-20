@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/main.dart';
 import 'package:infoklub/utils/utils.dart';
-import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';
-import 'package:infoklub/views/Goals/all_goals.dart';
-import 'package:provider/provider.dart';
+
+import 'package:infoklub/views/home_view/main_home.dart';
+
 import '../../app/routes.dart';
 import '../../app/theme.dart';
 import '../../widgets/custom_button.dart';
@@ -32,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    super.dispose();
     emailController.dispose();
     passwordController.dispose();
   }
@@ -50,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
+          builder: (context) => const MainHome(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<LoginViewModel>(context);
+    //final viewModel = Provider.of<LoginViewModel>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 

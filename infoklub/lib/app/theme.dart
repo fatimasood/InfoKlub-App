@@ -114,6 +114,11 @@ class AppTheme {
           color: whiteColor,
         ),
       ),
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: AppTheme.primaryColor, // Cursor color
+        selectionColor: AppTheme.lightsecondary, // Highlighted text color
+        selectionHandleColor: AppTheme.primaryColor, // Handle color
+      ),
       textTheme: getResponsiveTextTheme(context),
       buttonTheme: const ButtonThemeData(
         buttonColor: primaryColor,

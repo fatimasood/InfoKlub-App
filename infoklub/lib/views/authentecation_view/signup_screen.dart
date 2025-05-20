@@ -277,10 +277,46 @@ class _SignupScreenState extends State<SignupScreen> {
                           backgroundColor: AppTheme.whiteColor,
                           textColor: AppTheme.blackColor,
                           hintTextColor: AppTheme.greyColor,
-                          leftWidget: Icon(
-                            Icons.calendar_month,
-                            color: AppTheme.greyColor,
-                            size: screenHeight * 0.02,
+                          leftWidget: GestureDetector(
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime(2000),
+                                firstDate: DateTime(1900),
+                                lastDate: DateTime.now(),
+                                initialEntryMode:
+                                    DatePickerEntryMode.calendarOnly,
+                                builder: (BuildContext context, Widget? child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: AppTheme.primaryColor,
+                                        onPrimary: AppTheme.whiteColor,
+                                        onSurface: AppTheme.blackColor,
+                                      ),
+                                      textButtonTheme: TextButtonThemeData(
+                                        style: TextButton.styleFrom(
+                                          foregroundColor:
+                                              AppTheme.primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
+                              );
+                              if (pickedDate != null) {
+                                setState(() {
+                                  dateBirthController.text =
+                                      "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
+                                });
+                              }
+                            },
+                            child: Icon(
+                              Icons.calendar_month,
+                              color: AppTheme.greyColor,
+                              size: screenHeight * 0.02,
+                            ),
                           ),
                         ),
                         SizedBox(height: screenHeight * 0.01),
@@ -346,7 +382,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               padding: EdgeInsets.symmetric(
                                   horizontal: screenWidth * 0.01),
                               child: const Text(
-                                "Or login with",
+                                "OR",
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   color: AppTheme.whiteColor,
