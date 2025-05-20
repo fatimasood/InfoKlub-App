@@ -27,22 +27,20 @@ class _ProfileSetupView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<ProfileSetupViewModel>(context);
-    final screenWidth = MediaQuery.of(context).size.width;
+    //final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: AppTheme.whiteColor,
+      backgroundColor: AppTheme.halfwhite,
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(
-            top: screenHeight * 0.06,
-            bottom: screenHeight * 0.02,
-            left: screenWidth * 0.03,
-            right: screenWidth * 0.03,
-          ),
+          padding: const EdgeInsets.all(14),
           child: Center(
             child: Column(
               children: [
+                const SizedBox(
+                  height: 30,
+                ),
                 Text(
                   "Profile Set Up",
                   style: AppTheme.getResponsiveTextTheme(context).labelMedium,
@@ -71,10 +69,10 @@ class _ProfileSetupView extends StatelessWidget {
                         right: 0,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: AppTheme.whiteColor,
+                            color: AppTheme.greyColor,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: AppTheme.whiteColor,
+                              color: AppTheme.greyColor,
                               width: 2.0,
                             ),
                           ),
@@ -98,7 +96,7 @@ class _ProfileSetupView extends StatelessWidget {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.only(top: 20.0, bottom: 15.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -109,6 +107,7 @@ class _ProfileSetupView extends StatelessWidget {
                       ),
                       const SizedBox(height: 6.0),
                       const CustomInput(
+                        backgroundColor: AppTheme.halfwhite,
                         hintText: 'Email',
                         keyboardType: TextInputType.emailAddress,
                       ),
@@ -120,9 +119,9 @@ class _ProfileSetupView extends StatelessWidget {
                       ),
                       const SizedBox(height: 6.0),
                       CustomInput(
+                        backgroundColor: AppTheme.halfwhite,
                         keyboardType: TextInputType.phone,
                         hintText: "${viewModel.selectedCode} 726-0592",
-                        backgroundColor: Colors.white,
                         textColor: Colors.black,
                         hintTextColor: Colors.grey,
                         leftWidget: GestureDetector(
@@ -152,6 +151,7 @@ class _ProfileSetupView extends StatelessWidget {
                       ),
                       const SizedBox(height: 6.0),
                       const CustomInput(
+                        backgroundColor: AppTheme.halfwhite,
                         hintText: '24 Oct 2000',
                         keyboardType: TextInputType.text,
                       ),
@@ -164,6 +164,7 @@ class _ProfileSetupView extends StatelessWidget {
                       const SizedBox(height: 6.0),
                       const CustomInput(
                         hintText: 'City',
+                        backgroundColor: AppTheme.halfwhite,
                         keyboardType: TextInputType.streetAddress,
                       ),
                       const SizedBox(height: 8.0),
@@ -176,6 +177,7 @@ class _ProfileSetupView extends StatelessWidget {
                       CustomInput(
                         height: screenHeight * 0.20,
                         hintText: 'About',
+                        backgroundColor: AppTheme.halfwhite,
                         keyboardType: TextInputType.multiline,
                         textAlign: TextAlign.start,
                       ),

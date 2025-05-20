@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         text: 'Continue with Phone',
                         onPressed: () {
-                          // button onPressed logic
+                          Navigator.pushNamed(context, AppRoutes.phone);
                         },
                         color: AppTheme.whiteColor,
                         textColor: AppTheme.blackColor,
@@ -173,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: screenWidth * 0.02),
                             child: const Text(
-                              "Or login with",
+                              "OR",
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 color: AppTheme.whiteColor,
