@@ -11,6 +11,34 @@ class ProfileOptions extends StatefulWidget {
 }
 
 class _ProfileOptionsState extends State<ProfileOptions> {
+  // check data entry
+  bool healthCompleted = false;
+  bool educationCompleted = false;
+  bool careerCompleted = false;
+
+  // calculate progress
+  double get progress {
+    int completedCount = 0;
+    if (healthCompleted) completedCount++;
+    if (educationCompleted) completedCount++;
+    if (careerCompleted) completedCount++;
+    return completedCount / 3;
+  }
+
+// Get progress text
+  String get progressText {
+    if (progress == 0) return "Complete your Profile";
+    if (progress == 1) return "Profile Completed!";
+    return "${(progress * 100).toInt()}% Completed";
+  }
+
+  // Get progress text color
+  Color get progressColor {
+    if (progress == 0) return AppTheme.redAccent;
+    if (progress == 1) return AppTheme.forestGreen;
+    return AppTheme.azureBlue;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -53,11 +81,11 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                     const SizedBox(
                       height: 4.0,
                     ),
-                    const Text(
-                      "Complete your Profile",
+                    Text(
+                      progressText,
                       style: TextStyle(
                           fontSize: 18.5,
-                          color: AppTheme.redAccent,
+                          color: progressColor,
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w700),
                     ),
@@ -76,7 +104,7 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                           height: 8.0,
                           width: screenWidth * 0.2,
                           decoration: BoxDecoration(
-                            color: AppTheme.redAccent,
+                            color: progressColor,
                             borderRadius: BorderRadius.circular(4.0),
                           ),
                         )
@@ -88,7 +116,9 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                       icon: Icons.health_and_safety,
                       iconColor: AppTheme.forestGreen,
                       title: 'Health',
-                      description: 'Upload Your Medical Records Here',
+                      description: healthCompleted
+                          ? 'Health Data Uploaded'
+                          : 'Upload Your Medical Records Here',
                       backgroundColor: Colors.green[50]!,
                       arrowColor: AppTheme.forestGreen,
                       descolor: AppTheme.forestGreen,
@@ -102,7 +132,9 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                       icon: Icons.school,
                       iconColor: AppTheme.azureBlue,
                       title: 'Education',
-                      description: 'Upload Your Education Records Here',
+                      description: healthCompleted
+                          ? 'Education Data Uploaded'
+                          : 'Upload Your Education Records Here',
                       backgroundColor: Colors.blue[50]!,
                       arrowColor: AppTheme.azureBlue,
                       descolor: AppTheme.azureBlue,
@@ -116,7 +148,9 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                       icon: Icons.work,
                       iconColor: AppTheme.purpleAccent,
                       title: 'Career',
-                      description: 'Upload Your Career Records Here',
+                      description: healthCompleted
+                          ? 'Career Data Uploaded'
+                          : 'Upload Your Career Records Here',
                       backgroundColor: Colors.purple[50]!,
                       arrowColor: AppTheme.purpleAccent,
                       descolor: AppTheme.purpleAccent,

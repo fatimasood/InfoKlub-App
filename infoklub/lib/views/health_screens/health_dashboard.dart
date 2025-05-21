@@ -17,7 +17,7 @@ class _HealthDashboardState extends State<HealthDashboard> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: AppTheme.whiteColor,
+      backgroundColor: AppTheme.halfwhite,
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         padding: EdgeInsets.only(

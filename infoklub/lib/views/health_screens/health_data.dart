@@ -20,13 +20,12 @@ class HealthData extends StatelessWidget {
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
-            Navigator.pop(context);
+            Navigator.pop(context, false);
           },
-          child: Image.asset(
-            'lib/assets/Images/backarrow.png',
-            color: AppTheme.tealAccent,
-            height: 22,
-            width: 22,
+          child: const Icon(
+            Icons.arrow_back_ios,
+            color: AppTheme.textColor,
+            size: 18,
           ),
         ),
         title: Text(

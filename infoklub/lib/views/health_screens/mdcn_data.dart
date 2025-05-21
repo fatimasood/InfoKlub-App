@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infoklub/views/create_profile/add_info_dashboard.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 
 import '../../app/routes.dart';
@@ -133,7 +134,12 @@ class _MdcnDataState extends State<MdcnData> {
               width: double.infinity,
               text: "Save Information",
               onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.healthdboard);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileOptions(),
+                  ),
+                );
               },
               color: AppTheme.tealAccent,
               borderRadius: 10.0,
