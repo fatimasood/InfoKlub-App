@@ -31,6 +31,23 @@ class UserProfileModel extends HiveObject {
   @HiveField(8)
   String name;
 
+  // for links
+
+  @HiveField(9)
+  String? behance;
+
+  @HiveField(10)
+  String? dribble;
+
+  @HiveField(11)
+  String? github;
+
+  @HiveField(12)
+  String? linkedin;
+
+  @HiveField(13)
+  String? website;
+
   UserProfileModel({
     required this.name,
     required this.email,
@@ -41,7 +58,11 @@ class UserProfileModel extends HiveObject {
     required this.profileImagePath,
     required this.flag,
     required this.dialCode,
+    this.behance,
+    this.dribble,
+    this.github,
+    this.linkedin,
+    this.website,
   });
 }
-// This model is used to store user profile information in Hive.
-// It includes fields for email, phone number, date of birth, city, bio, profile
+// This model is used to store user profile information and links in Hive.

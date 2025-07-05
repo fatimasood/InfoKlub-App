@@ -13,6 +13,8 @@ import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
 import 'package:infoklub/viewmodels/health/mdcn_viewmodel.dart';
 import 'package:infoklub/viewmodels/nav_bar_models/navigation_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/finishprofile_viewmodel.dart';
+import 'package:infoklub/viewmodels/profile_setup/link_add_viewmodel.dart';
+import 'package:infoklub/viewmodels/profile_setup/profilesetup_viewmodel.dart';
 import 'package:infoklub/viewmodels/rating/rating_viewmodel.dart';
 import 'package:infoklub/viewmodels/splash_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +22,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 String? userMail;
-String userName = '';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,10 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SplashScreenViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => AddLinkViewModel(),
+        ),
+        ChangeNotifierProvider(create: (_) => ProfileSetupViewModel()),
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => SignupViewmodel()),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
