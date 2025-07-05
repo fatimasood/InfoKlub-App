@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:infoklub/views/create_profile/add_info_dashboard.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 
-import '../../app/routes.dart';
 import '../../app/theme.dart';
 
 class MdcnData extends StatefulWidget {

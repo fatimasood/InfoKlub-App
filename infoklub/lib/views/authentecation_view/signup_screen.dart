@@ -4,7 +4,6 @@ import 'package:country_picker/country_picker.dart';
 import 'package:infoklub/main.dart';
 import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/views/create_profile/profile_setup.dart';
-//import 'package:country_pickers/country.dart';
 import '../../app/routes.dart';
 import '../../app/theme.dart';
 import '../../widgets/custom_button.dart';
@@ -55,11 +54,19 @@ class _SignupScreenState extends State<SignupScreen> {
         .then((value) {
       Utils().toastMessage(value.user!.email.toString());
       userMail = emailController.text;
+
       print(userMail);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const ProfileSetup(),
+          builder: (context) => ProfileSetup(
+              initialName: firstNameController.text,
+              initialLastName: lastNameController.text,
+              initialEmail: emailController.text,
+              initialPhone: phoneNumberController.text,
+              initialDob: dateBirthController.text,
+              initialFlag: _selectedFlag,
+              initialCode: _selectedCode),
         ),
       );
     }).onError((error, stackTrace) {

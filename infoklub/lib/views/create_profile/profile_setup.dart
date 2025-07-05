@@ -2,20 +2,47 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:country_picker/country_picker.dart';
-
-import '../../app/constants.dart';
 import '../../app/theme.dart';
 import '../../viewmodels/profile_setup/profilesetup_viewmodel.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 
-class ProfileSetup extends StatelessWidget {
-  const ProfileSetup({super.key});
+class ProfileSetup extends StatefulWidget {
+  final String initialName;
+  final String initialLastName;
+  final String initialEmail;
+  final String initialPhone;
+  final String initialDob;
+  final String initialFlag;
+  final String initialCode;
+  // Constructor to accept initial values
+  const ProfileSetup(
+      {super.key,
+      required this.initialName,
+      required this.initialLastName,
+      required this.initialEmail,
+      required this.initialPhone,
+      required this.initialDob,
+      required this.initialFlag,
+      required this.initialCode});
 
   @override
+  State<ProfileSetup> createState() => _ProfileSetupState();
+}
+
+class _ProfileSetupState extends State<ProfileSetup> {
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ProfileSetupViewModel(),
+    return ChangeNotifierProvider<ProfileSetupViewModel>(
+      create: (_) {
+        final vm = ProfileSetupViewModel();
+        vm.updateName(widget.initialName, widget.initialLastName);
+        vm.updateEmail(widget.initialEmail);
+        vm.updatePhone(widget.initialPhone);
+        vm.updateDob(widget.initialDob);
+        vm.updateCountry(widget.initialFlag, widget.initialCode);
+        return vm;
+      },
       child: const _ProfileSetupView(),
     );
   }
@@ -23,6 +50,11 @@ class ProfileSetup extends StatelessWidget {
 
 class _ProfileSetupView extends StatelessWidget {
   const _ProfileSetupView();
+
+  get personImage => Image.asset(
+        "lib/assets/Images/person.png",
+        fit: BoxFit.cover,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +101,10 @@ class _ProfileSetupView extends StatelessWidget {
                         right: 0,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: AppTheme.greyColor,
+                            color: const Color.fromARGB(255, 209, 209, 209),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: AppTheme.greyColor,
+                              color: const Color.fromARGB(255, 209, 209, 209),
                               width: 2.0,
                             ),
                           ),
@@ -86,13 +118,35 @@ class _ProfileSetupView extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      personName,
-                      style:
-                          AppTheme.getResponsiveTextTheme(context).labelMedium,
-                    ),
+                    viewModel.isEditingName
+                        ? SizedBox(
+                            width: 180,
+                            child: TextField(
+                              autofocus: true,
+                              onSubmitted: (val) {
+                                viewModel.updateName(val, val);
+                                viewModel.toggleNameEdit();
+                              },
+                              decoration: const InputDecoration(
+                                hintText: 'Enter Name',
+                                border: UnderlineInputBorder(),
+                              ),
+                              style: AppTheme.getResponsiveTextTheme(context)
+                                  .labelMedium,
+                            ),
+                          )
+                        : Text(
+                            viewModel.name,
+                            style: AppTheme.getResponsiveTextTheme(context)
+                                .labelMedium,
+                          ),
                     const SizedBox(width: 4.0),
-                    const Icon(Icons.edit),
+                    GestureDetector(
+                      onTap: () {
+                        viewModel.toggleNameEdit();
+                      },
+                      child: const Icon(Icons.edit, color: AppTheme.textColor),
+                    ),
                   ],
                 ),
                 Padding(
@@ -106,10 +160,11 @@ class _ProfileSetupView extends StatelessWidget {
                             .displaySmall,
                       ),
                       const SizedBox(height: 6.0),
-                      const CustomInput(
+                      CustomInput(
                         backgroundColor: AppTheme.halfwhite,
                         hintText: 'Email',
                         keyboardType: TextInputType.emailAddress,
+                        onChanged: (val) => viewModel.updateEmail(val),
                       ),
                       const SizedBox(height: 8.0),
                       Text(
@@ -142,6 +197,9 @@ class _ProfileSetupView extends StatelessWidget {
                             style: const TextStyle(fontSize: 24),
                           ),
                         ),
+                        onChanged: (val) {
+                          viewModel.updatePhone(val);
+                        },
                       ),
                       const SizedBox(height: 8.0),
                       Text(
@@ -150,10 +208,11 @@ class _ProfileSetupView extends StatelessWidget {
                             .displaySmall,
                       ),
                       const SizedBox(height: 6.0),
-                      const CustomInput(
+                      CustomInput(
                         backgroundColor: AppTheme.halfwhite,
                         hintText: '24 Oct 2000',
                         keyboardType: TextInputType.text,
+                        onChanged: (val) => viewModel.updateDob(val),
                       ),
                       const SizedBox(height: 8.0),
                       Text(
@@ -162,10 +221,11 @@ class _ProfileSetupView extends StatelessWidget {
                             .displaySmall,
                       ),
                       const SizedBox(height: 6.0),
-                      const CustomInput(
+                      CustomInput(
                         hintText: 'City',
                         backgroundColor: AppTheme.halfwhite,
                         keyboardType: TextInputType.streetAddress,
+                        onChanged: (val) => viewModel.updateCity(val),
                       ),
                       const SizedBox(height: 8.0),
                       Text(
@@ -180,22 +240,7 @@ class _ProfileSetupView extends StatelessWidget {
                         backgroundColor: AppTheme.halfwhite,
                         keyboardType: TextInputType.multiline,
                         textAlign: TextAlign.start,
-                      ),
-                      const SizedBox(height: 10.0),
-                      CustomButton(
-                        text: "Connect with",
-                        onPressed: () {
-                          // connect with linkedln
-                        },
-                        image: Image.asset(
-                          "lib/assets/Images/linkedlnlogo.png",
-                          height: 40,
-                          width: 60,
-                        ),
-                        color: AppTheme.whiteColor,
-                        textColor: AppTheme.secondaryColor,
-                        borderColor: AppTheme.secondaryColor,
-                        borderRadius: 10.0,
+                        onChanged: (val) => viewModel.updateBio(val),
                       ),
                       const SizedBox(height: 10.0),
                       CustomButton(

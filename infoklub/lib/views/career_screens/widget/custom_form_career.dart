@@ -49,6 +49,7 @@ class ReusableFormCareer extends StatelessWidget {
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
           Text(
@@ -65,6 +66,7 @@ class ReusableFormCareer extends StatelessWidget {
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
           Text(
@@ -81,6 +83,7 @@ class ReusableFormCareer extends StatelessWidget {
             keyboardType: TextInputType.number,
             backgroundColor: Colors.white,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
           Text(
@@ -96,6 +99,7 @@ class ReusableFormCareer extends StatelessWidget {
             controller: startDateController,
             keyboardType: TextInputType.number,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
           Text(
@@ -111,6 +115,7 @@ class ReusableFormCareer extends StatelessWidget {
             controller: startDateController,
             keyboardType: TextInputType.number,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
           Text(
@@ -127,6 +132,7 @@ class ReusableFormCareer extends StatelessWidget {
             controller: skillsController,
             keyboardType: TextInputType.text,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 16.0),
 

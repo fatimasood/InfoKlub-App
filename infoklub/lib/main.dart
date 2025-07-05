@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/models/user_profile_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';
@@ -16,12 +17,18 @@ import 'package:infoklub/viewmodels/rating/rating_viewmodel.dart';
 import 'package:infoklub/viewmodels/splash_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 String? userMail;
+String userName = '';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  //hive initialize
+  await Hive.initFlutter();
+  Hive.registerAdapter(UserProfileModelAdapter());
   runApp(const MyApp());
 }
 

@@ -34,6 +34,7 @@ class CustomInput extends StatelessWidget {
     this.countryDropdownData,
     this.onCountrySelected,
     this.textAlign = TextAlign.start,
+    required void Function(dynamic val) onChanged,
   });
 
   @override

@@ -69,10 +69,11 @@ class _AddlinkState extends State<Addlink> {
                               .displaySmall,
                         ),
                         const SizedBox(height: 6.0),
-                        const CustomInput(
+                        CustomInput(
                           backgroundColor: AppTheme.halfwhite,
                           hintText: 'https://',
                           keyboardType: TextInputType.url,
+                          onChanged: (val) {},
                         ),
                         const SizedBox(height: 8.0),
                         Text(
@@ -82,10 +83,11 @@ class _AddlinkState extends State<Addlink> {
                               .displaySmall,
                         ),
                         const SizedBox(height: 6.0),
-                        const CustomInput(
+                        CustomInput(
                           backgroundColor: AppTheme.halfwhite,
                           hintText: 'https://',
                           keyboardType: TextInputType.url,
+                          onChanged: (val) {},
                         ),
                         const SizedBox(height: 8.0),
                         Text(
@@ -95,10 +97,11 @@ class _AddlinkState extends State<Addlink> {
                               .displaySmall,
                         ),
                         const SizedBox(height: 6.0),
-                        const CustomInput(
+                        CustomInput(
                           backgroundColor: AppTheme.halfwhite,
                           hintText: 'https://',
                           keyboardType: TextInputType.url,
+                          onChanged: (val) {},
                         ),
                         const SizedBox(height: 8.0),
                         Text(
@@ -108,10 +111,11 @@ class _AddlinkState extends State<Addlink> {
                               .displaySmall,
                         ),
                         const SizedBox(height: 6.0),
-                        const CustomInput(
+                        CustomInput(
                           backgroundColor: AppTheme.halfwhite,
                           hintText: 'https://',
                           keyboardType: TextInputType.url,
+                          onChanged: (val) {},
                         ),
                         const SizedBox(height: 8.0),
                         Text(
@@ -121,10 +125,11 @@ class _AddlinkState extends State<Addlink> {
                               .displaySmall,
                         ),
                         const SizedBox(height: 6.0),
-                        const CustomInput(
+                        CustomInput(
                           backgroundColor: AppTheme.halfwhite,
                           hintText: 'https://',
                           keyboardType: TextInputType.url,
+                          onChanged: (val) {},
                         ),
                       ],
                     ),

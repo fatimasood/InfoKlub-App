@@ -49,6 +49,7 @@ class ReusableForm extends StatelessWidget {
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
           Text(
@@ -65,6 +66,7 @@ class ReusableForm extends StatelessWidget {
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
           Text(
@@ -81,6 +83,7 @@ class ReusableForm extends StatelessWidget {
             keyboardType: TextInputType.number,
             backgroundColor: Colors.white,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
           Text(
@@ -96,6 +99,7 @@ class ReusableForm extends StatelessWidget {
             controller: scoreGradeController,
             keyboardType: TextInputType.number,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
           Text(
@@ -112,6 +116,7 @@ class ReusableForm extends StatelessWidget {
             controller: achievementsController,
             keyboardType: TextInputType.text,
             textColor: Colors.black,
+            onChanged: (val) {},
           ),
           const SizedBox(height: 16.0),
 
