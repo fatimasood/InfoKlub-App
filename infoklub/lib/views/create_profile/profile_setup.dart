@@ -96,7 +96,7 @@ class _ProfileSetupView extends StatelessWidget {
                             ? personImage
                             : null,
                       ),
-                      Positioned(
+                      /*Positioned(
                         bottom: 10,
                         right: 0,
                         child: Container(
@@ -108,9 +108,9 @@ class _ProfileSetupView extends StatelessWidget {
                               width: 2.0,
                             ),
                           ),
-                          child: const Icon(Icons.edit),
+                          //child: const Icon(Icons.edit),
                         ),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
@@ -161,6 +161,7 @@ class _ProfileSetupView extends StatelessWidget {
                       ),
                       const SizedBox(height: 6.0),
                       CustomInput(
+                        initialValue: viewModel.email,
                         backgroundColor: AppTheme.halfwhite,
                         hintText: 'Email',
                         keyboardType: TextInputType.emailAddress,
@@ -174,6 +175,7 @@ class _ProfileSetupView extends StatelessWidget {
                       ),
                       const SizedBox(height: 6.0),
                       CustomInput(
+                        initialValue: viewModel.phone,
                         backgroundColor: AppTheme.halfwhite,
                         keyboardType: TextInputType.phone,
                         hintText: "${viewModel.selectedCode} 726-0592",
@@ -209,6 +211,7 @@ class _ProfileSetupView extends StatelessWidget {
                       ),
                       const SizedBox(height: 6.0),
                       CustomInput(
+                        initialValue: viewModel.dob,
                         backgroundColor: AppTheme.halfwhite,
                         hintText: '24 Oct 2000',
                         keyboardType: TextInputType.text,

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class CustomInput extends StatelessWidget {
+class CustomInput extends StatefulWidget {
   final String hintText;
   final TextEditingController? controller;
   final TextInputType keyboardType;
-  final Widget? leftWidget; // Can be an Icon or a Dropdown
-  final Widget? rightWidget; // Can be a Button/Icon/etc.
+  final Widget? leftWidget;
+  final Widget? rightWidget;
   final Function()? onRightIconPressed;
   final bool obscureText;
   final double? height;
@@ -16,6 +16,8 @@ class CustomInput extends StatelessWidget {
   final Color hintTextColor;
   final List<Map<String, String>>? countryDropdownData;
   final Function(String)? onCountrySelected;
+  final String? initialValue;
+  final Function(String)? onChanged;
 
   const CustomInput({
     super.key,
@@ -34,16 +36,39 @@ class CustomInput extends StatelessWidget {
     this.countryDropdownData,
     this.onCountrySelected,
     this.textAlign = TextAlign.start,
-    required void Function(dynamic val) onChanged,
+    this.initialValue,
+    this.onChanged,
   });
+
+  @override
+  State<CustomInput> createState() => _CustomInputState();
+}
+
+class _CustomInputState extends State<CustomInput> {
+  late TextEditingController _internalController;
+
+  @override
+  void initState() {
+    super.initState();
+    _internalController = widget.controller ??
+        TextEditingController(text: widget.initialValue ?? '');
+  }
+
+  @override
+  void dispose() {
+    if (widget.controller == null) {
+      _internalController.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
-      width: width,
+      height: widget.height,
+      width: widget.width,
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: widget.backgroundColor,
         borderRadius: BorderRadius.circular(10.0),
         border: Border.all(
           color: Colors.grey,
@@ -52,70 +77,31 @@ class CustomInput extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start, // Aligns text to the top
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left Widget (Optional, could be Icon or Dropdown)
-          if (leftWidget != null)
+          if (widget.leftWidget != null)
             Padding(
               padding: const EdgeInsets.only(right: 8.0, top: 10),
-              child: leftWidget!,
+              child: widget.leftWidget!,
             ),
-
-          // Country Dropdown (Optional)
-          if (countryDropdownData != null && leftWidget == null) ...[
-            DropdownButton<String>(
-              value: countryDropdownData?.first['code'], // Default value
-              icon: const Icon(Icons.arrow_drop_down),
-              underline: const SizedBox(), // Removes underline
-              onChanged: (value) {
-                if (onCountrySelected != null) {
-                  onCountrySelected!(value!);
-                }
-              },
-              items: countryDropdownData?.map((country) {
-                return DropdownMenuItem<String>(
-                  value: country['code'],
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        country['flag']!,
-                        width: 24,
-                        height: 24,
-                      ),
-                      // const SizedBox(width: 8.0),
-                      Text(
-                        country['name']!,
-                        style: TextStyle(color: textColor),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-
-          // Input Field
           Expanded(
             child: TextField(
-              controller: controller,
-              keyboardType: keyboardType,
-              obscureText: obscureText,
+              controller: _internalController,
+              keyboardType: widget.keyboardType,
+              obscureText: widget.obscureText,
               maxLines: null,
               textAlignVertical: TextAlignVertical.top,
-              style: TextStyle(color: textColor),
-              textAlign: textAlign,
+              style: TextStyle(color: widget.textColor),
+              textAlign: widget.textAlign,
               decoration: InputDecoration(
-                hintText: hintText,
-                hintStyle: TextStyle(color: hintTextColor),
+                hintText: widget.hintText,
+                hintStyle: TextStyle(color: widget.hintTextColor),
                 border: InputBorder.none,
               ),
+              onChanged: widget.onChanged,
             ),
           ),
-
-          // Right Widget (Optional)
-          if (rightWidget != null) rightWidget!,
+          if (widget.rightWidget != null) widget.rightWidget!,
         ],
       ),
     );

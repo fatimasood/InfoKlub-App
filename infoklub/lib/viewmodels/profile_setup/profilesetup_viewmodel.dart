@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,6 +28,9 @@ class ProfileSetupViewModel with ChangeNotifier {
   String get selectedFlag => _selectedFlag;
   String get selectedCode => _selectedCode;
   String get name => _name;
+  String get email => _email;
+  String get phone => _phone;
+  String get dob => _dob;
   bool get isEditingName => _isEditingName;
 
   // Setters
@@ -107,16 +111,36 @@ class ProfileSetupViewModel with ChangeNotifier {
     );
 
     await box.put('localUser', model);
-    print('Saved to Hive:');
-    print('Name: ${model.name}');
-    print('Email: ${model.email}');
-    print('Phone: ${model.phone}');
-    print('DOB: ${model.dob}');
-    print('City: ${model.city}');
-    print('Bio: ${model.bio}');
-    print('Image Path: ${model.profileImagePath}');
-    print('Flag: ${model.flag}');
-    print('Dial Code: ${model.dialCode}');
+    if (kDebugMode) {
+      print('Saved to Hive:');
+    }
+    if (kDebugMode) {
+      print('Name: ${model.name}');
+    }
+    if (kDebugMode) {
+      print('Email: ${model.email}');
+    }
+    if (kDebugMode) {
+      print('Phone: ${model.phone}');
+    }
+    if (kDebugMode) {
+      print('DOB: ${model.dob}');
+    }
+    if (kDebugMode) {
+      print('City: ${model.city}');
+    }
+    if (kDebugMode) {
+      print('Bio: ${model.bio}');
+    }
+    if (kDebugMode) {
+      print('Image Path: ${model.profileImagePath}');
+    }
+    if (kDebugMode) {
+      print('Flag: ${model.flag}');
+    }
+    if (kDebugMode) {
+      print('Dial Code: ${model.dialCode}');
+    }
   }
 
   // Navigate Next
