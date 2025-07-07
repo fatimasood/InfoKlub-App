@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:infoklub/models/health/health_model.dart';
@@ -32,6 +33,7 @@ class HealthDataViewModel extends ChangeNotifier {
   List<String> filteredMedications = [];
   List<String> selectedMedications = [];
   List<String> uploadedDocs = [];
+  List<String> allergies = [];
 
   HealthDataViewModel() {
     filteredMedications = List.from(medications);
@@ -87,8 +89,24 @@ class HealthDataViewModel extends ChangeNotifier {
       bloodType: selectedBloodType ?? "Unknown",
       medications: List.from(selectedMedications),
       documentPaths: List.from(uploadedDocs),
-      allergies: [],
+      allergies: allergies,
     );
     await box.put('user_health', healthData);
+
+    if (kDebugMode) {
+      print("✅ Saved Health Record:");
+    }
+    if (kDebugMode) {
+      print("Blood Type: ${healthData.bloodType}");
+    }
+    if (kDebugMode) {
+      print("Medications: ${healthData.medications}");
+    }
+    if (kDebugMode) {
+      print("Documents: ${healthData.documentPaths}");
+    }
+    if (kDebugMode) {
+      print("Allergies: ${healthData.allergies}");
+    }
   }
 }

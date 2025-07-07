@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:infoklub/app/routes.dart';
+import 'package:infoklub/utils/utils.dart';
+import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
+import 'package:infoklub/viewmodels/health/mdcn_viewmodel.dart';
 import 'package:infoklub/views/create_profile/add_info_dashboard.dart';
 import 'package:infoklub/widgets/custom_button.dart';
+import 'package:provider/provider.dart';
 
 import '../../app/theme.dart';
 
@@ -108,6 +113,10 @@ class _MdcnDataState extends State<MdcnData> {
                             onSubmitted: (value) {
                               if (value.isNotEmpty) {
                                 setState(() {
+                                  final symptomVM =
+                                      Provider.of<MdcnDataViewModel>(context,
+                                          listen: false);
+                                  symptomVM.addSymptom(value);
                                   _enteredSymptoms.add(value);
                                   _textController.clear();
                                 });
@@ -132,13 +141,22 @@ class _MdcnDataState extends State<MdcnData> {
             child: CustomButton(
               width: double.infinity,
               text: "Save Information",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfileOptions(),
-                  ),
-                );
+              onPressed: () async {
+                final healthVM =
+                    Provider.of<HealthDataViewModel>(context, listen: false);
+                final symptomVM =
+                    Provider.of<MdcnDataViewModel>(context, listen: false);
+
+                //trasfer data to health view model
+                healthVM.allergies = symptomVM.selectedSymptoms;
+                //save everything to hive
+
+                await healthVM.saveHealthData();
+
+                Utils()
+                    .toastMessage("Your health record saved successfully...");
+                Navigator.pushReplacementNamed(
+                    context, AppRoutes.infodashboard);
               },
               color: AppTheme.tealAccent,
               borderRadius: 10.0,

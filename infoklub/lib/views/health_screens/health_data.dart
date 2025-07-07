@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/widgets/drag_dropfile.dart';
@@ -317,14 +318,12 @@ class HealthData extends StatelessWidget {
                   onPressed: () {
                     if (viewModel.selectedBloodType == null ||
                         viewModel.selectedMedications.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text("Please select blood type and medications"),
-                        ),
+                      Utils().toastMessage(
+                        "Please select blood type and medications",
                       );
                       return;
                     }
+
                     Navigator.pushNamed(context, AppRoutes.mdcndata);
                   },
                   style: ElevatedButton.styleFrom(
