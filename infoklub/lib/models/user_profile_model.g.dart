@@ -26,13 +26,18 @@ class UserProfileModelAdapter extends TypeAdapter<UserProfileModel> {
       profileImagePath: fields[5] as String,
       flag: fields[6] as String,
       dialCode: fields[7] as String,
+      behance: fields[9] as String?,
+      dribble: fields[10] as String?,
+      github: fields[11] as String?,
+      linkedin: fields[12] as String?,
+      website: fields[13] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserProfileModel obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.email)
       ..writeByte(1)
@@ -50,7 +55,17 @@ class UserProfileModelAdapter extends TypeAdapter<UserProfileModel> {
       ..writeByte(7)
       ..write(obj.dialCode)
       ..writeByte(8)
-      ..write(obj.name);
+      ..write(obj.name)
+      ..writeByte(9)
+      ..write(obj.behance)
+      ..writeByte(10)
+      ..write(obj.dribble)
+      ..writeByte(11)
+      ..write(obj.github)
+      ..writeByte(12)
+      ..write(obj.linkedin)
+      ..writeByte(13)
+      ..write(obj.website);
   }
 
   @override

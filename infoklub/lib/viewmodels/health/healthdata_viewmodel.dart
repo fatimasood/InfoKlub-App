@@ -51,3 +51,16 @@ class HealthDataViewModel extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+/*Future<void> saveHealthData() async {
+
+  final box =  awaitHiveHelper.openHealthBox();
+  final healthData = HealthModel(
+    bloodType: selectedBloodType ?? "Unknown",
+    medications: List.from(selectedMedications),
+     documentPaths: uploadedDocs, // Store paths of uploaded files
+    allergies: [], // Add logic to handle allergies
+  );
+
+  await box.put('user_health', healthData);
+}*/

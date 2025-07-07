@@ -15,13 +15,12 @@ class HealthData extends StatelessWidget {
     final viewModel = Provider.of<HealthDataViewModel>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final isTablet = screenWidth > 600;
 
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context, false);
-          },
+          onTap: () => Navigator.pop(context, false),
           child: const Icon(
             Icons.arrow_back_ios,
             color: AppTheme.textColor,
@@ -36,8 +35,8 @@ class HealthData extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // Main scrolling content
           SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: EdgeInsets.symmetric(
               horizontal: screenWidth * 0.04,
               vertical: screenHeight * 0.02,
@@ -45,10 +44,8 @@ class HealthData extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Drag and Drop Section
                 dropfiles(),
                 const SizedBox(height: 20),
-
                 CustomButton(
                   text: 'Use Camera to Scan Document',
                   borderColor: AppTheme.tealAccent,
@@ -58,17 +55,17 @@ class HealthData extends StatelessWidget {
                   color: AppTheme.whiteColor,
                   borderRadius: 15.0,
                   onPressed: () {
-                    //scan document
+                    // TODO: implement camera scan
                   },
                 ),
                 const SizedBox(height: 15),
-                // Blood Type Section
                 const Text(
                   "Personal Health Information",
                   style: TextStyle(
-                      fontSize: 16,
-                      color: AppTheme.blackColor,
-                      fontWeight: FontWeight.bold),
+                    fontSize: 16,
+                    color: AppTheme.blackColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Container(
@@ -77,70 +74,71 @@ class HealthData extends StatelessWidget {
                     color: AppTheme.backgreen,
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Blood Type",
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: AppTheme.blackColor,
-                              fontWeight: FontWeight.bold),
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Blood Type",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppTheme.blackColor,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(
-                          height: 4.0,
-                        ),
-                        Wrap(
-                          spacing: 7,
-                          runSpacing: 6,
-                          children: viewModel.bloodTypes.map((type) {
-                            final isSelected =
-                                viewModel.selectedBloodType == type;
-                            return GestureDetector(
-                              onTap: () => viewModel.selectBloodType(type),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 9.0),
-                                decoration: BoxDecoration(
+                      ),
+                      const SizedBox(height: 4.0),
+                      Wrap(
+                        spacing: 7,
+                        runSpacing: 6,
+                        children: viewModel.bloodTypes.map((type) {
+                          final isSelected =
+                              viewModel.selectedBloodType == type;
+                          return GestureDetector(
+                            onTap: () => viewModel.selectBloodType(type),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 9.0),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppTheme.tealAccent
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(3.0),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 2.0,
+                                    offset: Offset(0, 1),
+                                  )
+                                ],
+                              ),
+                              child: Text(
+                                type,
+                                style: TextStyle(
                                   color: isSelected
-                                      ? AppTheme.tealAccent
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(3.0),
-                                ),
-                                child: Text(
-                                  type,
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? AppTheme.whiteColor
-                                        : AppTheme.forestGreen,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
+                                      ? AppTheme.whiteColor
+                                      : AppTheme.forestGreen,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
                                 ),
                               ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Medications Section
-                const Text(
+                Text(
                   "What medications do you take?",
                   style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inter',
-                      color: AppTheme.blackColor),
+                    fontSize: isTablet ? 26.0 : 22.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter',
+                    color: AppTheme.blackColor,
+                  ),
                 ),
                 const SizedBox(height: 10),
-
-                // Updated Search Bar
                 Container(
                   decoration: BoxDecoration(
                     color: AppTheme.whiteColor,
@@ -151,75 +149,61 @@ class HealthData extends StatelessWidget {
                     ),
                   ),
                   child: TextField(
-                    style: const TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Inter',
-                        fontSize: 18.0),
-                    onChanged: (query) {
-                      viewModel.filterMedications(query);
-                    },
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Inter',
+                      fontSize: isTablet ? 18.0 : 16.0,
+                    ),
+                    onChanged: viewModel.filterMedications,
                     decoration: const InputDecoration(
                       hintText: "Search medications...",
                       hintStyle: TextStyle(
                         color: Colors.black,
                         fontSize: 14,
                       ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Colors.black38,
-                      ),
+                      prefixIcon: Icon(Icons.search, color: Colors.black38),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 10,
-                      ),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 10),
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 10),
-
-                // Medication List
                 Column(
-                  children: viewModel.filteredMedications.map((medication) {
+                  children: viewModel.filteredMedications.map((med) {
                     final isSelected =
-                        viewModel.selectedMedications.contains(medication);
+                        viewModel.selectedMedications.contains(med);
                     return CheckboxListTile(
                       value: isSelected,
-
-                      //tileColor: isSelected ? AppTheme.tealAccent : Colors.white,
                       activeColor: Colors.white,
                       checkColor: AppTheme.tealAccent,
-                      onChanged: (bool? value) =>
-                          viewModel.toggleMedication(medication),
+                      onChanged: (_) => viewModel.toggleMedication(med),
                       title: Text(
-                        medication,
+                        med,
                         style: TextStyle(
-                            color:
-                                isSelected ? AppTheme.tealAccent : Colors.black,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'Inter'),
+                          color:
+                              isSelected ? AppTheme.tealAccent : Colors.black,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Inter',
+                        ),
                       ),
                     );
                   }).toList(),
                 ),
-
                 const SizedBox(height: 15),
-
-                // Selected Medications
                 if (viewModel.selectedMedications.isNotEmpty)
                   Wrap(
                     spacing: 8.0,
                     children: viewModel.selectedMedications
-                        .map((medication) => Chip(
+                        .map((med) => Chip(
                               label: Text(
-                                medication,
+                                med,
                                 style: const TextStyle(
-                                    color: AppTheme.greyblacktext,
-                                    fontSize: 16,
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.normal),
+                                  color: AppTheme.greyblacktext,
+                                  fontSize: 16,
+                                  fontFamily: 'Inter',
+                                ),
                               ),
                               backgroundColor: Colors.grey[100],
                               deleteIcon: const Icon(
@@ -227,31 +211,35 @@ class HealthData extends StatelessWidget {
                                 size: 16,
                                 color: AppTheme.greyblacktext,
                               ),
-                              onDeleted: () =>
-                                  viewModel.toggleMedication(medication),
+                              onDeleted: () => viewModel.toggleMedication(med),
                             ))
                         .toList(),
                   ),
-
-                const SizedBox(
-                    height: 100), // Extra padding for the fixed button
+                const SizedBox(height: 100),
               ],
             ),
           ),
-          // Fixed Button at the Bottom
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Container(
-              color: Colors.white, // Add background if needed
-              padding: const EdgeInsets.only(
-                  bottom: 20, left: 10, right: 10, top: 0),
+              color: Colors.white,
+              padding: const EdgeInsets.only(bottom: 20, left: 10, right: 10),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    //medicines
+                    if (viewModel.selectedBloodType == null ||
+                        viewModel.selectedMedications.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text("Please select blood type and medications"),
+                        ),
+                      );
+                      return;
+                    }
                     Navigator.pushNamed(context, AppRoutes.mdcndata);
                   },
                   style: ElevatedButton.styleFrom(
@@ -264,9 +252,10 @@ class HealthData extends StatelessWidget {
                   child: const Text(
                     "Continue",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),

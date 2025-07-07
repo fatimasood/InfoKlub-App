@@ -11,32 +11,37 @@ class ProfileOptions extends StatefulWidget {
 }
 
 class _ProfileOptionsState extends State<ProfileOptions> {
-  // check data entry
+  // Flags to track data completion
   bool healthCompleted = false;
   bool educationCompleted = false;
   bool careerCompleted = false;
 
-  // calculate progress
+  // Calculate progress value
   double get progress {
-    int completedCount = 0;
-    if (healthCompleted) completedCount++;
-    if (educationCompleted) completedCount++;
-    if (careerCompleted) completedCount++;
-    return completedCount / 3;
+    int completed = 0;
+    if (healthCompleted) completed++;
+    if (educationCompleted) completed++;
+    if (careerCompleted) completed++;
+    return completed / 3;
   }
 
-// Get progress text
   String get progressText {
     if (progress == 0) return "Complete your Profile";
     if (progress == 1) return "Profile Completed!";
     return "${(progress * 100).toInt()}% Completed";
   }
 
-  // Get progress text color
   Color get progressColor {
     if (progress == 0) return AppTheme.redAccent;
     if (progress == 1) return AppTheme.forestGreen;
     return AppTheme.azureBlue;
+  }
+
+  Future<void> _navigateAndUpdate(String route, Function onComplete) async {
+    final result = await Navigator.pushNamed(context, route);
+    if (result == true) {
+      setState(() => onComplete());
+    }
   }
 
   @override
@@ -51,7 +56,6 @@ class _ProfileOptionsState extends State<ProfileOptions> {
         child: Padding(
           padding: EdgeInsets.only(
             top: screenHeight * 0.06,
-            // bottom: screenHeight * 0.6,
             left: screenWidth * 0.01,
             right: screenWidth * 0.01,
           ),
@@ -65,29 +69,29 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(
-                    top: 20.0, bottom: 20.0, left: 14.0, right: 14.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 20.0, horizontal: 14.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       "Your progress",
                       style: TextStyle(
-                          fontSize: 13.5,
-                          color: AppTheme.greyColor,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600),
+                        fontSize: 13.5,
+                        color: AppTheme.greyColor,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    const SizedBox(
-                      height: 4.0,
-                    ),
+                    const SizedBox(height: 4.0),
                     Text(
                       progressText,
                       style: TextStyle(
-                          fontSize: 18.5,
-                          color: progressColor,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700),
+                        fontSize: 18.5,
+                        color: progressColor,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 10.0),
                     Stack(
@@ -102,15 +106,17 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                         ),
                         Container(
                           height: 8.0,
-                          width: screenWidth * 0.2,
+                          width: screenWidth * progress,
                           decoration: BoxDecoration(
                             color: progressColor,
                             borderRadius: BorderRadius.circular(4.0),
                           ),
-                        )
+                        ),
                       ],
                     ),
                     const SizedBox(height: 25.0),
+
+                    /// HEALTH CARD
                     InfoCard(
                       context,
                       icon: Icons.health_and_safety,
@@ -122,41 +128,48 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                       backgroundColor: Colors.green[50]!,
                       arrowColor: AppTheme.forestGreen,
                       descolor: AppTheme.forestGreen,
-                      onTap: () {
-                        Navigator.pushNamed(context, AppRoutes.health);
-                      },
+                      onTap: () => _navigateAndUpdate(
+                        AppRoutes.health,
+                        () => healthCompleted = true,
+                      ),
                     ),
                     const SizedBox(height: 15.0),
+
+                    /// EDUCATION CARD
                     InfoCard(
                       context,
                       icon: Icons.school,
                       iconColor: AppTheme.azureBlue,
                       title: 'Education',
-                      description: healthCompleted
+                      description: educationCompleted
                           ? 'Education Data Uploaded'
                           : 'Upload Your Education Records Here',
                       backgroundColor: Colors.blue[50]!,
                       arrowColor: AppTheme.azureBlue,
                       descolor: AppTheme.azureBlue,
-                      onTap: () {
-                        Navigator.pushNamed(context, AppRoutes.health);
-                      },
+                      onTap: () => _navigateAndUpdate(
+                        AppRoutes.eduData,
+                        () => educationCompleted = true,
+                      ),
                     ),
                     const SizedBox(height: 15.0),
+
+                    /// CAREER CARD
                     InfoCard(
                       context,
                       icon: Icons.work,
                       iconColor: AppTheme.purpleAccent,
                       title: 'Career',
-                      description: healthCompleted
+                      description: careerCompleted
                           ? 'Career Data Uploaded'
                           : 'Upload Your Career Records Here',
                       backgroundColor: Colors.purple[50]!,
                       arrowColor: AppTheme.purpleAccent,
                       descolor: AppTheme.purpleAccent,
-                      onTap: () {
-                        Navigator.pushNamed(context, AppRoutes.career);
-                      },
+                      onTap: () => _navigateAndUpdate(
+                        AppRoutes.career,
+                        () => careerCompleted = true,
+                      ),
                     ),
                   ],
                 ),
