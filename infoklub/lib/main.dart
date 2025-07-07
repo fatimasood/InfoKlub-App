@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/models/user_profile_model.dart';
+import 'package:infoklub/utils/hive_helpers.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';
@@ -30,6 +31,7 @@ void main() async {
   //hive initialize
   await Hive.initFlutter();
   Hive.registerAdapter(UserProfileModelAdapter());
+  HiveHelper.initHive();
   runApp(const MyApp());
 }
 

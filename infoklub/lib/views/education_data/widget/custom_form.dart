@@ -121,7 +121,7 @@ class ReusableForm extends StatelessWidget {
           const SizedBox(height: 16.0),
 
           // File Upload Section
-          dropfiles(),
+          // dropfiles(),
           const SizedBox(height: 16.0),
 
           // Scan Documents Button

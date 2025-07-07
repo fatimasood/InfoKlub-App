@@ -137,7 +137,7 @@ class ReusableFormCareer extends StatelessWidget {
           const SizedBox(height: 16.0),
 
           // File Upload Section
-          dropfiles(),
+          //dropfiles(),
           const SizedBox(height: 16.0),
 
           // Scan Documents Button
@@ -146,9 +146,7 @@ class ReusableFormCareer extends StatelessWidget {
             textColor: AppTheme.purpleAccent,
             borderColor: AppTheme.purpleAccent,
             color: AppTheme.whiteColor,
-            onPressed: () {
-              //scan documents
-            },
+            onPressed: () {},
           ),
         ],
       ),

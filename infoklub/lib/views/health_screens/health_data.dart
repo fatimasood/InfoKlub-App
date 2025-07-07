@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
 import 'package:infoklub/widgets/custom_button.dart';
@@ -44,7 +46,9 @@ class HealthData extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                dropfiles(),
+                FileUploadWidget(onUploadTap: () {
+                  viewModel.pickDocument();
+                }),
                 const SizedBox(height: 20),
                 CustomButton(
                   text: 'Use Camera to Scan Document',
@@ -55,9 +59,90 @@ class HealthData extends StatelessWidget {
                   color: AppTheme.whiteColor,
                   borderRadius: 15.0,
                   onPressed: () {
-                    // TODO: implement camera scan
+                    viewModel.captureWithCamera();
                   },
                 ),
+                const SizedBox(height: 15),
+                if (viewModel.uploadedDocs.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  Text(
+                    "Uploaded Documents",
+                    style: TextStyle(
+                      fontSize: isTablet ? 20.0 : 18.0,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Inter',
+                      color: AppTheme.blackColor,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: viewModel.uploadedDocs.length,
+                    itemBuilder: (context, index) {
+                      final path = viewModel.uploadedDocs[index];
+                      final isImage = path.endsWith('.jpg') ||
+                          path.endsWith('.jpeg') ||
+                          path.endsWith('.png');
+
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 6.0),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.whiteColor,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey[300]!),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              blurRadius: 5,
+                              offset: const Offset(0, 2),
+                            )
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            isImage
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.file(
+                                      File(path),
+                                      width: 50,
+                                      height: 50,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.insert_drive_file,
+                                    color: AppTheme.tealAccent,
+                                    size: 40,
+                                  ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                path.split('/').last,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.greyblacktext,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete,
+                                  color: Colors.redAccent),
+                              onPressed: () {
+                                viewModel.uploadedDocs.removeAt(index);
+                                viewModel.notifyListeners(); // To update the UI
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
                 const SizedBox(height: 15),
                 const Text(
                   "Personal Health Information",
