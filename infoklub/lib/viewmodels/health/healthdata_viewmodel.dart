@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:infoklub/models/health/health_model.dart';
 import 'package:infoklub/utils/hive_helpers.dart';
@@ -83,6 +82,29 @@ class HealthDataViewModel extends ChangeNotifier {
     }
   }
 
+  bool hasData() {
+    return allergies.isNotEmpty ||
+        selectedBloodType != null ||
+        selectedMedications.isNotEmpty ||
+        uploadedDocs.isNotEmpty;
+  }
+
+//fetch health data
+  Future<void> loadHealthData() async {
+    final box = await HiveHelper.openHealthBox();
+
+    final healthData = box.get('user_health');
+
+    if (healthData != null) {
+      selectedBloodType = healthData.bloodType;
+      selectedMedications = List<String>.from(healthData.medications);
+      uploadedDocs = List<String>.from(healthData.documentPaths);
+      allergies = List<String>.from(healthData.allergies);
+      notifyListeners();
+    }
+  }
+
+//save data
   Future<void> saveHealthData() async {
     final box = await HiveHelper.openHealthBox();
     final healthData = HealthModel(

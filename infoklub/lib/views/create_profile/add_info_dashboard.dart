@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
+import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import '../../widgets/custom_card.dart';
 
@@ -16,7 +18,24 @@ class _ProfileOptionsState extends State<ProfileOptions> {
   bool educationCompleted = false;
   bool careerCompleted = false;
 
-  // Calculate progress value
+  @override
+  void initState() {
+    super.initState();
+    _checkCompletionStatus();
+  }
+
+  Future<void> _checkCompletionStatus() async {
+    final healthVM = Provider.of<HealthDataViewModel>(context, listen: false);
+    //final eduVM = Provider.of<Education>(context, listen: false);
+    //final careerVM = Provider.of<CareerViewModel>(context, listen: false);
+
+    await healthVM.loadHealthData(); //load from HIve
+
+    setState(() {
+      healthCompleted = healthVM.hasData(); // true if data exists
+    });
+  }
+
   double get progress {
     int completed = 0;
     if (healthCompleted) completed++;
@@ -37,10 +56,10 @@ class _ProfileOptionsState extends State<ProfileOptions> {
     return AppTheme.azureBlue;
   }
 
-  Future<void> _navigateAndUpdate(String route, Function onComplete) async {
+  Future<void> _navigateAndUpdate(String route) async {
     final result = await Navigator.pushNamed(context, route);
     if (result == true) {
-      setState(() => onComplete());
+      await _checkCompletionStatus();
     }
   }
 
@@ -128,10 +147,7 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                       backgroundColor: Colors.green[50]!,
                       arrowColor: AppTheme.forestGreen,
                       descolor: AppTheme.forestGreen,
-                      onTap: () => _navigateAndUpdate(
-                        AppRoutes.health,
-                        () => healthCompleted = true,
-                      ),
+                      onTap: () => _navigateAndUpdate(AppRoutes.health),
                     ),
                     const SizedBox(height: 15.0),
 
@@ -147,10 +163,7 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                       backgroundColor: Colors.blue[50]!,
                       arrowColor: AppTheme.azureBlue,
                       descolor: AppTheme.azureBlue,
-                      onTap: () => _navigateAndUpdate(
-                        AppRoutes.eduData,
-                        () => educationCompleted = true,
-                      ),
+                      onTap: () => _navigateAndUpdate(AppRoutes.eduData),
                     ),
                     const SizedBox(height: 15.0),
 
@@ -166,10 +179,7 @@ class _ProfileOptionsState extends State<ProfileOptions> {
                       backgroundColor: Colors.purple[50]!,
                       arrowColor: AppTheme.purpleAccent,
                       descolor: AppTheme.purpleAccent,
-                      onTap: () => _navigateAndUpdate(
-                        AppRoutes.career,
-                        () => careerCompleted = true,
-                      ),
+                      onTap: () => _navigateAndUpdate(AppRoutes.career),
                     ),
                   ],
                 ),

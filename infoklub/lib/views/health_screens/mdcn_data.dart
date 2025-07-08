@@ -3,7 +3,6 @@ import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
 import 'package:infoklub/viewmodels/health/mdcn_viewmodel.dart';
-import 'package:infoklub/views/create_profile/add_info_dashboard.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
@@ -67,7 +66,6 @@ class _MdcnDataState extends State<MdcnData> {
                     ),
                     child: Wrap(
                       spacing: 4.0,
-                      // runSpacing: 2.0,
                       children: [
                         // Display the entered symptoms as chips
                         ..._enteredSymptoms.map((symptom) {
@@ -91,7 +89,7 @@ class _MdcnDataState extends State<MdcnData> {
                               setState(() {
                                 _enteredSymptoms.remove(symptom);
                                 if (_enteredSymptoms.isEmpty) {
-                                  _showHintText = true; // Show hint again
+                                  _showHintText = true;
                                 }
                               });
                             },
@@ -103,7 +101,7 @@ class _MdcnDataState extends State<MdcnData> {
                           child: TextField(
                             controller: _textController,
                             style: const TextStyle(
-                              color: Colors.black, // Black text when typing
+                              color: Colors.black,
                             ),
                             onChanged: (value) {
                               setState(() {
@@ -155,6 +153,7 @@ class _MdcnDataState extends State<MdcnData> {
 
                 Utils()
                     .toastMessage("Your health record saved successfully...");
+                await Future.delayed(Duration(milliseconds: 500));
                 Navigator.pushReplacementNamed(
                     context, AppRoutes.infodashboard);
               },
@@ -162,7 +161,7 @@ class _MdcnDataState extends State<MdcnData> {
               borderRadius: 10.0,
             ),
           ),
-          const SizedBox(height: 16.0), // Space below button
+          const SizedBox(height: 16.0),
         ],
       ),
     );

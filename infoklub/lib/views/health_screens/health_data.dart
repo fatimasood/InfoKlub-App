@@ -78,7 +78,7 @@ class HealthData extends StatelessWidget {
                   const SizedBox(height: 10),
                   ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: viewModel.uploadedDocs.length,
                     itemBuilder: (context, index) {
                       final path = viewModel.uploadedDocs[index];
@@ -113,7 +113,7 @@ class HealthData extends StatelessWidget {
                                       fit: BoxFit.cover,
                                     ),
                                   )
-                                : Icon(
+                                : const Icon(
                                     Icons.insert_drive_file,
                                     color: AppTheme.tealAccent,
                                     size: 40,
