@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/main.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
@@ -21,14 +22,15 @@ class _ProfileOptionsState extends State<ProfileOptions> {
   @override
   void initState() {
     super.initState();
-    _checkCompletionStatus();
+    _checkCompletionStatus(userMail);
   }
 
-  Future<void> _checkCompletionStatus() async {
-    final healthVM = Provider.of<HealthDataViewModel>(context, listen: false);
-    //final eduVM = Provider.of<Education>(context, listen: false);
+  Future<void> _checkCompletionStatus(String email) async {
+    final healthVM = Provider.of<HealthDataViewModel>(context,
+        listen:
+            false); //final eduVM = Provider.of<Education>(context, listen: false);
     //final careerVM = Provider.of<CareerViewModel>(context, listen: false);
-
+    healthVM.initialize(email);
     await healthVM.loadHealthData(); //load from HIve
 
     setState(() {
@@ -59,7 +61,7 @@ class _ProfileOptionsState extends State<ProfileOptions> {
   Future<void> _navigateAndUpdate(String route) async {
     final result = await Navigator.pushNamed(context, route);
     if (result == true) {
-      await _checkCompletionStatus();
+      await _checkCompletionStatus(userMail);
     }
   }
 

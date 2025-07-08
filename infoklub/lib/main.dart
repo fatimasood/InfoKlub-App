@@ -3,7 +3,6 @@ import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/models/health/health_model.dart';
 import 'package:infoklub/models/user_profile_model.dart';
-import 'package:infoklub/utils/hive_helpers.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';
@@ -19,23 +18,34 @@ import 'package:infoklub/viewmodels/profile_setup/link_add_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/profilesetup_viewmodel.dart';
 import 'package:infoklub/viewmodels/rating/rating_viewmodel.dart';
 import 'package:infoklub/viewmodels/splash_viewmodel.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
-String? userMail;
+String userMail = '';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  //hive initialize
-  await Hive.initFlutter();
+  await Hive.initFlutter(); // Hive default dir
 
-  Hive.registerAdapter(UserProfileModelAdapter());
-  Hive.registerAdapter(HealthModelAdapter());
-  HiveHelper.initHive();
+  await initHive(); // Register adapters
+
   runApp(const MyApp());
+}
+
+Future<void> initHive() async {
+  // Register all adapters once
+  if (!Hive.isAdapterRegistered(1)) {
+    Hive.registerAdapter(HealthModelAdapter());
+  }
+
+  if (!Hive.isAdapterRegistered(2)) {
+    Hive.registerAdapter(UserProfileModelAdapter());
+  }
+
+  // other adapters
 }
 
 class MyApp extends StatelessWidget {
@@ -46,9 +56,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SplashScreenViewModel()),
-        ChangeNotifierProvider(
-          create: (_) => AddLinkViewModel(),
-        ),
+        ChangeNotifierProvider(create: (_) => AddLinkViewModel()),
         ChangeNotifierProvider(create: (_) => ProfileSetupViewModel()),
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => SignupViewmodel()),

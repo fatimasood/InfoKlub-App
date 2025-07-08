@@ -142,9 +142,10 @@ class _MdcnDataState extends State<MdcnData> {
               onPressed: () async {
                 final healthVM =
                     Provider.of<HealthDataViewModel>(context, listen: false);
+
                 final symptomVM =
                     Provider.of<MdcnDataViewModel>(context, listen: false);
-
+                healthVM.initialize(healthVM.userEmail);
                 //trasfer data to health view model
                 healthVM.allergies = symptomVM.selectedSymptoms;
                 //save everything to hive
@@ -153,9 +154,11 @@ class _MdcnDataState extends State<MdcnData> {
 
                 Utils()
                     .toastMessage("Your health record saved successfully...");
-                await Future.delayed(Duration(milliseconds: 500));
-                Navigator.pushReplacementNamed(
-                    context, AppRoutes.infodashboard);
+                await Future.delayed(const Duration(milliseconds: 500));
+
+                if (!mounted) return;
+                Navigator.pushReplacementNamed(context, AppRoutes.infodashboard,
+                    arguments: healthVM.userEmail);
               },
               color: AppTheme.tealAccent,
               borderRadius: 10.0,

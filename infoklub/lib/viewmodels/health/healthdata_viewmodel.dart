@@ -4,6 +4,12 @@ import 'package:infoklub/models/health/health_model.dart';
 import 'package:infoklub/utils/hive_helpers.dart';
 
 class HealthDataViewModel extends ChangeNotifier {
+  late String userEmail;
+
+  void initialize(String email) {
+    userEmail = email;
+  }
+
   final List<String> bloodTypes = [
     "A+",
     "A-",
@@ -91,7 +97,7 @@ class HealthDataViewModel extends ChangeNotifier {
 
 //fetch health data
   Future<void> loadHealthData() async {
-    final box = await HiveHelper.openHealthBox();
+    final box = await HiveHelper.openHealthBox(userEmail);
 
     final healthData = box.get('user_health');
 
@@ -106,7 +112,7 @@ class HealthDataViewModel extends ChangeNotifier {
 
 //save data
   Future<void> saveHealthData() async {
-    final box = await HiveHelper.openHealthBox();
+    final box = await HiveHelper.openHealthBox(userEmail);
     final healthData = HealthModel(
       bloodType: selectedBloodType ?? "Unknown",
       medications: List.from(selectedMedications),
