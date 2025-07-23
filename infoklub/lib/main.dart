@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/models/education/education_model.dart';
 import 'package:infoklub/models/health/health_model.dart';
 import 'package:infoklub/models/user/user_profile_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
@@ -36,7 +40,21 @@ Future<void> main() async {
 }
 
 Future<void> initHive() async {
-  // Register all adapters once
+  const secureStorage = FlutterSecureStorage();
+  String? existingKey = await secureStorage.read(key: 'hiveKey');
+
+  if (existingKey == null) {
+    final key = Hive.generateSecureKey();
+    await secureStorage.write(key: 'hiveKey', value: base64UrlEncode(key));
+    existingKey = base64UrlEncode(key);
+  }
+
+  final encryptionKey = base64Url.decode(existingKey);
+  await Hive.openBox(
+    'userBox',
+    encryptionCipher: HiveAesCipher(encryptionKey),
+  );
+
   if (!Hive.isAdapterRegistered(1)) {
     Hive.registerAdapter(HealthModelAdapter());
   }
@@ -44,8 +62,9 @@ Future<void> initHive() async {
   if (!Hive.isAdapterRegistered(2)) {
     Hive.registerAdapter(UserProfileModelAdapter());
   }
-
-  // other adapters
+  if (!Hive.isAdapterRegistered(3)) {
+    Hive.registerAdapter(EducationInfoAdapter());
+  }
 }
 
 class MyApp extends StatelessWidget {

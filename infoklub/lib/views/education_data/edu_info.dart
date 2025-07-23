@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:infoklub/main.dart';
+import 'package:infoklub/models/education/education_model.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/widgets/custom_button.dart';
@@ -98,7 +100,22 @@ class EduInfo extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    final viewmodel =
+                        Provider.of<EduinfoViewmodel>(context, listen: false);
+                    final String email = userMail;
+
+                    final info = EducationInfo(
+                      degree: degreeController.text,
+                      institution: institutionController.text,
+                      totalGrade: totalGradeController.text,
+                      scoreGrade: scoreGradeController.text,
+                      percentage: percentageController.text,
+                      achievements: achievementsController.text,
+                    );
+
+                    await viewmodel.saveEducationInfo(email, info);
+                    viewmodel.clearEducationInfo();
                     Navigator.pushNamed(context, AppRoutes.eduSave);
                   },
                   style: ElevatedButton.styleFrom(
