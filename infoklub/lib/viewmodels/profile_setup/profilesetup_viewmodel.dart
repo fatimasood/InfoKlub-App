@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:infoklub/models/user_profile_model.dart';
+import 'package:infoklub/models/user/user_profile_model.dart';
 import 'package:infoklub/viewmodels/profile_setup/finishprofile_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';

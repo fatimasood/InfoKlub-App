@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:infoklub/widgets/custom_button.dart';
 
 import '../../../app/theme.dart';
 import '../../../widgets/custom_input.dart';
@@ -11,8 +10,6 @@ class ReusableForm extends StatelessWidget {
   final TextEditingController scoreGradeController;
   final TextEditingController percentageController;
   final TextEditingController achievementsController;
-  final VoidCallback onFileUpload;
-  final VoidCallback onScanDocuments;
 
   const ReusableForm({
     super.key,
@@ -22,8 +19,6 @@ class ReusableForm extends StatelessWidget {
     required this.scoreGradeController,
     required this.percentageController,
     required this.achievementsController,
-    required this.onFileUpload,
-    required this.onScanDocuments,
   });
 
   @override
@@ -118,20 +113,6 @@ class ReusableForm extends StatelessWidget {
             onChanged: (val) {},
           ),
           const SizedBox(height: 16.0),
-
-          // File Upload Section
-          // dropfiles(),
-          const SizedBox(height: 16.0),
-
-          // Scan Documents Button
-          CustomButton(
-              text: "Use Camera to Scan Documents",
-              textColor: AppTheme.primaryColor,
-              borderColor: AppTheme.secondaryColor,
-              color: AppTheme.whiteColor,
-              onPressed: () {
-                //scan documents
-              })
         ],
       ),
     );

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:infoklub/widgets/custom_button.dart';
+import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/widgets/custom_button.dart';
+import 'package:infoklub/widgets/drag_dropfile.dart';
+import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import 'widget/custom_form.dart';
 
@@ -9,9 +12,10 @@ class EduInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final viewModel = Provider.of<EduinfoViewmodel>(context);
+    final viewModel = Provider.of<EduinfoViewmodel>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final isTablet = screenWidth > 600;
 
     final TextEditingController degreeController = TextEditingController();
     final TextEditingController institutionController = TextEditingController();
@@ -27,11 +31,10 @@ class EduInfo extends StatelessWidget {
           onTap: () {
             Navigator.pop(context);
           },
-          child: Image.asset(
-            'lib/assets/Images/backarrow.png',
-            color: AppTheme.azureBlue,
-            height: 22,
-            width: 22,
+          child: const Icon(
+            Icons.arrow_back_ios,
+            color: AppTheme.textColor,
+            size: 18,
           ),
         ),
         title: Text(
@@ -45,7 +48,7 @@ class EduInfo extends StatelessWidget {
           SingleChildScrollView(
             padding: EdgeInsets.symmetric(
               horizontal: screenWidth * 0.04,
-              vertical: screenHeight * 0.02,
+              // vertical: screenHeight * 0,
             ),
             child: ConstrainedBox(
               constraints: BoxConstraints(
@@ -55,18 +58,20 @@ class EduInfo extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  FileUploadWidget(onUploadTap: () {
+                    //viewModel.pickDocument();
+                  }),
+                  const SizedBox(height: 10.0),
                   CustomButton(
-                    text: 'Add Education',
-                    color: const Color(0xFFFFFFFF),
-                    borderColor: Colors.grey,
-                    borderRadius: 10.0,
-                    textColor: AppTheme.blackColor,
-                    icon: const Icon(
-                      Icons.add_circle,
-                      color: Colors.black,
-                    ),
+                    text: 'Use Camera to Scan Document',
+                    borderColor: AppTheme.azureBlue,
+                    height: 45.0,
+                    width: double.infinity,
+                    textColor: AppTheme.azureBlue,
+                    color: AppTheme.whiteColor,
+                    borderRadius: 15.0,
                     onPressed: () {
-                      print("Add Education Button Pressed");
+                      // viewModel.captureWithCamera();
                     },
                   ),
                   //take info from user
@@ -77,14 +82,7 @@ class EduInfo extends StatelessWidget {
                     scoreGradeController: scoreGradeController,
                     percentageController: percentageController,
                     achievementsController: achievementsController,
-                    onFileUpload: () {
-                      print("File upload clicked");
-                    },
-                    onScanDocuments: () {
-                      print("Scan documents clicked");
-                    },
                   ),
-                  const SizedBox(height: 100),
                 ],
               ),
             ),

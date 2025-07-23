@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/models/health/health_model.dart';
-import 'package:infoklub/models/user_profile_model.dart';
+import 'package:infoklub/models/user/user_profile_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';

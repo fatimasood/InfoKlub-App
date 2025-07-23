@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import '../../models/user_profile_model.dart';
+import '../../models/user/user_profile_model.dart';
 
 class AddLinkViewModel extends ChangeNotifier {
   final TextEditingController behanceController = TextEditingController();
