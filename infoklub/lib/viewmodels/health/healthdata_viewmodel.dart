@@ -28,7 +28,6 @@ class HealthDataViewModel extends ChangeNotifier {
     "Paracetamol",
     "Vitamin C",
     "Antibiotics",
-    "Ibuprofen",
     "Diclofenac",
     "Ketorolac",
     "Multivitamins",

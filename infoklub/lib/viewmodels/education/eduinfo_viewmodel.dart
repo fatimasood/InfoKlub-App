@@ -43,6 +43,7 @@ class EduinfoViewmodel extends ChangeNotifier {
     await box.put("eduInfo_$email", info);
     _eduInfo = info;
     notifyListeners();
+    printAllUserBoxData(); // just for debugging
   }
 
   Future<void> loadEducationInfo(String email) async {
@@ -54,5 +55,13 @@ class EduinfoViewmodel extends ChangeNotifier {
   void clearEducationInfo() {
     _eduInfo = null;
     notifyListeners();
+  }
+
+  void printAllUserBoxData() {
+    final box = Hive.box('userBox');
+    print("📚 Hive Box Data:");
+    for (var key in box.keys) {
+      print("🔑 $key => ${box.get(key)}");
+    }
   }
 }

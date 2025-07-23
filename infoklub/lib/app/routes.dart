@@ -7,7 +7,6 @@ import 'package:infoklub/views/career_screens/finish_screen.dart';
 import 'package:infoklub/views/create_profile/add_info_dashboard.dart';
 import 'package:infoklub/views/create_profile/addlink.dart';
 import 'package:infoklub/views/education_data/edu_info.dart';
-import 'package:infoklub/views/health_screens/health_dashboard.dart';
 import 'package:infoklub/views/health_screens/health_data.dart';
 import '../views/career_screens/career_dashboard.dart';
 import '../views/career_screens/career_data.dart';
@@ -80,8 +79,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HealthData());
       case mdcndata:
         return MaterialPageRoute(builder: (_) => const MdcnData());
-      case healthdboard:
-        return MaterialPageRoute(builder: (_) => const HealthDashboard());
+
       case eduData:
         return MaterialPageRoute(builder: (_) => const EduInfo());
 

@@ -135,6 +135,7 @@ class HealthData extends StatelessWidget {
                                   color: Colors.redAccent),
                               onPressed: () {
                                 viewModel.uploadedDocs.removeAt(index);
+
                                 viewModel.notifyListeners(); // To update the UI
                               },
                             ),

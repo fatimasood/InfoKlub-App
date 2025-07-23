@@ -5,7 +5,6 @@ import 'package:infoklub/main.dart';
 import 'package:infoklub/models/education/education_model.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/widgets/drag_dropfile.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
@@ -62,6 +61,9 @@ class EduInfo extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  FileUploadWidget(onUploadTap: () {
+                    viewModel.pickDocument();
+                  }),
                   if (viewModel.uploadedDocs.isNotEmpty) ...[
                     const SizedBox(height: 20),
                     Text(
@@ -113,7 +115,7 @@ class EduInfo extends StatelessWidget {
                                     )
                                   : const Icon(
                                       Icons.insert_drive_file,
-                                      color: AppTheme.tealAccent,
+                                      color: AppTheme.secondaryColor,
                                       size: 40,
                                     ),
                               const SizedBox(width: 12),
@@ -144,18 +146,7 @@ class EduInfo extends StatelessWidget {
                     ),
                   ],
                   const SizedBox(height: 10.0),
-                  CustomButton(
-                    text: 'Use Camera to Scan Document',
-                    borderColor: AppTheme.azureBlue,
-                    height: 45.0,
-                    width: double.infinity,
-                    textColor: AppTheme.azureBlue,
-                    color: AppTheme.whiteColor,
-                    borderRadius: 15.0,
-                    onPressed: () {
-                      viewModel.captureWithCamera();
-                    },
-                  ),
+
                   //take info from user
                   ReusableForm(
                     degreeController: degreeController,
@@ -198,6 +189,7 @@ class EduInfo extends StatelessWidget {
 
                     await viewmodel.saveEducationInfo(email, info);
                     viewmodel.clearEducationInfo();
+
                     Navigator.pushNamed(context, AppRoutes.eduSave);
                   },
                   style: ElevatedButton.styleFrom(
