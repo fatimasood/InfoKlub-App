@@ -19,6 +19,7 @@ class ReusableForm extends StatelessWidget {
     required this.scoreGradeController,
     required this.percentageController,
     required this.achievementsController,
+    required List<String> uploadedDocs,
   });
 
   @override

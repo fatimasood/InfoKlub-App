@@ -23,13 +23,14 @@ class EducationInfoAdapter extends TypeAdapter<EducationInfo> {
       scoreGrade: fields[3] as String,
       percentage: fields[4] as String,
       achievements: fields[5] as String,
+      uploadedDocs: (fields[6] as List).cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, EducationInfo obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.degree)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class EducationInfoAdapter extends TypeAdapter<EducationInfo> {
       ..writeByte(4)
       ..write(obj.percentage)
       ..writeByte(5)
-      ..write(obj.achievements);
+      ..write(obj.achievements)
+      ..writeByte(6)
+      ..write(obj.uploadedDocs);
   }
 
   @override

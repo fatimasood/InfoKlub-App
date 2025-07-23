@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:infoklub/main.dart';
 import 'package:infoklub/models/education/education_model.dart';
@@ -50,19 +52,97 @@ class EduInfo extends StatelessWidget {
           SingleChildScrollView(
             padding: EdgeInsets.symmetric(
               horizontal: screenWidth * 0.04,
-              // vertical: screenHeight * 0,
+              // vertical: screenHeight * 0.02,
             ),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: screenHeight, // Ensures proper layout
+                minHeight: screenHeight,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  FileUploadWidget(onUploadTap: () {
-                    //viewModel.pickDocument();
-                  }),
+                  if (viewModel.uploadedDocs.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    Text(
+                      "Uploaded Documents",
+                      style: TextStyle(
+                        fontSize: isTablet ? 20.0 : 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inter',
+                        color: AppTheme.blackColor,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: viewModel.uploadedDocs.length,
+                      itemBuilder: (context, index) {
+                        final path = viewModel.uploadedDocs[index];
+                        final isImage = path.endsWith('.jpg') ||
+                            path.endsWith('.jpeg') ||
+                            path.endsWith('.png');
+
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 6.0),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppTheme.whiteColor,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey[300]!),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                blurRadius: 5,
+                                offset: const Offset(0, 2),
+                              )
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              isImage
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.file(
+                                        File(path),
+                                        width: 50,
+                                        height: 50,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.insert_drive_file,
+                                      color: AppTheme.tealAccent,
+                                      size: 40,
+                                    ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  path.split('/').last,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppTheme.greyblacktext,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete,
+                                    color: Colors.redAccent),
+                                onPressed: () {
+                                  viewModel.uploadedDocs.removeAt(index);
+                                  viewModel
+                                      .notifyListeners(); // To update the UI
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                   const SizedBox(height: 10.0),
                   CustomButton(
                     text: 'Use Camera to Scan Document',
@@ -73,7 +153,7 @@ class EduInfo extends StatelessWidget {
                     color: AppTheme.whiteColor,
                     borderRadius: 15.0,
                     onPressed: () {
-                      // viewModel.captureWithCamera();
+                      viewModel.captureWithCamera();
                     },
                   ),
                   //take info from user
@@ -84,6 +164,7 @@ class EduInfo extends StatelessWidget {
                     scoreGradeController: scoreGradeController,
                     percentageController: percentageController,
                     achievementsController: achievementsController,
+                    uploadedDocs: viewModel.uploadedDocs,
                   ),
                 ],
               ),
@@ -112,6 +193,7 @@ class EduInfo extends StatelessWidget {
                       scoreGrade: scoreGradeController.text,
                       percentage: percentageController.text,
                       achievements: achievementsController.text,
+                      uploadedDocs: viewmodel.uploadedDocs,
                     );
 
                     await viewmodel.saveEducationInfo(email, info);
