@@ -1,12 +1,20 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
+
+// Routes & Theme
 import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/models/education/education_model.dart';
-import 'package:infoklub/models/health/health_model.dart';
+
+// Models
 import 'package:infoklub/models/user/user_profile_model.dart';
+import 'package:infoklub/models/health/health_model.dart';
+import 'package:infoklub/models/education/education_model.dart';
+
+// ViewModels
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';
@@ -22,9 +30,6 @@ import 'package:infoklub/viewmodels/profile_setup/link_add_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/profilesetup_viewmodel.dart';
 import 'package:infoklub/viewmodels/rating/rating_viewmodel.dart';
 import 'package:infoklub/viewmodels/splash_viewmodel.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:provider/provider.dart';
 
 String userMail = '';
 
@@ -32,9 +37,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  await Hive.initFlutter(); // Hive default dir
-
-  await initHive(); // Register adapters
+  await Hive.initFlutter(); // Initialize Hive with default path
+  await initHive(); // Register adapters and open encrypted box
 
   runApp(const MyApp());
 }
@@ -46,23 +50,29 @@ Future<void> initHive() async {
   if (existingKey == null) {
     final key = Hive.generateSecureKey();
     await secureStorage.write(key: 'hiveKey', value: base64UrlEncode(key));
-    existingKey = base64UrlEncode(key);
+    existingKey = await secureStorage.read(key: 'hiveKey');
+    print('🔐 Hive encryption key created and stored securely.');
   }
 
-  final encryptionKey = base64Url.decode(existingKey);
+  final encryptionKey = base64Url.decode(existingKey!);
+
+  // 💣 Delete the box to reset all stored values
+  await Hive.deleteBoxFromDisk('userBox');
+
+  // 🧠 Now open a clean box
   await Hive.openBox(
     'userBox',
     encryptionCipher: HiveAesCipher(encryptionKey),
   );
 
+  // Register adapters
+  if (!Hive.isAdapterRegistered(0)) {
+    Hive.registerAdapter(UserProfileModelAdapter());
+  }
   if (!Hive.isAdapterRegistered(1)) {
     Hive.registerAdapter(HealthModelAdapter());
   }
-
   if (!Hive.isAdapterRegistered(2)) {
-    Hive.registerAdapter(UserProfileModelAdapter());
-  }
-  if (!Hive.isAdapterRegistered(3)) {
     Hive.registerAdapter(EducationInfoAdapter());
   }
 }
