@@ -31,27 +31,74 @@ class EduInfo extends StatefulWidget {
 
 class _EduInfoState extends State<EduInfo> {
   final String email = userMail;
+  late EduinfoViewmodel viewModel;
+  late TextEditingController degreeController;
+  late TextEditingController institutionController;
+  late TextEditingController totalGradeController;
+  late TextEditingController scoreGradeController;
+  late TextEditingController achievementsController;
+
+  @override
+  void initState() {
+    super.initState();
+    viewModel = EduinfoViewmodel();
+    viewModel.degreeName(widget.degreeName);
+    viewModel.institutionName(widget.institutionName);
+    viewModel.totalGradeName(widget.totalGrade);
+    viewModel.scoreGradeName(widget.scoreGrade);
+    viewModel.achievementsName(widget.achievements);
+    viewModel.uploadedDocs = [];
+
+    degreeController = TextEditingController(text: widget.degreeName);
+    institutionController = TextEditingController(text: widget.institutionName);
+    totalGradeController = TextEditingController(text: widget.totalGrade);
+    scoreGradeController = TextEditingController(text: widget.scoreGrade);
+    achievementsController = TextEditingController(text: widget.achievements);
+  }
+
+  @override
+  void dispose() {
+    degreeController.dispose();
+    institutionController.dispose();
+    totalGradeController.dispose();
+    scoreGradeController.dispose();
+    achievementsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<EduinfoViewmodel>(
-      create: (_) {
-        final viewModel = EduinfoViewmodel();
-        viewModel.degreeName(widget.degreeName);
-        viewModel.institutionName(widget.institutionName);
-        viewModel.totalGradeName(widget.totalGrade);
-        viewModel.scoreGradeName(widget.scoreGrade);
-        viewModel.achievementsName(widget.achievements);
-        viewModel.uploadedDocs = [];
-        return viewModel;
-      },
-      child: const _EducationInfoView(),
+    return ChangeNotifierProvider.value(
+      value: viewModel,
+      child: _EducationInfoView(
+        degreeController: degreeController,
+        institutionController: institutionController,
+        totalGradeController: totalGradeController,
+        scoreGradeController: scoreGradeController,
+        achievementsController: achievementsController,
+        viewModel: viewModel,
+      ),
     );
   }
 }
 
 class _EducationInfoView extends StatelessWidget {
-  const _EducationInfoView({super.key});
+  final TextEditingController degreeController;
+  final TextEditingController institutionController;
+  final TextEditingController totalGradeController;
+  final TextEditingController scoreGradeController;
+  final TextEditingController achievementsController;
+  final EduinfoViewmodel viewModel;
+
+  const _EducationInfoView({
+    super.key,
+    required this.degreeController,
+    required this.institutionController,
+    required this.totalGradeController,
+    required this.scoreGradeController,
+    required this.achievementsController,
+    required this.viewModel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -59,18 +106,6 @@ class _EducationInfoView extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final isTablet = screenWidth > 600;
-
-    final TextEditingController degreeController =
-        TextEditingController(text: viewModel.degree);
-    final TextEditingController institutionController =
-        TextEditingController(text: viewModel.institution);
-    final TextEditingController totalGradeController =
-        TextEditingController(text: viewModel.totalGrade);
-    final TextEditingController scoreGradeController =
-        TextEditingController(text: viewModel.scoreGrade);
-
-    final TextEditingController achievementsController =
-        TextEditingController(text: viewModel.achievements);
 
     return Scaffold(
       appBar: AppBar(
@@ -233,7 +268,17 @@ class _EducationInfoView extends StatelessWidget {
                         achievements: achievementsController.text.trim(),
                         uploadedDocs: viewmodel.uploadedDocs,
                       );
-                      print("👤 Saving education info for: $email");
+
+                      if (kDebugMode) {
+                        print("👤 Saving education info for: $email");
+                        print("📚 Degree: ${info.degree}");
+                        print("🏫 Institution: ${info.institution}");
+                        print("📊 Total Grade: ${info.totalGrade}");
+                        print("📈 Score Grade: ${info.scoreGrade}");
+                        print("🏆 Achievements: ${info.achievements}");
+                        print(
+                            "📂 Uploaded Docs: ${info.uploadedDocs.join(', ')}");
+                      }
 
                       await viewmodel.saveEducationInfo(email, info);
                       viewmodel.clearEduInfo();

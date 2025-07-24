@@ -56,6 +56,26 @@ class EduinfoViewmodel extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteEducationInfoAt(String email, int index) async {
+    final box = Hive.box('userBox');
+
+    try {
+      final rawList = box.get("eduInfo_$email", defaultValue: []);
+      List<EducationInfo> existingList = List<EducationInfo>.from(rawList);
+
+      if (index >= 0 && index < existingList.length) {
+        existingList.removeAt(index);
+        await box.put("eduInfo_$email", existingList);
+        notifyListeners();
+        print("🗑️ Deleted education entry at index $index");
+      } else {
+        print("⚠️ Invalid index: $index");
+      }
+    } catch (e) {
+      print("❌ Error deleting education info: $e");
+    }
+  }
+
   List<EducationInfo> getAllEducationEntries(String email) {
     final box = Hive.box('userBox');
     final rawList = box.get("eduInfo_$email", defaultValue: []);
