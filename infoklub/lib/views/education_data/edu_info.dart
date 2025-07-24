@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/main.dart';
 import 'package:infoklub/models/education/education_model.dart';
@@ -10,8 +11,47 @@ import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import 'widget/custom_form.dart';
 
-class EduInfo extends StatelessWidget {
-  const EduInfo({super.key});
+class EduInfo extends StatefulWidget {
+  final String degreeName;
+  final String institutionName;
+  final String totalGrade;
+  final String scoreGrade;
+  final String achievements;
+  const EduInfo(
+      {super.key,
+      required this.degreeName,
+      required this.institutionName,
+      required this.totalGrade,
+      required this.scoreGrade,
+      required this.achievements});
+
+  @override
+  State<EduInfo> createState() => _EduInfoState();
+}
+
+class _EduInfoState extends State<EduInfo> {
+  final String email = userMail;
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<EduinfoViewmodel>(
+      create: (_) {
+        final viewModel = EduinfoViewmodel();
+        viewModel.degreeName(widget.degreeName);
+        viewModel.institutionName(widget.institutionName);
+        viewModel.totalGradeName(widget.totalGrade);
+        viewModel.scoreGradeName(widget.scoreGrade);
+        viewModel.achievementsName(widget.achievements);
+        viewModel.uploadedDocs = [];
+        return viewModel;
+      },
+      child: const _EducationInfoView(),
+    );
+  }
+}
+
+class _EducationInfoView extends StatelessWidget {
+  const _EducationInfoView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +60,17 @@ class EduInfo extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final isTablet = screenWidth > 600;
 
-    final TextEditingController degreeController = TextEditingController();
-    final TextEditingController institutionController = TextEditingController();
-    final TextEditingController totalGradeController = TextEditingController();
-    final TextEditingController scoreGradeController = TextEditingController();
-    final TextEditingController percentageController = TextEditingController();
+    final TextEditingController degreeController =
+        TextEditingController(text: viewModel.degree);
+    final TextEditingController institutionController =
+        TextEditingController(text: viewModel.institution);
+    final TextEditingController totalGradeController =
+        TextEditingController(text: viewModel.totalGrade);
+    final TextEditingController scoreGradeController =
+        TextEditingController(text: viewModel.scoreGrade);
+
     final TextEditingController achievementsController =
-        TextEditingController();
+        TextEditingController(text: viewModel.achievements);
 
     return Scaffold(
       appBar: AppBar(
@@ -156,7 +200,6 @@ class EduInfo extends StatelessWidget {
                       institutionController: institutionController,
                       totalGradeController: totalGradeController,
                       scoreGradeController: scoreGradeController,
-                      percentageController: percentageController,
                       achievementsController: achievementsController,
                       uploadedDocs: viewModel.uploadedDocs,
                     ),
@@ -179,16 +222,18 @@ class EduInfo extends StatelessWidget {
                       final viewmodel =
                           Provider.of<EduinfoViewmodel>(context, listen: false);
                       final String email = userMail;
-
+                      if (kDebugMode) {
+                        print("Saving for email: $email");
+                      }
                       final info = EducationInfo(
-                        degree: degreeController.text,
-                        institution: institutionController.text,
-                        totalGrade: totalGradeController.text,
-                        scoreGrade: scoreGradeController.text,
-                        percentage: percentageController.text,
-                        achievements: achievementsController.text,
+                        degree: degreeController.text.trim(),
+                        institution: institutionController.text.trim(),
+                        totalGrade: totalGradeController.text.trim(),
+                        scoreGrade: scoreGradeController.text.trim(),
+                        achievements: achievementsController.text.trim(),
                         uploadedDocs: viewmodel.uploadedDocs,
                       );
+                      print("👤 Saving education info for: $email");
 
                       await viewmodel.saveEducationInfo(email, info);
                       viewmodel.clearEduInfo();

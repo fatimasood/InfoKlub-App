@@ -119,8 +119,9 @@ class EduSave extends StatelessWidget {
                               child: const Icon(Icons.edit),
                             ),
                             GestureDetector(
-                              onTap: () async => await viewModel
-                                  .deleteEducationInfoAt(userMail, i),
+                              onTap: () {},
+                              /*async => await viewModel
+                                  .deleteEducationInfoAt(userMail, i),*/
                               child: const Icon(
                                 Icons.delete,
                                 color: AppTheme.secondaryColor,

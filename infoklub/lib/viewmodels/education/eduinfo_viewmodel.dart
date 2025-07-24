@@ -5,32 +5,61 @@ import 'package:file_picker/file_picker.dart';
 
 class EduinfoViewmodel extends ChangeNotifier {
   List<String> uploadedDocs = [];
-  EducationInfo? _eduInfo;
 
-  EducationInfo? get eduInfo => _eduInfo;
+  String degree = '';
+  String institution = '';
+  String totalGrade = '';
+  String scoreGrade = '';
+  String achievements = '';
+
+  void degreeName(String val) => degree = val;
+  void institutionName(String val) => institution = val;
+  void totalGradeName(String val) => totalGrade = val;
+  void scoreGradeName(String val) => scoreGrade = val;
+  void achievementsName(String val) => achievements = val;
 
   /// Save new education info to the list associated with the user's email
   Future<void> saveEducationInfo(String email, EducationInfo info) async {
     final box = Hive.box('userBox');
 
-    final existingList = box.get("eduInfo_$email",
-            defaultValue: <EducationInfo>[])?.cast<EducationInfo>() ??
-        [];
+    try {
+      final rawList = box.get("eduInfo_$email", defaultValue: []);
+      final List<EducationInfo> existingList =
+          List<EducationInfo>.from(rawList);
+      existingList.add(info);
+      await box.put("eduInfo_$email", existingList);
+    } catch (e) {
+      print("❌ Hive saving error: $e");
+      return;
+    }
 
-    existingList.add(info);
-
-    await box.put("eduInfo_$email", existingList);
-    _eduInfo = null; // Clear after save
     uploadedDocs.clear();
     notifyListeners();
+
+    final savedList = box.get("eduInfo_$email", defaultValue: []) as List;
+
+    if (savedList.isEmpty) {
+      print("📭 No education data found.");
+      return;
+    }
+
+    for (int i = 0; i < savedList.length; i++) {
+      final edu = savedList[i] as EducationInfo;
+      print("🔍 Entry #$i:");
+      print("🎓 Degree: ${edu.degree}");
+      print("🏛️ Institution: ${edu.institution}");
+      print("📊 Total Grade: ${edu.totalGrade}");
+      print("📈 Score Grade: ${edu.scoreGrade}");
+      print("🏆 Achievements: ${edu.achievements}");
+      print("📂 Uploaded Docs: ${edu.uploadedDocs.join(', ')}");
+      print("──────────────────────────────");
+    }
   }
 
-  /// Get all education info entries for the user
   List<EducationInfo> getAllEducationEntries(String email) {
     final box = Hive.box('userBox');
-    return box.get("eduInfo_$email",
-            defaultValue: <EducationInfo>[])?.cast<EducationInfo>() ??
-        [];
+    final rawList = box.get("eduInfo_$email", defaultValue: []);
+    return List<EducationInfo>.from(rawList);
   }
 
   Future<void> pickDocument() async {
@@ -46,24 +75,8 @@ class EduinfoViewmodel extends ChangeNotifier {
     }
   }
 
-  /// Delete a specific entry at the given index
-  Future<void> deleteEducationInfoAt(String email, int index) async {
-    final box = Hive.box('userBox');
-    final existingList = box.get("eduInfo_$email",
-            defaultValue: <EducationInfo>[])?.cast<EducationInfo>() ??
-        [];
-
-    if (index < existingList.length) {
-      existingList.removeAt(index);
-      await box.put("eduInfo_$email", existingList);
-      notifyListeners();
-    }
-  }
-
-  /// For testing or UI resets
   void clearEduInfo() {
-    _eduInfo = null;
-    uploadedDocs.clear();
+    uploadedDocs = [];
     notifyListeners();
   }
 }

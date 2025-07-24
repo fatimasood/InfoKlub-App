@@ -16,12 +16,9 @@ class EducationInfo extends HiveObject {
   final String scoreGrade;
 
   @HiveField(4)
-  final String percentage;
-
-  @HiveField(5)
   final String achievements;
 
-  @HiveField(6)
+  @HiveField(5)
   final List<String> uploadedDocs;
 
   EducationInfo({
@@ -29,7 +26,6 @@ class EducationInfo extends HiveObject {
     required this.institution,
     required this.totalGrade,
     required this.scoreGrade,
-    required this.percentage,
     required this.achievements,
     required this.uploadedDocs,
   });

@@ -8,7 +8,6 @@ class ReusableForm extends StatelessWidget {
   final TextEditingController institutionController;
   final TextEditingController totalGradeController;
   final TextEditingController scoreGradeController;
-  final TextEditingController percentageController;
   final TextEditingController achievementsController;
 
   const ReusableForm({
@@ -17,7 +16,6 @@ class ReusableForm extends StatelessWidget {
     required this.institutionController,
     required this.totalGradeController,
     required this.scoreGradeController,
-    required this.percentageController,
     required this.achievementsController,
     required List<String> uploadedDocs,
   });

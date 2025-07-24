@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -51,15 +52,17 @@ Future<void> initHive() async {
     final key = Hive.generateSecureKey();
     await secureStorage.write(key: 'hiveKey', value: base64UrlEncode(key));
     existingKey = await secureStorage.read(key: 'hiveKey');
-    print('🔐 Hive encryption key created and stored securely.');
+    if (kDebugMode) {
+      print('🔐 Hive encryption key created and stored securely.');
+    }
   }
 
   final encryptionKey = base64Url.decode(existingKey!);
 
-  // 💣 Delete the box to reset all stored values
-  await Hive.deleteBoxFromDisk('userBox');
+  //  Delete the box to reset all stored values
+  //await Hive.deleteBoxFromDisk('userBox');
 
-  // 🧠 Now open a clean box
+  //  Now open a clean box
   await Hive.openBox(
     'userBox',
     encryptionCipher: HiveAesCipher(encryptionKey),

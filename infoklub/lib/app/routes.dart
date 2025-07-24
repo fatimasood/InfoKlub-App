@@ -81,7 +81,15 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const MdcnData());
 
       case eduData:
-        return MaterialPageRoute(builder: (_) => const EduInfo());
+        return MaterialPageRoute(
+          builder: (_) => const EduInfo(
+            degreeName: '',
+            institutionName: '',
+            totalGrade: '',
+            scoreGrade: '',
+            achievements: '',
+          ),
+        );
 
       case eduSave:
         return MaterialPageRoute(builder: (_) => const EduSave());
