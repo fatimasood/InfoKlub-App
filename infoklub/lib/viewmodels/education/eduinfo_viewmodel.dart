@@ -5,12 +5,21 @@ import 'package:file_picker/file_picker.dart';
 
 class EduinfoViewmodel extends ChangeNotifier {
   List<String> uploadedDocs = [];
+  late String Email;
+
+  void initialize(String email) {
+    Email = email;
+    print("mail");
+    print(userEmail);
+  }
 
   String degree = '';
   String institution = '';
   String totalGrade = '';
   String scoreGrade = '';
   String achievements = '';
+
+  get userEmail => null;
 
   void degreeName(String val) => degree = val;
   void institutionName(String val) => institution = val;
@@ -98,5 +107,37 @@ class EduinfoViewmodel extends ChangeNotifier {
   void clearEduInfo() {
     uploadedDocs = [];
     notifyListeners();
+  }
+
+  bool hasData() {
+    final box = Hive.box('userBox');
+    final rawList = box.get("eduInfo_$Email", defaultValue: []);
+    return rawList.isNotEmpty;
+  }
+
+//fetch EDU data
+  Future<void> loadEducationData(String email) async {
+    final box = Hive.box('userBox');
+
+    final rawList = box.get("eduInfo_$email", defaultValue: []);
+    if (rawList == null || rawList.isEmpty) {
+      print("📭 No education data found for $email");
+      return;
+    }
+
+    try {
+      final latestEntry = rawList.last as EducationInfo;
+
+      uploadedDocs = List<String>.from(latestEntry.uploadedDocs);
+      degree = latestEntry.degree;
+      institution = latestEntry.institution;
+      totalGrade = latestEntry.totalGrade;
+      scoreGrade = latestEntry.scoreGrade;
+      achievements = latestEntry.achievements;
+
+      notifyListeners();
+    } catch (e) {
+      print("❌ Error loading education data: $e");
+    }
   }
 }

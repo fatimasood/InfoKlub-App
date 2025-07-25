@@ -62,12 +62,6 @@ Future<void> initHive() async {
   //  Delete the box to reset all stored values
   //await Hive.deleteBoxFromDisk('userBox');
 
-  //  Now open a clean box
-  await Hive.openBox(
-    'userBox',
-    encryptionCipher: HiveAesCipher(encryptionKey),
-  );
-
   // Register adapters
   if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(UserProfileModelAdapter());
@@ -78,6 +72,11 @@ Future<void> initHive() async {
   if (!Hive.isAdapterRegistered(2)) {
     Hive.registerAdapter(EducationInfoAdapter());
   }
+
+  await Hive.openBox(
+    'userBox',
+    encryptionCipher: HiveAesCipher(encryptionKey),
+  );
 }
 
 class MyApp extends StatelessWidget {

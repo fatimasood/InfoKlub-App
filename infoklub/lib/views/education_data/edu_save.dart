@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/main.dart';
+import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/app/theme.dart';
@@ -9,6 +10,8 @@ import '../../app/routes.dart';
 
 class EduSave extends StatelessWidget {
   const EduSave({super.key});
+
+  bool get mounted => false;
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +102,10 @@ class EduSave extends StatelessWidget {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.school_outlined),
+                            const Icon(
+                              Icons.school,
+                              color: AppTheme.secondaryColor,
+                            ),
                             const SizedBox(
                               width: 10,
                             ),
@@ -116,7 +122,10 @@ class EduSave extends StatelessWidget {
                             ),
                             GestureDetector(
                               //onTap: () => ,
-                              child: const Icon(Icons.edit),
+                              child: const Icon(
+                                Icons.edit,
+                                color: AppTheme.secondaryColor,
+                              ),
                             ),
                             GestureDetector(
                               onTap: () async => await viewModel
@@ -144,8 +153,15 @@ class EduSave extends StatelessWidget {
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRoutes.eduboard);
+                    onPressed: () async {
+                      Utils().toastMessage(
+                          "Your health record saved successfully...");
+                      await Future.delayed(const Duration(milliseconds: 500));
+
+                      if (!mounted) return;
+                      Navigator.pushReplacementNamed(
+                          context, AppRoutes.infodashboard,
+                          arguments: viewModel.userEmail);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.secondaryColor,
