@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/main.dart';
 import 'package:infoklub/utils/utils.dart';
@@ -8,14 +7,17 @@ import 'package:infoklub/app/theme.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 
-class EduSave extends StatelessWidget {
+class EduSave extends StatefulWidget {
   const EduSave({super.key});
 
-  bool get mounted => false;
+  @override
+  State<EduSave> createState() => _EduSaveState();
+}
 
+class _EduSaveState extends State<EduSave> {
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<EduinfoViewmodel>(context);
+    final viewModel = Provider.of<EduinfoViewmodel>(context, listen: false);
     final educationList = viewModel.getAllEducationEntries(userMail);
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -121,13 +123,6 @@ class EduSave extends StatelessWidget {
                               ),
                             ),
                             GestureDetector(
-                              //onTap: () => ,
-                              child: const Icon(
-                                Icons.edit,
-                                color: AppTheme.secondaryColor,
-                              ),
-                            ),
-                            GestureDetector(
                               onTap: () async => await viewModel
                                   .deleteEducationInfoAt(userMail, i),
                               child: const Icon(
@@ -147,15 +142,17 @@ class EduSave extends StatelessWidget {
               left: 0,
               right: 0,
               child: Container(
-                color: Colors.white,
                 padding: const EdgeInsets.only(
                     bottom: 20, left: 10, right: 10, top: 0),
                 child: SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: CustomButton(
                     onPressed: () async {
+                      viewModel.initialize(
+                          userMail); // Correctly initialize the ViewModel
+
                       Utils().toastMessage(
-                          "Your health record saved successfully...");
+                          "Your education record saved successfully...");
                       await Future.delayed(const Duration(milliseconds: 500));
 
                       if (!mounted) return;
@@ -163,20 +160,10 @@ class EduSave extends StatelessWidget {
                           context, AppRoutes.infodashboard,
                           arguments: viewModel.userEmail);
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.secondaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 15.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    child: const Text(
-                      "Save",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
+                    width: double.infinity,
+                    text: "Save Information",
+                    color: AppTheme.secondaryColor,
+                    borderRadius: 10.0,
                   ),
                 ),
               ),

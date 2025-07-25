@@ -19,7 +19,7 @@ class EduinfoViewmodel extends ChangeNotifier {
   String scoreGrade = '';
   String achievements = '';
 
-  get userEmail => null;
+  String get userEmail => Email;
 
   void degreeName(String val) => degree = val;
   void institutionName(String val) => institution = val;

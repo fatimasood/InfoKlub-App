@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/main.dart';
-import 'package:infoklub/models/cv/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
 import 'package:provider/provider.dart';
