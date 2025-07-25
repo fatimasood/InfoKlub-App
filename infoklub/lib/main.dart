@@ -5,8 +5,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-
-// Routes & Theme
 import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
 

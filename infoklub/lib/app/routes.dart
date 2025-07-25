@@ -14,8 +14,6 @@ import '../views/career_screens/carrer_all_info.dart';
 import '../views/create_profile/profile_setup.dart';
 import '../views/authentecation_view/login_screen.dart';
 import '../views/education_data/edu_save.dart';
-import '../views/education_data/education_dashboard.dart'
-    show EducationDashboard;
 import '../views/health_screens/mdcn_data.dart';
 import '../views/onboarding_screens_view/onboarding_screen_one.dart';
 import '../views/splash_view/splash_screens.dart';
@@ -26,21 +24,18 @@ class AppRoutes {
   static const String login = '/login';
   static const String signup = '/signup';
   static const String phone = '/phone';
-
   static const String forgotpsd = '/forgotpsd';
   static const String onboardfirst = '/onboardfirst';
   static const String addlinks = '/addlinks';
   static const String infodashboard = '/infodashboard';
   static const String health = '/health';
   static const String mdcndata = '/mdcndata';
-  static const String healthdboard = '/healthdboard';
   static const String eduData = '/eduData';
   static const String career = '/career';
   static const String eduSave = '/eduSave';
   static const String feedback = '/feedback';
 
   //dashboard
-  static const String eduboard = '/eduboard';
   static const String careerdashboard = '/careerdashboard';
   static const String careerInfo = '/careerallinfo';
   static const String finishScreen = '/dataEnter';
@@ -95,8 +90,6 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const EduSave());
       case career:
         return MaterialPageRoute(builder: (_) => const CareerData());
-      case eduboard:
-        return MaterialPageRoute(builder: (_) => const EducationDashboard());
       case careerdashboard:
         return MaterialPageRoute(builder: (_) => const CareerDashboard());
       case careerInfo:
