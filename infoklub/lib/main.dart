@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:infoklub/models/career/career_model.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:infoklub/app/routes.dart';
@@ -71,9 +72,9 @@ Future<void> initHive() async {
   if (!Hive.isAdapterRegistered(2)) {
     Hive.registerAdapter(EducationInfoAdapter());
   }
-  /* if (!Hive.isAdapterRegistered(3)) {
-    Hive.registerAdapter(CareerModelAdapter());
-  }*/
+  if (!Hive.isAdapterRegistered(3)) {
+    Hive.registerAdapter(CarrerModelAdapter());
+  }
 
   await Hive.openBox(
     'userBox',

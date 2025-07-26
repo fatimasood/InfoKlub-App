@@ -1,9 +1,9 @@
 //user career model
 import 'package:hive/hive.dart';
-//part 'career_model.g.dart';
+part 'career_model.g.dart';
 
 @HiveType(typeId: 3)
-class CareerInfo extends HiveObject {
+class CarrerModel extends HiveObject {
   @HiveField(0)
   final String jobTitle;
 
@@ -22,12 +22,16 @@ class CareerInfo extends HiveObject {
   @HiveField(5)
   final String location;
 
-  CareerInfo({
+  @HiveField(6)
+  List<String> documentPaths;
+
+  CarrerModel({
     required this.jobTitle,
     required this.companyName,
     required this.startDate,
     required this.endDate,
     required this.skills,
     required this.location,
+    required this.documentPaths,
   });
 }
