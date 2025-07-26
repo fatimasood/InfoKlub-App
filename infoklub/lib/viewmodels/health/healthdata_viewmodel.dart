@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:infoklub/models/health/health_model.dart';
-import 'package:infoklub/utils/hive_helpers.dart';
+import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
 
 class HealthDataViewModel extends ChangeNotifier {
   late String userEmail;

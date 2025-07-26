@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
@@ -70,6 +71,9 @@ Future<void> initHive() async {
   if (!Hive.isAdapterRegistered(2)) {
     Hive.registerAdapter(EducationInfoAdapter());
   }
+  /* if (!Hive.isAdapterRegistered(3)) {
+    Hive.registerAdapter(CareerModelAdapter());
+  }*/
 
   await Hive.openBox(
     'userBox',
@@ -99,6 +103,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => HomeViewModel()),
         ChangeNotifierProvider(create: (_) => CvViewModel()),
         ChangeNotifierProvider(create: (_) => CvCreationViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => CareerViewmodel(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

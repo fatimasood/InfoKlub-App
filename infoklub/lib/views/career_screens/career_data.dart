@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
 import 'package:infoklub/views/career_screens/widget/custom_form_career.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 
 class CareerData extends StatelessWidget {
@@ -9,7 +11,7 @@ class CareerData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final viewModel = Provider.of<CareerDataViewmodel>(context);
+    final viewModel = Provider.of<CareerViewmodel>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
