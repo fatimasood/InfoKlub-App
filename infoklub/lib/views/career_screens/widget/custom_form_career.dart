@@ -12,7 +12,6 @@ class ReusableFormCareer extends StatelessWidget {
   final TextEditingController endDateController;
   final TextEditingController skillsController;
   final VoidCallback onFileUpload;
-  final VoidCallback onScanDocuments;
 
   const ReusableFormCareer({
     super.key,
@@ -23,7 +22,6 @@ class ReusableFormCareer extends StatelessWidget {
     required this.endDateController,
     required this.skillsController,
     required this.onFileUpload,
-    required this.onScanDocuments,
   });
 
   @override
@@ -79,7 +77,7 @@ class ReusableFormCareer extends StatelessWidget {
           CustomInput(
             hintText: "Bangladesh",
             controller: addressController,
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
             textColor: Colors.black,
             onChanged: (val) {},
@@ -111,7 +109,7 @@ class ReusableFormCareer extends StatelessWidget {
           // Score Grade
           CustomInput(
             hintText: "01 Dec 2024",
-            controller: startDateController,
+            controller: endDateController,
             keyboardType: TextInputType.number,
             textColor: Colors.black,
             onChanged: (val) {},
@@ -132,20 +130,6 @@ class ReusableFormCareer extends StatelessWidget {
             keyboardType: TextInputType.text,
             textColor: Colors.black,
             onChanged: (val) {},
-          ),
-          const SizedBox(height: 16.0),
-
-          // File Upload Section
-          //dropfiles(),
-          const SizedBox(height: 16.0),
-
-          // Scan Documents Button
-          CustomButton(
-            text: "Use Camera to Scan Documents",
-            textColor: AppTheme.purpleAccent,
-            borderColor: AppTheme.purpleAccent,
-            color: AppTheme.whiteColor,
-            onPressed: () {},
           ),
         ],
       ),

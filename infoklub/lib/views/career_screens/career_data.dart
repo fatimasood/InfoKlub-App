@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/main.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
 import 'package:infoklub/views/career_screens/widget/custom_form_career.dart';
-import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/widgets/drag_dropfile.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 
@@ -32,7 +36,7 @@ class CareerData extends StatefulWidget {
 }
 
 class _CareerDataState extends State<CareerData> {
-  final String email = userMail;
+  String email = userMail;
   late CareerViewmodel careerViewmodel;
   late TextEditingController companyNameController;
   late TextEditingController jobTitleController;
@@ -45,7 +49,8 @@ class _CareerDataState extends State<CareerData> {
   void initState() {
     super.initState();
     careerViewmodel = Provider.of<CareerViewmodel>(context, listen: false);
-
+    email = FirebaseAuth.instance.currentUser?.email ?? 'unknown@example.com';
+    careerViewmodel.initialize(email);
     careerViewmodel.uploadedDocs = [];
 
     companyNameController = TextEditingController(text: widget.companyName);
@@ -103,6 +108,8 @@ class _CareerInfoView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final careerViewmodel = Provider.of<CareerViewmodel>(context);
+
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final isTablet = screenWidth > 600;
@@ -129,9 +136,11 @@ class _CareerInfoView extends StatelessWidget {
         child: Stack(
           children: [
             SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.04,
-                vertical: screenHeight * 0.02,
+              padding: EdgeInsets.fromLTRB(
+                screenWidth * 0.04,
+                screenHeight * 0.02,
+                screenWidth * 0.04,
+                100,
               ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -141,7 +150,7 @@ class _CareerInfoView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    CustomButton(
+                    /* CustomButton(
                       text: 'Add Experience',
                       color: const Color(0xFFFFFFFF),
                       borderColor: Colors.grey,
@@ -154,8 +163,94 @@ class _CareerInfoView extends StatelessWidget {
                       onPressed: () {
                         print("Add experience Button Pressed");
                       },
-                    ),
-                    //take info from user
+                    ),*/
+
+                    FileUploadWidget(onUploadTap: () {
+                      careerViewmodel.pickDocument();
+                    }),
+                    if (careerViewmodel.uploadedDocs.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Text(
+                        "Uploaded Documents",
+                        style: TextStyle(
+                          fontSize: isTablet ? 20.0 : 18.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inter',
+                          color: AppTheme.blackColor,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: careerViewmodel.uploadedDocs.length,
+                        itemBuilder: (context, index) {
+                          final path = careerViewmodel.uploadedDocs[index];
+                          final isImage = path.endsWith('.jpg') ||
+                              path.endsWith('.jpeg') ||
+                              path.endsWith('.png');
+
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 6.0),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.whiteColor,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.grey[300]!),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 2),
+                                )
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                isImage
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.file(
+                                          File(path),
+                                          width: 50,
+                                          height: 50,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : const Icon(
+                                        Icons.insert_drive_file,
+                                        color: AppTheme.secondaryColor,
+                                        size: 40,
+                                      ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    path.split('/').last,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.greyblacktext,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.redAccent),
+                                  onPressed: () {
+                                    careerViewmodel.uploadedDocs
+                                        .removeAt(index);
+                                    careerViewmodel
+                                        .notifyListeners(); // To update the UI
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                    const SizedBox(height: 10.0),
                     ReusableFormCareer(
                       companyNameController: companyNameController,
                       jobTitleController: jobTitleController,
@@ -165,9 +260,6 @@ class _CareerInfoView extends StatelessWidget {
                       skillsController: skillsController,
                       onFileUpload: () {
                         print("File upload clicked");
-                      },
-                      onScanDocuments: () {
-                        print("Scan documents clicked");
                       },
                     ),
                     const SizedBox(height: 100),
@@ -186,7 +278,29 @@ class _CareerInfoView extends StatelessWidget {
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      final viewModel =
+                          Provider.of<CareerViewmodel>(context, listen: false);
+
+                      viewModel.jobTitleName(jobTitleController.text.trim());
+                      viewModel.company(companyNameController.text.trim());
+                      viewModel.locationName(addressController.text.trim());
+                      viewModel.startDateName(startDateController.text.trim());
+                      viewModel.endDateName(endDateController.text.trim());
+                      viewModel.skillsName(skillsController.text.trim());
+                      viewModel.uploadedDocs;
+
+                      await viewModel.saveCareerData();
+                      if (kDebugMode) {
+                        print("Company Name: ${viewModel.companyName}");
+                        print("Job Title: ${viewModel.jobTitle}");
+                        print("Address: ${viewModel.location}");
+                        print("Start Date: ${viewModel.startDate}");
+                        print("End Date: ${viewModel.endDate}");
+                        print("Skills: ${viewModel.skills}");
+                        print(viewModel.uploadedDocs);
+                      }
+                      viewModel.clearCareerData();
                       Navigator.pushNamed(context, AppRoutes.careerInfo);
                     },
                     style: ElevatedButton.styleFrom(

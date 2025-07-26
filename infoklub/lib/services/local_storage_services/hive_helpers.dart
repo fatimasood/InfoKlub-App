@@ -24,7 +24,7 @@ class HiveHelper {
   }
 
   static Future<Box<CarrerModel>> openCareerBox(String email) async {
-    final boxName = getHealthBoxName(email);
+    final boxName = getCareerBoxName(email);
     return await Hive.openBox<CarrerModel>(boxName);
   }
 }

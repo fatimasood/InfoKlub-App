@@ -5,8 +5,12 @@ import 'package:infoklub/models/career/career_model.dart';
 import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
 
 class CareerViewmodel extends ChangeNotifier {
-  List<String> uploadedDocs = [];
   late String userEmail;
+  void initialize(String email) {
+    userEmail = email;
+  }
+
+  List<String> uploadedDocs = [];
 
   String jobTitle = '';
   String companyName = '';
@@ -14,10 +18,6 @@ class CareerViewmodel extends ChangeNotifier {
   String endDate = '';
   String skills = '';
   String location = '';
-
-  void initialize(String email) {
-    userEmail = email;
-  }
 
   void jobTitleName(String val) => jobTitle = val;
   void company(String val) => companyName = val;
@@ -79,5 +79,17 @@ class CareerViewmodel extends ChangeNotifier {
       print("Documents: ${careerData.documentPaths}");
       print("──────────────────────────────");
     }
+  }
+
+  //clear career data
+  void clearCareerData() {
+    jobTitle = '';
+    companyName = '';
+    startDate = '';
+    endDate = '';
+    skills = '';
+    location = '';
+    uploadedDocs.clear();
+    notifyListeners();
   }
 }
