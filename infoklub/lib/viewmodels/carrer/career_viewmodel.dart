@@ -1,16 +1,18 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:infoklub/models/career/career_model.dart';
 import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
 
 class CareerViewmodel extends ChangeNotifier {
-  late String userEmail;
-  void initialize(String email) {
-    userEmail = email;
-  }
-
   List<String> uploadedDocs = [];
+  late String _email;
+
+  String get userEmail => _email;
+
+  void initialize(String email) {
+    _email = email;
+    print("CareerViewmodel initialized for: $_email");
+  }
 
   String jobTitle = '';
   String companyName = '';
@@ -19,6 +21,10 @@ class CareerViewmodel extends ChangeNotifier {
   String skills = '';
   String location = '';
 
+  // 🔥 Career entries list
+  List<CarrerModel> careerList = [];
+
+  // 👇 Add/Setters
   void jobTitleName(String val) => jobTitle = val;
   void company(String val) => companyName = val;
   void startDateName(String val) => startDate = val;
@@ -26,8 +32,7 @@ class CareerViewmodel extends ChangeNotifier {
   void skillsName(String val) => skills = val;
   void locationName(String val) => location = val;
 
-  //for document upload
-
+  // 📂 Pick files
   Future<void> pickDocument() async {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
@@ -41,7 +46,93 @@ class CareerViewmodel extends ChangeNotifier {
     }
   }
 
-  // check if career data exists
+  // 📥 Save data
+  Future<void> saveCareerInfo(String email, CarrerModel info) async {
+    final box = await HiveHelper.openCareerBox(email);
+    final existing = box.values.toList();
+
+    try {
+      await box.put(existing.length, info);
+    } catch (e) {
+      print("Error saving career info: $e");
+      return;
+    }
+
+    uploadedDocs.clear();
+    await loadCareerList(); // 🔄 Refresh local list after save
+    notifyListeners();
+
+    print("✅ Career entry saved:");
+    print("──────────────────────────────");
+    print("Job Title: ${info.jobTitle}");
+    print("Company: ${info.companyName}");
+    print("Start: ${info.startDate}");
+    print("End: ${info.endDate}");
+    print("Skills: ${info.skills}");
+    print("Location: ${info.location}");
+    print("Docs: ${info.documentPaths}");
+    print("──────────────────────────────");
+  }
+
+  // 🔍 Return all entries (on demand)
+  Future<List<CarrerModel>> getAllCareerEntries(String email) async {
+    final box = await HiveHelper.openCareerBox(email);
+    return box.values.toList();
+  }
+
+  // 🔥 Load & assign to internal list
+  Future<void> loadCareerList() async {
+    final box = await HiveHelper.openCareerBox(_email);
+    careerList = box.values.toList();
+    notifyListeners();
+    print("🔁 Loaded ${careerList.length} career entries for $_email");
+  }
+
+  // ❌ Delete
+  Future<void> deleteCareerInfoAt(String email, int index) async {
+    final box = await HiveHelper.openCareerBox(email);
+
+    try {
+      if (index >= 0 && index < box.length) {
+        await box.deleteAt(index);
+        await loadCareerList(); // Refresh list after delete
+        notifyListeners();
+        print("Deleted career entry at index $index");
+      } else {
+        print("Invalid index: $index");
+      }
+    } catch (e) {
+      print("Error deleting career info: $e");
+    }
+  }
+
+  // 🔃 Load most recent for form prefill
+  Future<void> loadCareerData(String email) async {
+    final box = await HiveHelper.openCareerBox(email);
+    final entries = box.values.toList();
+
+    if (entries.isEmpty) {
+      print("No career data found for $email");
+      return;
+    }
+
+    try {
+      final latest = entries.last;
+
+      uploadedDocs = List<String>.from(latest.documentPaths);
+      jobTitle = latest.jobTitle;
+      companyName = latest.companyName;
+      startDate = latest.startDate;
+      endDate = latest.endDate;
+      skills = latest.skills;
+      location = latest.location;
+
+      notifyListeners();
+    } catch (e) {
+      print("❌ Error loading career data: $e");
+    }
+  }
+
   bool hasData() {
     return jobTitle.isNotEmpty ||
         companyName.isNotEmpty ||
@@ -51,37 +142,7 @@ class CareerViewmodel extends ChangeNotifier {
         uploadedDocs.isNotEmpty;
   }
 
-  //save career data to Hive
-  Future<void> saveCareerData() async {
-    final box = await HiveHelper.openCareerBox(userEmail);
-    final careerData = CarrerModel(
-      jobTitle: jobTitle,
-      companyName: companyName,
-      startDate: startDate,
-      endDate: endDate,
-      skills: skills,
-      location: location,
-      documentPaths: List.from(uploadedDocs),
-    );
-    await box.put('user_career', careerData);
-
-    if (kDebugMode) {
-      print("✅ Saved Career Record:");
-    }
-    if (kDebugMode) {
-      print("──────────────────────────────");
-      print("Job Title: $jobTitle");
-      print("Company Name: $companyName");
-      print("Start Date: $startDate");
-      print("End Date: $endDate");
-      print("Skills: $skills");
-      print("Location: $location");
-      print("Documents: ${careerData.documentPaths}");
-      print("──────────────────────────────");
-    }
-  }
-
-  //clear career data
+  // 🧹 Clear fields
   void clearCareerData() {
     jobTitle = '';
     companyName = '';

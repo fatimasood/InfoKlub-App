@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/main.dart';
+import 'package:infoklub/models/career/career_model.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
 import 'package:infoklub/views/career_screens/widget/custom_form_career.dart';
 import 'package:infoklub/app/theme.dart';
@@ -150,21 +151,6 @@ class _CareerInfoView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    /* CustomButton(
-                      text: 'Add Experience',
-                      color: const Color(0xFFFFFFFF),
-                      borderColor: Colors.grey,
-                      borderRadius: 10.0,
-                      textColor: AppTheme.blackColor,
-                      icon: const Icon(
-                        Icons.add_circle,
-                        color: Colors.black,
-                      ),
-                      onPressed: () {
-                        print("Add experience Button Pressed");
-                      },
-                    ),*/
-
                     FileUploadWidget(onUploadTap: () {
                       careerViewmodel.pickDocument();
                     }),
@@ -281,16 +267,21 @@ class _CareerInfoView extends StatelessWidget {
                     onPressed: () async {
                       final viewModel =
                           Provider.of<CareerViewmodel>(context, listen: false);
+                      final String email = userMail;
+                      if (kDebugMode) {
+                        print("Saving for email: $email");
+                      }
+                      final info = CarrerModel(
+                        jobTitle: jobTitleController.text.trim(),
+                        companyName: companyNameController.text.trim(),
+                        startDate: startDateController.text.trim(),
+                        endDate: endDateController.text.trim(),
+                        skills: skillsController.text.trim(),
+                        location: addressController.text.trim(),
+                        documentPaths: viewModel.uploadedDocs,
+                      );
 
-                      viewModel.jobTitleName(jobTitleController.text.trim());
-                      viewModel.company(companyNameController.text.trim());
-                      viewModel.locationName(addressController.text.trim());
-                      viewModel.startDateName(startDateController.text.trim());
-                      viewModel.endDateName(endDateController.text.trim());
-                      viewModel.skillsName(skillsController.text.trim());
-                      viewModel.uploadedDocs;
-
-                      await viewModel.saveCareerData();
+                      await viewModel.saveCareerInfo(email, info);
                       if (kDebugMode) {
                         print("Company Name: ${viewModel.companyName}");
                         print("Job Title: ${viewModel.jobTitle}");
