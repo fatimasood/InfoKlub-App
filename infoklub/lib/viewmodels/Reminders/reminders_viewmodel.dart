@@ -1,100 +1,114 @@
 import 'package:flutter/material.dart';
-import 'package:infoklub/models/reminder/reminder_model.dart';
+import 'package:infoklub/views/Reminders/reminder_mapper.dart';
+import 'package:infoklub/views/Reminders/reminder_repository.dart';
+import 'package:uuid/uuid.dart';
+
+import 'package:infoklub/models/reminder/reminder.dart';
 
 class RemindersViewModel extends ChangeNotifier {
+  final ReminderRepository _repo = ReminderRepository();
+  final String userEmail;
+
+  RemindersViewModel({required this.userEmail});
+
   List<Reminder> _reminders = [];
   String _searchQuery = '';
 
-  List<Reminder> get reminders => _sortedReminders;
-  List<Reminder> get filteredReminders => _searchQuery.isEmpty
-      ? _sortedReminders
-      : _sortedReminders
-          .where((r) =>
-              r.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              (r.notes?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
-                  false))
-          .toList();
-
+  List<Reminder> get reminders => _filtered(_sorted(_reminders));
   int get todayCount => _reminders.where(_isToday).length;
-  int get scheduledCount => _reminders.where((r) => r.date != null).length;
+  int get scheduledCount => _reminders.where((r) => r.dateTime != null).length;
   int get totalCount => _reminders.length;
+  String get currentUserEmail => userEmail;
 
-  List<Reminder> get _sortedReminders {
-    final list = List<Reminder>.from(_reminders);
-    list.sort((a, b) {
-      if (a.date == null) return 1;
-      if (b.date == null) return -1;
-      return a.date!.compareTo(b.date!);
-    });
-    return list;
-  }
-
-  RemindersViewModel() {
-    // Initialize with dummy data
-    final now = DateTime.now();
-    _reminders = [
-      Reminder(
-        id: '1',
-        title: 'Team Meeting',
-        notes: 'Weekly sprint planning',
-        date: DateTime(now.year, now.month, now.day, 14, 30),
-        time: const TimeOfDay(hour: 14, minute: 30),
-        color: Colors.blue,
-        repeatDays: [2], // Every Tuesday
-      ),
-      Reminder(
-        id: '2',
-        title: 'Buy Groceries',
-        date: DateTime(now.year, now.month, now.day + 1, 18, 0),
-        time: const TimeOfDay(hour: 18, minute: 0),
-        color: Colors.green,
-      ),
-      Reminder(
-        id: '3',
-        title: 'Call Mom',
-        isCompleted: true,
-      ),
-    ];
-  }
-
-  bool _isToday(Reminder reminder) {
-    if (reminder.date == null) return false;
-    final now = DateTime.now();
-    return reminder.date!.year == now.year &&
-        reminder.date!.month == now.month &&
-        reminder.date!.day == now.day;
-  }
-
-  void setSearchQuery(String query) {
-    _searchQuery = query;
+  Future<void> load() async {
+    final models = await _repo.fetchAll(userEmail);
+    _reminders =
+        models.map((m) => ReminderMapper.fromModel(m, userEmail)).toList();
     notifyListeners();
   }
 
-  void addReminder(Reminder reminder) {
-    _reminders.add(reminder);
+  void setSearchQuery(String q) {
+    _searchQuery = q;
     notifyListeners();
   }
 
-  void updateReminder(String id, Reminder updated) {
-    final index = _reminders.indexWhere((r) => r.id == id);
-    if (index != -1) {
-      _reminders[index] = updated;
-      notifyListeners();
-    }
+  Future<void> addReminder(Reminder reminder) async {
+    // ensure id
+    final id = (reminder.id.isEmpty) ? const Uuid().v4() : reminder.id;
+    final withId = reminder.copyWith()..id; // ignore; copy keeps same id
+
+    final toSave = Reminder(
+      id: id,
+      title: reminder.title,
+      notes: reminder.notes,
+      dateTime: reminder.dateTime,
+      isCompleted: reminder.isCompleted,
+      colorValue: reminder.colorValue,
+      repeatDays: reminder.repeatDays,
+      userEmail: userEmail,
+    );
+
+    final model = ReminderMapper.toModel(toSave);
+    await _repo.upsert(userEmail, model);
+
+    _reminders.add(toSave);
+    notifyListeners();
   }
 
-  void deleteReminder(String id) {
+  Future<void> updateReminder(String id, Reminder updated) async {
+    final idx = _reminders.indexWhere((r) => r.id == id);
+    if (idx == -1) return;
+
+    final toSave = updated.copyWith();
+    final model = ReminderMapper.toModel(toSave);
+    await _repo.upsert(userEmail, model);
+
+    _reminders[idx] = toSave;
+    notifyListeners();
+  }
+
+  Future<void> deleteReminder(String id) async {
+    await _repo.delete(userEmail, id);
     _reminders.removeWhere((r) => r.id == id);
     notifyListeners();
   }
 
-  void toggleCompletion(String id) {
-    final index = _reminders.indexWhere((r) => r.id == id);
-    if (index != -1) {
-      _reminders[index] = _reminders[index].copyWith(
-        isCompleted: !_reminders[index].isCompleted,
-      );
-      notifyListeners();
-    }
+  Future<void> toggleCompletion(String id) async {
+    final idx = _reminders.indexWhere((r) => r.id == id);
+    if (idx == -1) return;
+
+    final newVal = !_reminders[idx].isCompleted;
+    _reminders[idx] = _reminders[idx].copyWith(isCompleted: newVal);
+    notifyListeners();
+
+    await _repo.toggleCompleted(userEmail, id, newVal);
+  }
+
+  // helpers
+  List<Reminder> _sorted(List<Reminder> list) {
+    final l = List<Reminder>.from(list);
+    l.sort((a, b) {
+      if (a.dateTime == null) return 1;
+      if (b.dateTime == null) return -1;
+      return a.dateTime!.compareTo(b.dateTime!);
+    });
+    return l;
+  }
+
+  List<Reminder> _filtered(List<Reminder> list) {
+    if (_searchQuery.isEmpty) return list;
+    final q = _searchQuery.toLowerCase();
+    return list
+        .where((r) =>
+            r.title.toLowerCase().contains(q) ||
+            (r.notes?.toLowerCase().contains(q) ?? false))
+        .toList();
+  }
+
+  bool _isToday(Reminder r) {
+    if (r.dateTime == null) return false;
+    final now = DateTime.now();
+    final d = r.dateTime!;
+    return d.year == now.year && d.month == now.month && d.day == now.day;
   }
 }

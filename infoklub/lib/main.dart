@@ -5,6 +5,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:infoklub/models/career/career_model.dart';
+import 'package:infoklub/models/reminder/reminder_model.dart';
+import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:infoklub/app/routes.dart';
@@ -75,6 +77,9 @@ Future<void> initHive() async {
   if (!Hive.isAdapterRegistered(3)) {
     Hive.registerAdapter(CarrerModelAdapter());
   }
+  if (!Hive.isAdapterRegistered(4)) {
+    Hive.registerAdapter(ReminderModelAdapter());
+  }
 
   await Hive.openBox(
     'userBox',
@@ -104,6 +109,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => HomeViewModel()),
         ChangeNotifierProvider(create: (_) => CvViewModel()),
         ChangeNotifierProvider(create: (_) => CvCreationViewModel()),
+        ChangeNotifierProvider(
+            create: (_) => RemindersViewModel(userEmail: userMail)),
         ChangeNotifierProvider(
           create: (_) => CareerViewmodel(),
         ),

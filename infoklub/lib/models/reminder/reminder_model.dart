@@ -1,44 +1,46 @@
-import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
-class Reminder {
-  final String id;
-  final String title;
-  final String? notes;
-  final DateTime? date;
-  final TimeOfDay? time;
-  final bool isCompleted;
-  final Color? color;
-  final List<int>? repeatDays; // 0=Sunday, 1=Monday,...6=Saturday
+part 'reminder_model.g.dart';
 
-  Reminder({
+@HiveType(typeId: 4)
+class ReminderModel extends HiveObject {
+  @HiveField(0)
+  String id;
+
+  @HiveField(1)
+  String title;
+
+  @HiveField(2)
+  String? notes;
+
+  // Store date as UTC milliseconds since epoch, nullable
+  @HiveField(3)
+  int? dateUtcMs;
+
+  // Store time as minutes since midnight, nullable
+  @HiveField(4)
+  int? timeMinutes;
+
+  // isCompleted flag
+  @HiveField(5)
+  bool isCompleted;
+
+  // Color stored as ARGB int, nullable
+  @HiveField(6)
+  int? colorValue;
+
+  // repeat days as list of ints (0..6), nullable
+  @HiveField(7)
+  List<int>? repeatDays;
+
+  ReminderModel({
     required this.id,
     required this.title,
     this.notes,
-    this.date,
-    this.time,
+    this.dateUtcMs,
+    this.timeMinutes,
     this.isCompleted = false,
-    this.color,
+    this.colorValue,
     this.repeatDays,
   });
-
-  Reminder copyWith({
-    String? title,
-    String? notes,
-    DateTime? date,
-    TimeOfDay? time,
-    bool? isCompleted,
-    Color? color,
-    List<int>? repeatDays,
-  }) {
-    return Reminder(
-      id: id,
-      title: title ?? this.title,
-      notes: notes ?? this.notes,
-      date: date ?? this.date,
-      time: time ?? this.time,
-      isCompleted: isCompleted ?? this.isCompleted,
-      color: color ?? this.color,
-      repeatDays: repeatDays ?? this.repeatDays,
-    );
-  }
 }

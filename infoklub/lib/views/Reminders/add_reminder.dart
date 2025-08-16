@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/models/reminder/reminder_model.dart';
+import 'package:infoklub/models/reminder/reminder.dart';
 import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
 import 'package:provider/provider.dart';
 
@@ -43,11 +43,7 @@ class _AddReminderState extends State<AddReminder> {
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
-    if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
+    if (picked != null) setState(() => _selectedDate = picked);
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -55,39 +51,68 @@ class _AddReminderState extends State<AddReminder> {
       context: context,
       initialTime: TimeOfDay.now(),
     );
-    if (picked != null) {
-      setState(() {
-        _selectedTime = picked;
-      });
-    }
+    if (picked != null) setState(() => _selectedTime = picked);
   }
 
   void _toggleDay(int dayIndex) {
     setState(() {
-      if (_repeatDays.contains(dayIndex)) {
-        _repeatDays.remove(dayIndex);
-      } else {
-        _repeatDays.add(dayIndex);
-      }
+      _repeatDays.contains(dayIndex)
+          ? _repeatDays.remove(dayIndex)
+          : _repeatDays.add(dayIndex);
     });
   }
 
-  void _submitReminder() {
-    if (_formKey.currentState!.validate()) {
-      final vm = Provider.of<RemindersViewModel>(context, listen: false);
+  void _submitReminder() async {
+    if (!_formKey.currentState!.validate()) {
+      print("❌ Form not valid!");
+      return;
+    }
 
-      final newReminder = Reminder(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: _titleController.text,
-        notes: _notesController.text,
-        date: _selectedDate,
-        time: _selectedTime,
-        repeatDays: _repeatDays.isNotEmpty ? _repeatDays : null,
-        color: _selectedColor,
+    final vm = Provider.of<RemindersViewModel>(context, listen: false);
+
+    DateTime? finalDt;
+    if (_selectedDate != null) {
+      final time = _selectedTime ?? const TimeOfDay(hour: 9, minute: 0);
+      finalDt = DateTime(
+        _selectedDate!.year,
+        _selectedDate!.month,
+        _selectedDate!.day,
+        time.hour,
+        time.minute,
       );
+    }
 
-      vm.addReminder(newReminder);
-      Navigator.pop(context);
+    final newReminder = Reminder(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: _titleController.text.trim(),
+      notes: _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
+      dateTime: finalDt,
+      isCompleted: false,
+      colorValue: _selectedColor.value,
+      repeatDays: _repeatDays.isNotEmpty ? List<int>.from(_repeatDays) : null,
+      userEmail: vm.currentUserEmail, // ✅ from VM
+    );
+
+    print("🟢 Creating reminder:");
+    print("   id: ${newReminder.id}");
+    print("   title: ${newReminder.title}");
+    print("   notes: ${newReminder.notes}");
+    print("   dateTime: ${newReminder.dateTime}");
+    print("   isCompleted: ${newReminder.isCompleted}");
+    print("   colorValue: ${newReminder.colorValue}");
+    print("   repeatDays: ${newReminder.repeatDays}");
+    print("   userEmail: ${newReminder.userEmail}");
+
+    try {
+      await vm.addReminder(newReminder);
+
+      print("✅ Reminder saved to VM/Hive");
+      if (mounted) Navigator.pop(context);
+    } catch (e, s) {
+      print("❌ Error saving reminder: $e");
+      print(s);
     }
   }
 
@@ -96,9 +121,7 @@ class _AddReminderState extends State<AddReminder> {
     return Dialog(
       backgroundColor: Colors.white,
       elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       shadowColor: Colors.black.withOpacity(0.5),
       surfaceTintColor: Colors.white,
       child: SingleChildScrollView(
@@ -112,10 +135,9 @@ class _AddReminderState extends State<AddReminder> {
               const Text(
                 'Add New Reminder',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.secondaryColor,
-                ),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.secondaryColor),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -130,12 +152,9 @@ class _AddReminderState extends State<AddReminder> {
                     borderSide: const BorderSide(color: Colors.grey),
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
+                validator: (value) => (value == null || value.trim().isEmpty)
+                    ? 'Please enter a title'
+                    : null,
               ),
               const SizedBox(height: 15),
               TextFormField(
@@ -194,35 +213,30 @@ class _AddReminderState extends State<AddReminder> {
                 ],
               ),
               const SizedBox(height: 15),
-              const Text(
-                'Repeat on:',
-                style: TextStyle(color: Colors.black),
-              ),
+              const Text('Repeat on:', style: TextStyle(color: Colors.black)),
               const SizedBox(height: 10),
               SizedBox(
                 height: 50,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(7, (index) {
                       return GestureDetector(
                         onTap: () => _toggleDay(index),
                         child: Container(
                           width: 40,
                           height: 40,
+                          margin: const EdgeInsets.only(right: 8),
                           decoration: BoxDecoration(
                             color: _repeatDays.contains(index)
                                 ? AppTheme.secondaryColor
                                 : Colors.transparent,
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppTheme.secondaryColor,
-                            ),
+                            border: Border.all(color: AppTheme.secondaryColor),
                           ),
                           child: Center(
                             child: Text(
-                              _getDayAbbreviation(index),
+                              const ['S', 'M', 'T', 'W', 'T', 'F', 'S'][index],
                               style: TextStyle(
                                 color: _repeatDays.contains(index)
                                     ? Colors.white
@@ -238,10 +252,8 @@ class _AddReminderState extends State<AddReminder> {
                 ),
               ),
               const SizedBox(height: 15),
-              const Text(
-                'Select Color:',
-                style: TextStyle(color: Colors.black),
-              ),
+              const Text('Select Color:',
+                  style: TextStyle(color: Colors.black)),
               const SizedBox(height: 5),
               SizedBox(
                 height: 50,
@@ -253,11 +265,7 @@ class _AddReminderState extends State<AddReminder> {
                   itemBuilder: (context, index) {
                     final color = _colorOptions[index];
                     return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedColor = color;
-                        });
-                      },
+                      onTap: () => setState(() => _selectedColor = color),
                       child: Container(
                         width: 40,
                         height: 40,
@@ -278,25 +286,17 @@ class _AddReminderState extends State<AddReminder> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.secondaryColor,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                      borderRadius: BorderRadius.circular(10)),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
                 onPressed: _submitReminder,
-                child: const Text(
-                  'Add Reminder',
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: const Text('Add Reminder',
+                    style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  String _getDayAbbreviation(int dayIndex) {
-    const abbreviations = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-    return abbreviations[dayIndex];
   }
 }

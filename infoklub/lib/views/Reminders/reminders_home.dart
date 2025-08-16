@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/models/reminder/reminder_model.dart';
+import 'package:infoklub/models/reminder/reminder.dart';
 import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
 import 'package:infoklub/views/Reminders/add_reminder.dart';
 import 'package:provider/provider.dart';
@@ -10,23 +10,22 @@ class RemindersHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => RemindersViewModel(),
-      child: const Scaffold(
-        backgroundColor: AppTheme.halfwhite,
-        body: SafeArea(
-          child: Column(
-            children: [
-              _ReminderStatsRow(),
-              SizedBox(height: 10),
-              _AllRemindersCard(),
-              SizedBox(height: 15),
-              _ListHeading(),
-              SizedBox(height: 10),
-              Expanded(child: _RemindersList()),
-              _BottomActionBar(),
-            ],
-          ),
+    final vm = context.watch<RemindersViewModel>();
+    vm.load();
+    return const Scaffold(
+      backgroundColor: AppTheme.halfwhite,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _ReminderStatsRow(),
+            SizedBox(height: 10),
+            _AllRemindersCard(),
+            SizedBox(height: 15),
+            _ListHeading(),
+            SizedBox(height: 10),
+            Expanded(child: _RemindersList()),
+            _BottomActionBar(),
+          ],
         ),
       ),
     );
@@ -38,7 +37,7 @@ class _ReminderStatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = Provider.of<RemindersViewModel>(context);
+    final vm = context.watch<RemindersViewModel>();
 
     return Padding(
       padding: const EdgeInsets.all(10),
@@ -142,7 +141,7 @@ class _AllRemindersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = Provider.of<RemindersViewModel>(context);
+    final vm = context.watch<RemindersViewModel>();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -228,16 +227,14 @@ class _RemindersList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = Provider.of<RemindersViewModel>(context);
+    final vm = context.watch<RemindersViewModel>();
 
     return Padding(
       padding: const EdgeInsets.only(left: 10.0, right: 10.0),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border.all(
-            color: Colors.grey.withOpacity(0.3),
-          ),
+          border: Border.all(color: Colors.grey.withOpacity(0.3)),
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [
             BoxShadow(
@@ -302,12 +299,15 @@ class _EmptyState extends StatelessWidget {
 
 class _ReminderItem extends StatelessWidget {
   final Reminder reminder;
-
   const _ReminderItem({required this.reminder});
 
   @override
   Widget build(BuildContext context) {
-    final vm = Provider.of<RemindersViewModel>(context);
+    final vm = context.read<RemindersViewModel>(); // only actions
+
+    final Color chipColor = (reminder.colorValue != null)
+        ? Color(reminder.colorValue!)
+        : Theme.of(context).primaryColor;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
@@ -320,13 +320,10 @@ class _ReminderItem extends StatelessWidget {
               height: 24,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: reminder.isCompleted
-                    ? (reminder.color ?? Theme.of(context).primaryColor)
-                    : Colors.transparent,
+                color: reminder.isCompleted ? chipColor : Colors.transparent,
                 border: Border.all(
-                  color: reminder.isCompleted
-                      ? (reminder.color ?? Theme.of(context).primaryColor)
-                      : AppTheme.primaryColor,
+                  color:
+                      reminder.isCompleted ? chipColor : AppTheme.primaryColor,
                   width: 2,
                 ),
               ),
@@ -363,10 +360,10 @@ class _ReminderItem extends StatelessWidget {
                     ),
                   ),
                 ],
-                if (reminder.date != null) ...[
+                if (reminder.dateTime != null) ...[
                   const SizedBox(height: 4),
                   Text(
-                    _formatDateTime(reminder.date!, reminder.time),
+                    _formatDateTime(reminder.dateTime!),
                     style: TextStyle(
                       fontSize: 12,
                       color: AppTheme.secondaryColor.withOpacity(0.8),
@@ -376,12 +373,12 @@ class _ReminderItem extends StatelessWidget {
               ],
             ),
           ),
-          if (reminder.color != null)
+          if (reminder.colorValue != null)
             Container(
               width: 12,
               height: 12,
               decoration: BoxDecoration(
-                color: reminder.color,
+                color: Color(reminder.colorValue!),
                 shape: BoxShape.circle,
               ),
             ),
@@ -390,11 +387,10 @@ class _ReminderItem extends StatelessWidget {
     );
   }
 
-  String _formatDateTime(DateTime date, TimeOfDay? time) {
-    final timeStr = time != null
-        ? '${time.hour}:${time.minute.toString().padLeft(2, '0')} • '
-        : '';
-    return '$timeStr${date.day}/${date.month}/${date.year}';
+  String _formatDateTime(DateTime dt) {
+    final hh = dt.hour.toString().padLeft(2, '0');
+    final mm = dt.minute.toString().padLeft(2, '0');
+    return '$hh:$mm • ${dt.day}/${dt.month}/${dt.year}';
   }
 }
 
