@@ -3,6 +3,7 @@ import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/models/reminder/reminder.dart';
 import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
 import 'package:infoklub/views/Reminders/add_reminder.dart';
+import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
 class RemindersHome extends StatelessWidget {
@@ -309,82 +310,124 @@ class _ReminderItem extends StatelessWidget {
         ? Color(reminder.colorValue!)
         : Theme.of(context).primaryColor;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => vm.toggleCompletion(reminder.id),
-            child: Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: reminder.isCompleted ? chipColor : Colors.transparent,
-                border: Border.all(
-                  color:
-                      reminder.isCompleted ? chipColor : AppTheme.primaryColor,
-                  width: 2,
-                ),
-              ),
-              child: reminder.isCompleted
-                  ? const Icon(Icons.check, size: 16, color: Colors.white)
-                  : null,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  reminder.title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    decoration: reminder.isCompleted
-                        ? TextDecoration.lineThrough
-                        : null,
+    return InkWell(
+      onTap: () => _showDeleteDialog(context, vm, reminder),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () => vm.toggleCompletion(reminder.id),
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: reminder.isCompleted ? chipColor : Colors.transparent,
+                  border: Border.all(
                     color: reminder.isCompleted
-                        ? AppTheme.secondaryColor.withOpacity(0.8)
-                        : AppTheme.secondaryColor,
+                        ? chipColor
+                        : AppTheme.primaryColor,
+                    width: 2,
                   ),
                 ),
-                if (reminder.notes != null && reminder.notes!.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    reminder.notes!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.secondaryColor.withOpacity(0.6),
-                    ),
-                  ),
-                ],
-                if (reminder.dateTime != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    _formatDateTime(reminder.dateTime!),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.secondaryColor.withOpacity(0.8),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          if (reminder.colorValue != null)
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                color: Color(reminder.colorValue!),
-                shape: BoxShape.circle,
+                child: reminder.isCompleted
+                    ? const Icon(Icons.check, size: 16, color: Colors.white)
+                    : null,
               ),
             ),
-        ],
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    reminder.title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      decoration: reminder.isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
+                      color: reminder.isCompleted
+                          ? AppTheme.secondaryColor.withOpacity(0.8)
+                          : AppTheme.secondaryColor,
+                    ),
+                  ),
+                  if (reminder.notes != null && reminder.notes!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      reminder.notes!,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.secondaryColor.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                  if (reminder.dateTime != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatDateTime(reminder.dateTime!),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.secondaryColor.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (reminder.colorValue != null)
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: Color(reminder.colorValue!),
+                  shape: BoxShape.circle,
+                ),
+              ),
+          ],
+        ),
       ),
     );
+  }
+
+  void _showDeleteDialog(
+      BuildContext context, RemindersViewModel vm, Reminder reminder) {
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: const Text(
+                "Delete Reminder",
+                style: TextStyle(
+                    color: AppTheme.primaryColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter'),
+              ),
+              content: Text(
+                "Are you sure you want to delete '${reminder.title}'?",
+                style: const TextStyle(
+                    fontFamily: 'Inter', fontSize: 18, color: Colors.black),
+              ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    right: 20.0,
+                  ),
+                  child: CustomButton(
+                    color: AppTheme.secondaryColor,
+                    onPressed: () {
+                      vm.deleteReminder(reminder.id);
+                      Navigator.of(ctx).pop();
+                    },
+                    text: "Delete",
+                    height: 45,
+                  ),
+                )
+              ],
+            ));
   }
 
   String _formatDateTime(DateTime dt) {

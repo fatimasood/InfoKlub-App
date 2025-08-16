@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/models/reminder/reminder.dart';
 import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
 import 'package:provider/provider.dart';
+import 'package:day_night_time_picker/day_night_time_picker.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class AddReminder extends StatefulWidget {
   const AddReminder({super.key});
@@ -16,7 +19,7 @@ class _AddReminderState extends State<AddReminder> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
   DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
+  TimeOfDay _selectedTime = const TimeOfDay(hour: 9, minute: 0);
   final List<int> _repeatDays = [];
   Color _selectedColor = Colors.blue;
 
@@ -37,21 +40,93 @@ class _AddReminderState extends State<AddReminder> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    await showDialog(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: SizedBox(
+            height: 400,
+            child: Column(
+              children: [
+                Expanded(
+                  child: SfDateRangePicker(
+                    selectionMode: DateRangePickerSelectionMode.single,
+                    initialSelectedDate: _selectedDate ?? DateTime.now(),
+                    minDate: DateTime.now(),
+                    maxDate: DateTime(2100),
+                    onSelectionChanged:
+                        (DateRangePickerSelectionChangedArgs args) {
+                      if (args.value is DateTime) {
+                        setState(() {
+                          _selectedDate = args.value;
+                        });
+                      }
+                    },
+                    monthViewSettings: const DateRangePickerMonthViewSettings(
+                      firstDayOfWeek: 1, // Monday start
+                    ),
+                    headerStyle: const DateRangePickerHeaderStyle(
+                      textAlign: TextAlign.center,
+                      textStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.secondaryColor,
+                        fontSize: 18,
+                      ),
+                    ),
+                    selectionColor: AppTheme.secondaryColor,
+                    todayHighlightColor: AppTheme.primaryColor,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.secondaryColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      "Select Date",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
-    if (picked != null) setState(() => _selectedDate = picked);
   }
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
+  void _openTimePicker() {
+    Navigator.of(context).push(
+      showPicker(
+        context: context,
+        value: Time(hour: _selectedTime.hour, minute: _selectedTime.minute),
+        onChange: (time) {
+          setState(() {
+            _selectedTime = TimeOfDay(hour: time.hour, minute: time.minute);
+          });
+        },
+        is24HrFormat: false,
+        accentColor: AppTheme.secondaryColor,
+        unselectedColor: Colors.grey,
+        cancelText: "Cancel",
+        cancelStyle: const TextStyle(
+          color: AppTheme.primaryColor,
+        ),
+        okText: "Select",
+        okStyle: const TextStyle(
+          color: AppTheme.primaryColor,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
-    if (picked != null) setState(() => _selectedTime = picked);
   }
 
   void _toggleDay(int dayIndex) {
@@ -64,7 +139,9 @@ class _AddReminderState extends State<AddReminder> {
 
   void _submitReminder() async {
     if (!_formKey.currentState!.validate()) {
-      print("❌ Form not valid!");
+      if (kDebugMode) {
+        print("❌ Form not valid!");
+      }
       return;
     }
 
@@ -72,13 +149,12 @@ class _AddReminderState extends State<AddReminder> {
 
     DateTime? finalDt;
     if (_selectedDate != null) {
-      final time = _selectedTime ?? const TimeOfDay(hour: 9, minute: 0);
       finalDt = DateTime(
         _selectedDate!.year,
         _selectedDate!.month,
         _selectedDate!.day,
-        time.hour,
-        time.minute,
+        _selectedTime.hour,
+        _selectedTime.minute,
       );
     }
 
@@ -90,29 +166,36 @@ class _AddReminderState extends State<AddReminder> {
           : _notesController.text.trim(),
       dateTime: finalDt,
       isCompleted: false,
+      // ignore: deprecated_member_use
       colorValue: _selectedColor.value,
       repeatDays: _repeatDays.isNotEmpty ? List<int>.from(_repeatDays) : null,
       userEmail: vm.currentUserEmail, // ✅ from VM
     );
 
-    print("🟢 Creating reminder:");
-    print("   id: ${newReminder.id}");
-    print("   title: ${newReminder.title}");
-    print("   notes: ${newReminder.notes}");
-    print("   dateTime: ${newReminder.dateTime}");
-    print("   isCompleted: ${newReminder.isCompleted}");
-    print("   colorValue: ${newReminder.colorValue}");
-    print("   repeatDays: ${newReminder.repeatDays}");
-    print("   userEmail: ${newReminder.userEmail}");
+    if (kDebugMode) {
+      print("🟢 Creating reminder:");
+      print("   id: ${newReminder.id}");
+      print("   title: ${newReminder.title}");
+      print("   notes: ${newReminder.notes}");
+      print("   dateTime: ${newReminder.dateTime}");
+      print("   isCompleted: ${newReminder.isCompleted}");
+      print("   colorValue: ${newReminder.colorValue}");
+      print("   repeatDays: ${newReminder.repeatDays}");
+      print("   userEmail: ${newReminder.userEmail}");
+    }
 
     try {
       await vm.addReminder(newReminder);
 
-      print("✅ Reminder saved to VM/Hive");
+      if (kDebugMode) {
+        print("✅ Reminder saved to VM/Hive");
+      }
       if (mounted) Navigator.pop(context);
     } catch (e, s) {
-      print("❌ Error saving reminder: $e");
-      print(s);
+      if (kDebugMode) {
+        print("❌ Error saving reminder: $e");
+        print(s);
+      }
     }
   }
 
@@ -122,178 +205,198 @@ class _AddReminderState extends State<AddReminder> {
       backgroundColor: Colors.white,
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      // ignore: deprecated_member_use
       shadowColor: Colors.black.withOpacity(0.5),
       surfaceTintColor: Colors.white,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Add New Reminder',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.secondaryColor),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                style: const TextStyle(color: Colors.black),
-                controller: _titleController,
-                decoration: InputDecoration(
-                  labelText: 'Title',
-                  labelStyle: const TextStyle(color: Colors.black),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.grey),
-                  ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Add New Reminder',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.secondaryColor),
+                  textAlign: TextAlign.center,
                 ),
-                validator: (value) => (value == null || value.trim().isEmpty)
-                    ? 'Please enter a title'
-                    : null,
-              ),
-              const SizedBox(height: 15),
-              TextFormField(
-                style: const TextStyle(color: Colors.black),
-                controller: _notesController,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  labelText: 'Notes',
-                  labelStyle: const TextStyle(color: Colors.black),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.grey),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => _selectDate(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          _selectedDate == null
-                              ? 'Select Date'
-                              : 'Date: ${_selectedDate!.toLocal().toString().split(' ')[0]}',
-                          style: const TextStyle(color: Colors.black),
-                        ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  style: const TextStyle(color: Colors.black),
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: AppTheme.secondaryColor,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => _selectTime(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          _selectedTime == null
-                              ? 'Select Time'
-                              : 'Time: ${_selectedTime!.format(context)}',
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                      ),
+                    labelText: 'Title',
+                    labelStyle: const TextStyle(color: Colors.black),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Colors.grey),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              const Text('Repeat on:', style: TextStyle(color: Colors.black)),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 50,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(7, (index) {
-                      return GestureDetector(
-                        onTap: () => _toggleDay(index),
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Please enter a title'
+                      : null,
+                ),
+                const SizedBox(height: 15),
+                TextFormField(
+                  style: const TextStyle(color: Colors.black),
+                  controller: _notesController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Notes',
+                    labelStyle: const TextStyle(color: Colors.black),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: AppTheme.secondaryColor,
+                      ),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => _selectDate(context),
                         child: Container(
-                          width: 40,
-                          height: 40,
-                          margin: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: _repeatDays.contains(index)
-                                ? AppTheme.secondaryColor
-                                : Colors.transparent,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppTheme.secondaryColor),
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Center(
-                            child: Text(
-                              const ['S', 'M', 'T', 'W', 'T', 'F', 'S'][index],
-                              style: TextStyle(
-                                color: _repeatDays.contains(index)
-                                    ? Colors.white
-                                    : AppTheme.secondaryColor,
-                                fontWeight: FontWeight.bold,
+                          child: Text(
+                            _selectedDate == null
+                                ? 'Select Date'
+                                : 'Date: ${_selectedDate!.toLocal().toString().split(' ')[0]}',
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: InkWell(
+                        onTap: _openTimePicker,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            'Time: ${_selectedTime.format(context)}',
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                const Text('Repeat on:', style: TextStyle(color: Colors.black)),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 50,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: List.generate(7, (index) {
+                        return GestureDetector(
+                          onTap: () => _toggleDay(index),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                              color: _repeatDays.contains(index)
+                                  ? AppTheme.secondaryColor
+                                  : Colors.transparent,
+                              shape: BoxShape.circle,
+                              border:
+                                  Border.all(color: AppTheme.secondaryColor),
+                            ),
+                            child: Center(
+                              child: Text(
+                                const [
+                                  'S',
+                                  'M',
+                                  'T',
+                                  'W',
+                                  'T',
+                                  'F',
+                                  'S'
+                                ][index],
+                                style: TextStyle(
+                                  color: _repeatDays.contains(index)
+                                      ? Colors.white
+                                      : AppTheme.secondaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    }),
+                        );
+                      }),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 15),
-              const Text('Select Color:',
-                  style: TextStyle(color: Colors.black)),
-              const SizedBox(height: 5),
-              SizedBox(
-                height: 50,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _colorOptions.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(width: 10),
-                  itemBuilder: (context, index) {
-                    final color = _colorOptions[index];
-                    return GestureDetector(
-                      onTap: () => setState(() => _selectedColor = color),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: _selectedColor == color
-                              ? Border.all(color: Colors.black, width: 2)
-                              : null,
+                const SizedBox(height: 15),
+                const Text('Select Color:',
+                    style: TextStyle(color: Colors.black)),
+                const SizedBox(height: 5),
+                SizedBox(
+                  height: 50,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _colorOptions.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 10),
+                    itemBuilder: (context, index) {
+                      final color = _colorOptions[index];
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedColor = color),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: _selectedColor == color
+                                ? Border.all(color: Colors.black, width: 2)
+                                : null,
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.secondaryColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.secondaryColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                  onPressed: _submitReminder,
+                  child: const Text('Add Reminder',
+                      style: TextStyle(color: Colors.white)),
                 ),
-                onPressed: _submitReminder,
-                child: const Text('Add Reminder',
-                    style: TextStyle(color: Colors.white)),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
