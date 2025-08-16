@@ -44,6 +44,7 @@ class _AddReminderState extends State<AddReminder> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -52,46 +53,52 @@ class _AddReminderState extends State<AddReminder> {
             child: Column(
               children: [
                 Expanded(
-                  child: SfDateRangePicker(
-                    selectionMode: DateRangePickerSelectionMode.single,
-                    initialSelectedDate: _selectedDate ?? DateTime.now(),
-                    minDate: DateTime.now(),
-                    maxDate: DateTime(2100),
-                    onSelectionChanged:
-                        (DateRangePickerSelectionChangedArgs args) {
-                      if (args.value is DateTime) {
-                        setState(() {
-                          _selectedDate = args.value;
-                        });
-                      }
-                    },
-                    monthViewSettings: const DateRangePickerMonthViewSettings(
-                      firstDayOfWeek: 1, // Monday start
-                    ),
-                    headerStyle: const DateRangePickerHeaderStyle(
-                      textAlign: TextAlign.center,
-                      textStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.secondaryColor,
-                        fontSize: 18,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: SfDateRangePicker(
+                      backgroundColor: Colors.white,
+                      selectionMode: DateRangePickerSelectionMode.single,
+                      initialSelectedDate: _selectedDate ?? DateTime.now(),
+                      minDate: DateTime.now(),
+                      maxDate: DateTime(2100),
+                      onSelectionChanged:
+                          (DateRangePickerSelectionChangedArgs args) {
+                        if (args.value is DateTime) {
+                          setState(() {
+                            _selectedDate = args.value;
+                          });
+                        }
+                      },
+                      monthViewSettings: const DateRangePickerMonthViewSettings(
+                        firstDayOfWeek: 1, // Monday start
                       ),
+                      headerStyle: const DateRangePickerHeaderStyle(
+                        backgroundColor: Colors.white,
+                        textAlign: TextAlign.center,
+                        textStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.secondaryColor,
+                          fontSize: 18,
+                        ),
+                      ),
+                      selectionColor: AppTheme.secondaryColor,
+                      todayHighlightColor: AppTheme.primaryColor,
                     ),
-                    selectionColor: AppTheme.secondaryColor,
-                    todayHighlightColor: AppTheme.primaryColor,
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.secondaryColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      "Select Date",
-                      style: TextStyle(color: Colors.white),
+                  padding: const EdgeInsets.only(bottom: 20.0, right: 20.0),
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        "Select Date",
+                        style: TextStyle(
+                            color: AppTheme.primaryColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 )
