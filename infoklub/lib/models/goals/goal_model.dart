@@ -1,14 +1,35 @@
 import 'dart:ui';
+import 'package:hive/hive.dart';
 
+part 'goal_model.g.dart';
+
+@HiveType(typeId: 5)
 class Goal {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String title;
+
+  @HiveField(2)
   final String description;
+
+  @HiveField(3)
   final int currentStreak;
+
+  @HiveField(4)
   final int longestStreak;
+
+  @HiveField(5)
   final bool completedToday;
-  final Color color;
+
+  @HiveField(6)
+  final int colorValue;
+
+  @HiveField(7)
   final DateTime startDate;
+
+  @HiveField(8)
   final DateTime endDate;
 
   Goal({
@@ -18,10 +39,13 @@ class Goal {
     required this.currentStreak,
     required this.longestStreak,
     required this.completedToday,
-    required this.color,
+    required Color color,
     required this.startDate,
     required this.endDate,
-  });
+  }) : colorValue = color.value;
+
+  // Getter to convert colorValue back to Color
+  Color get color => Color(colorValue);
 
   Goal copyWith({
     String? id,

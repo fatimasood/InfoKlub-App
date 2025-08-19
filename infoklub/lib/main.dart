@@ -40,8 +40,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  await Hive.initFlutter(); // Initialize Hive with default path
-  await initHive(); // Register adapters and open encrypted box
+  await Hive.initFlutter();
+  await initHive();
 
   runApp(const MyApp());
 }
