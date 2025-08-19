@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/main.dart';
 import 'package:infoklub/models/goals/goal_model.dart';
 import 'package:infoklub/viewmodels/goal_viewmodel/goal_viemodel.dart';
 import 'package:infoklub/views/Goals/add_goal.dart';
@@ -12,7 +13,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => HomeViewModel(),
+      create: (context) => HomeViewModel(userEmail: userMail),
       child: Scaffold(
         backgroundColor: AppTheme.halfwhite,
         body: SafeArea(
@@ -54,7 +55,11 @@ class HomeScreen extends StatelessWidget {
       context: context,
       barrierColor: Colors.white.withOpacity(0.5),
       builder: (context) => const AddGoal(),
-    );
+    ).then((value) {
+      // Refresh goals when dialog closes
+      final viewModel = Provider.of<HomeViewModel>(context, listen: false);
+      viewModel.loadGoals();
+    });
   }
 }
 
@@ -105,7 +110,10 @@ class _StreaksSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<HomeViewModel>(context);
-
+    // Show empty state if no goals
+    if (viewModel.goals.isEmpty) {
+      return const SizedBox.shrink(); // Hide streaks section when no goals
+    }
     return SizedBox(
       height: 120,
       child: ListView.separated(
@@ -204,7 +212,45 @@ class _GoalsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<HomeViewModel>(context);
-
+    // Show empty state message when no goals
+    if (viewModel.goals.isEmpty) {
+      return Expanded(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.flag_outlined,
+                  size: 64,
+                  color: Colors.grey[400],
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'SET YOUR GOALS TO ACHIEVE AND BE MOTIVATED',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.secondaryColor,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Press + to add your first goal',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -248,56 +294,87 @@ class _GoalItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<HomeViewModel>(context);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  goal.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+    return GestureDetector(
+      onLongPress: () {
+        _showDeleteDialog(context, viewModel, goal);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    goal.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Current streak: ${goal.currentStreak} days',
-                  style: const TextStyle(
-                    color: AppTheme.secondaryColor,
-                    fontSize: 12,
+                  const SizedBox(height: 4),
+                  Text(
+                    'Current streak: ${goal.currentStreak} days',
+                    style: const TextStyle(
+                      color: AppTheme.secondaryColor,
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () => viewModel.toggleGoalCompletion(goal.id),
-            child: Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: goal.completedToday ? goal.color : Colors.transparent,
-                border: Border.all(
-                  color: goal.completedToday ? goal.color : Colors.grey,
-                  width: 2,
-                ),
+                ],
               ),
-              child: goal.completedToday
-                  ? const Icon(
-                      Icons.check,
-                      size: 16,
-                      color: Colors.white,
-                    )
-                  : null,
             ),
-          ),
-        ],
+            GestureDetector(
+              onTap: () => viewModel.toggleGoalCompletion(goal.id),
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: goal.completedToday ? goal.color : Colors.transparent,
+                  border: Border.all(
+                    color: goal.completedToday ? goal.color : Colors.grey,
+                    width: 2,
+                  ),
+                ),
+                child: goal.completedToday
+                    ? const Icon(
+                        Icons.check,
+                        size: 16,
+                        color: Colors.white,
+                      )
+                    : null,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+void _showDeleteDialog(
+    BuildContext context, HomeViewModel viewModel, Goal goal) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Delete Goal'),
+        content: Text('Are you sure you want to delete "${goal.title}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              viewModel.deleteGoal(goal.id);
+              Navigator.of(context).pop();
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      );
+    },
+  );
 }

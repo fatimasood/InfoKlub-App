@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 part 'goal_model.g.dart';
@@ -32,6 +33,7 @@ class Goal {
   @HiveField(8)
   final DateTime endDate;
 
+  // Hive-compatible constructor
   Goal({
     required this.id,
     required this.title,
@@ -39,10 +41,35 @@ class Goal {
     required this.currentStreak,
     required this.longestStreak,
     required this.completedToday,
-    required Color color,
+    required this.colorValue, // Use colorValue instead of Color
     required this.startDate,
     required this.endDate,
-  }) : colorValue = color.value;
+  });
+
+  // Factory constructor for easy creation from Color
+  factory Goal.fromColor({
+    required String id,
+    required String title,
+    String description = '',
+    required int currentStreak,
+    required int longestStreak,
+    required bool completedToday,
+    required Color color,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) {
+    return Goal(
+      id: id,
+      title: title,
+      description: description,
+      currentStreak: currentStreak,
+      longestStreak: longestStreak,
+      completedToday: completedToday,
+      colorValue: color.value,
+      startDate: startDate,
+      endDate: endDate,
+    );
+  }
 
   // Getter to convert colorValue back to Color
   Color get color => Color(colorValue);
@@ -65,9 +92,34 @@ class Goal {
       currentStreak: currentStreak ?? this.currentStreak,
       longestStreak: longestStreak ?? this.longestStreak,
       completedToday: completedToday ?? this.completedToday,
-      color: color ?? this.color,
+      colorValue: color?.value ?? this.colorValue,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
+    );
+  }
+
+  // Safe factory method for migration
+  factory Goal.safe({
+    String? id,
+    required String title,
+    String description = '',
+    int currentStreak = 0,
+    int longestStreak = 0,
+    bool completedToday = false,
+    Color? color,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) {
+    return Goal(
+      id: id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      title: title,
+      description: description,
+      currentStreak: currentStreak,
+      longestStreak: longestStreak,
+      completedToday: completedToday,
+      colorValue: color?.value ?? Colors.blue.value,
+      startDate: startDate ?? DateTime.now(),
+      endDate: endDate ?? DateTime.now().add(const Duration(days: 30)),
     );
   }
 }

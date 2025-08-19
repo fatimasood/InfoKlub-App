@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:infoklub/models/career/career_model.dart';
+import 'package:infoklub/models/goals/goal_model.dart';
 import 'package:infoklub/models/health/health_model.dart';
 import 'package:infoklub/models/reminder/reminder_model.dart';
 import 'package:path_provider/path_provider.dart';
@@ -39,5 +40,45 @@ class HiveHelper {
     return Hive.isBoxOpen(boxName)
         ? Hive.box<ReminderModel>(boxName)
         : await Hive.openBox<ReminderModel>(boxName);
+  }
+
+  static String getGoalsBoxName(String email) {
+    return "goals_${email.replaceAll('@', '_').replaceAll('.', '_')}";
+  }
+
+  static Future<Box<Goal>> openGoalsBox(String email) async {
+    final boxName = getGoalsBoxName(email);
+
+    return Hive.isBoxOpen(boxName)
+        ? Hive.box<Goal>(boxName)
+        : await Hive.openBox<Goal>(boxName);
+  }
+
+  // goal CURD
+
+  // Add to the switch statement in generic methods
+  static Future<void> saveGoal(String email, Goal goal) async {
+    final box = await openGoalsBox(email);
+    await box.put(goal.id, goal);
+  }
+
+  static Future<List<Goal>> getAllGoals(String email) async {
+    final box = await openGoalsBox(email);
+    return box.values.toList();
+  }
+
+  static Future<Goal?> getGoal(String email, String goalId) async {
+    final box = await openGoalsBox(email);
+    return box.get(goalId);
+  }
+
+  static Future<void> deleteGoal(String email, String goalId) async {
+    final box = await openGoalsBox(email);
+    await box.delete(goalId);
+  }
+
+  static Future<void> clearAllGoals(String email) async {
+    final box = await openGoalsBox(email);
+    await box.clear();
   }
 }

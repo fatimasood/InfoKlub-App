@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:infoklub/models/career/career_model.dart';
+import 'package:infoklub/models/goals/goal_model.dart';
 import 'package:infoklub/models/reminder/reminder_model.dart';
 import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
@@ -33,6 +34,8 @@ import 'package:infoklub/viewmodels/profile_setup/link_add_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/profilesetup_viewmodel.dart';
 import 'package:infoklub/viewmodels/rating/rating_viewmodel.dart';
 import 'package:infoklub/viewmodels/splash_viewmodel.dart';
+
+import 'views/authentecation_view/login_screen.dart';
 
 String userMail = '';
 
@@ -81,6 +84,10 @@ Future<void> initHive() async {
     Hive.registerAdapter(ReminderModelAdapter());
   }
 
+  if (!Hive.isAdapterRegistered(5)) {
+    Hive.registerAdapter(GoalAdapter());
+  }
+
   await Hive.openBox(
     'userBox',
     encryptionCipher: HiveAesCipher(encryptionKey),
@@ -106,11 +113,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => MdcnDataViewModel()),
         ChangeNotifierProvider(create: (_) => EduinfoViewmodel()),
         ChangeNotifierProvider(create: (_) => FinishprofileViewmodel()),
-        ChangeNotifierProvider(create: (_) => HomeViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => HomeViewModel(userEmail: userMail),
+        ),
         ChangeNotifierProvider(create: (_) => CvViewModel()),
         ChangeNotifierProvider(create: (_) => CvCreationViewModel()),
         ChangeNotifierProvider(
-            create: (_) => RemindersViewModel(userEmail: userMail)),
+            create: (_) => RemindersViewModel(userEmail: userMail!)),
         ChangeNotifierProvider(
           create: (_) => CareerViewmodel(),
         ),

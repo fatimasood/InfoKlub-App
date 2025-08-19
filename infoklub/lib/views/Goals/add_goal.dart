@@ -65,7 +65,7 @@ class _AddGoalState extends State<AddGoal> {
         return;
       }
 
-      final newGoal = Goal(
+      final newGoal = Goal.safe(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: _titleController.text,
         description: _descriptionController.text,
@@ -78,7 +78,7 @@ class _AddGoalState extends State<AddGoal> {
       );
 
       Provider.of<HomeViewModel>(context, listen: false).addNewGoal(newGoal);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
   }
 

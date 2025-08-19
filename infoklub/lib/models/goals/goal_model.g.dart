@@ -23,9 +23,9 @@ class GoalAdapter extends TypeAdapter<Goal> {
       currentStreak: fields[3] as int,
       longestStreak: fields[4] as int,
       completedToday: fields[5] as bool,
+      colorValue: fields[6] as int,
       startDate: fields[7] as DateTime,
       endDate: fields[8] as DateTime,
-      color: fields[9] as Color,
     );
   }
 

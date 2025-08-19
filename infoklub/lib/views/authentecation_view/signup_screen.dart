@@ -11,6 +11,10 @@ import '../../widgets/custom_divider.dart';
 import '../../widgets/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+//current user
+
+String? email = FirebaseAuth.instance.currentUser!.email;
+
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
