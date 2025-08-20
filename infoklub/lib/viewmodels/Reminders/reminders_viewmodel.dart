@@ -35,6 +35,7 @@ class RemindersViewModel extends ChangeNotifier {
   Future<void> addReminder(Reminder reminder) async {
     // ensure id
     final id = (reminder.id.isEmpty) ? const Uuid().v4() : reminder.id;
+    // ignore: unused_local_variable
     final withId = reminder.copyWith()..id; // ignore; copy keeps same id
 
     final toSave = Reminder(

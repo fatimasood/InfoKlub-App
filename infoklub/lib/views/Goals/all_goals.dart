@@ -7,9 +7,14 @@ import 'package:infoklub/views/Goals/add_goal.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -28,18 +33,20 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 const _StreaksSection(),
                 const SizedBox(height: 20),
-                CustomButton(
-                  height: 50,
-                  text: "Add New Goal",
-                  textColor: Colors.white,
-                  color: AppTheme.secondaryColor,
-                  borderRadius: 10.0,
-                  icon: const Icon(
-                    Icons.add_circle_outline,
-                    color: AppTheme.whiteColor,
-                  ),
-                  onPressed: () => _showAddGoalDialog(context),
-                ),
+                Consumer<HomeViewModel>(builder: (context, viewModel, child) {
+                  return CustomButton(
+                    height: 50,
+                    text: "Add New Goal",
+                    textColor: Colors.white,
+                    color: AppTheme.secondaryColor,
+                    borderRadius: 10.0,
+                    icon: const Icon(
+                      Icons.add_circle_outline,
+                      color: AppTheme.whiteColor,
+                    ),
+                    onPressed: () => _showAddGoalDialog(context, viewModel),
+                  );
+                }),
                 const SizedBox(height: 20),
                 const _GoalsList(),
               ],
@@ -50,15 +57,17 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _showAddGoalDialog(BuildContext context) {
+  void _showAddGoalDialog(BuildContext context, HomeViewModel viewModel) {
     showDialog(
       context: context,
       barrierColor: Colors.white.withOpacity(0.5),
       builder: (context) => const AddGoal(),
     ).then((value) {
       // Refresh goals when dialog closes
-      final viewModel = Provider.of<HomeViewModel>(context, listen: false);
-      viewModel.loadGoals();
+
+      if (value == true) {
+        viewModel.loadGoals();
+      }
     });
   }
 }
@@ -109,28 +118,31 @@ class _StreaksSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<HomeViewModel>(context);
-    // Show empty state if no goals
-    if (viewModel.goals.isEmpty) {
-      return const SizedBox.shrink(); // Hide streaks section when no goals
-    }
-    return SizedBox(
-      height: 120,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: viewModel.goals.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          final goal = viewModel.goals[index];
-          return GestureDetector(
-            onTap: () => viewModel.selectGoal(goal.id),
-            child: _StreakCard(
-              goal: goal,
-              isSelected: viewModel.selectedGoalId == goal.id,
-            ),
-          );
-        },
-      ),
+    return Consumer<HomeViewModel>(
+      builder: (context, viewModel, child) {
+        // Show empty state if no goals
+        if (viewModel.goals.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return SizedBox(
+          height: 120,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: viewModel.goals.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              final goal = viewModel.goals[index];
+              return GestureDetector(
+                onTap: () => viewModel.selectGoal(goal.id),
+                child: _StreakCard(
+                  goal: goal,
+                  isSelected: viewModel.selectedGoalId == goal.id,
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -211,76 +223,79 @@ class _GoalsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<HomeViewModel>(context);
-    // Show empty state message when no goals
-    if (viewModel.goals.isEmpty) {
-      return Expanded(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.flag_outlined,
-                  size: 64,
-                  color: Colors.grey[400],
+    return Consumer<HomeViewModel>(
+      builder: (context, viewModel, child) {
+        // Show empty state message when no goals
+        if (viewModel.goals.isEmpty) {
+          return Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.flag_outlined,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'SET YOUR GOALS TO ACHIEVE AND BE MOTIVATED',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.secondaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Press + to add your first goal',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                const Text(
-                  'SET YOUR GOALS TO ACHIEVE AND BE MOTIVATED',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.secondaryColor,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Press + to add your first goal',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+              ),
+            ),
+          );
+        }
+        return Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                color: Colors.grey.withOpacity(0.3),
+              ),
+              borderRadius: BorderRadius.circular(20.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  blurRadius: 5.0,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
-          ),
-        ),
-      );
-    }
-    return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(
-            color: Colors.grey.withOpacity(0.3),
-          ),
-          borderRadius: BorderRadius.circular(20.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              blurRadius: 5.0,
-              offset: const Offset(0, 3),
+            child: ListView.separated(
+              padding: const EdgeInsets.all(8.0),
+              itemCount: viewModel.filteredGoals.length,
+              separatorBuilder: (context, index) => Divider(
+                height: 1,
+                thickness: 1,
+                color: Colors.grey.withOpacity(0.2),
+              ),
+              itemBuilder: (context, index) {
+                final goal = viewModel.filteredGoals[index];
+                return _GoalItem(goal: goal);
+              },
             ),
-          ],
-        ),
-        child: ListView.separated(
-          padding: const EdgeInsets.all(8.0),
-          itemCount: viewModel.filteredGoals.length,
-          separatorBuilder: (context, index) => Divider(
-            height: 1,
-            thickness: 1,
-            color: Colors.grey.withOpacity(0.2),
           ),
-          itemBuilder: (context, index) {
-            final goal = viewModel.filteredGoals[index];
-            return _GoalItem(goal: goal);
-          },
-        ),
-      ),
+        );
+      },
     );
   }
 }

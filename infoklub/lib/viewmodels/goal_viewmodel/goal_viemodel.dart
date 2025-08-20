@@ -29,6 +29,7 @@ class HomeViewModel with ChangeNotifier {
       // Ensure all goals have valid color values
       _goals = _goals.map((goal) {
         // If colorValue is invalid, create a new goal with default color
+        // ignore: unnecessary_null_comparison
         if (goal.colorValue == null || goal.colorValue == 0) {
           return Goal.safe(
             id: goal.id,

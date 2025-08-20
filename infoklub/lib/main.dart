@@ -35,8 +35,6 @@ import 'package:infoklub/viewmodels/profile_setup/profilesetup_viewmodel.dart';
 import 'package:infoklub/viewmodels/rating/rating_viewmodel.dart';
 import 'package:infoklub/viewmodels/splash_viewmodel.dart';
 
-import 'views/authentecation_view/login_screen.dart';
-
 String userMail = '';
 
 Future<void> main() async {
@@ -119,7 +117,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CvViewModel()),
         ChangeNotifierProvider(create: (_) => CvCreationViewModel()),
         ChangeNotifierProvider(
-            create: (_) => RemindersViewModel(userEmail: userMail!)),
+            create: (_) => RemindersViewModel(userEmail: userMail)),
         ChangeNotifierProvider(
           create: (_) => CareerViewmodel(),
         ),
