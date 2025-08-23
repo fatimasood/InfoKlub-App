@@ -64,5 +64,24 @@ class UserProfileModel extends HiveObject {
     this.linkedin,
     this.website,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'dob': dob,
+      'city': city,
+      'bio': bio,
+      'profileImagePath': profileImagePath,
+      'flag': flag,
+      'dialCode': dialCode,
+      'behance': behance ?? '',
+      'dribble': dribble ?? '',
+      'github': github ?? '',
+      'linkedin': linkedin ?? '',
+      'website': website ?? '',
+    };
+  }
 }
 // This model is used to store user profile information and links in Hive.

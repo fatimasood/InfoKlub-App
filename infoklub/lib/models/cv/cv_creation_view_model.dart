@@ -1,6 +1,5 @@
 import 'dart:io' show File;
 
-// Define these classes outside of CVModel
 class Activity {
   final String name;
   final String description;

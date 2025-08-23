@@ -34,4 +34,15 @@ class CarrerModel extends HiveObject {
     required this.location,
     required this.documentPaths,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      'jobTitle': jobTitle,
+      'companyName': companyName,
+      'startDate': startDate,
+      'endDate': endDate,
+      'skills': skills,
+      'location': location,
+      'documentPaths': documentPaths,
+    };
+  }
 }

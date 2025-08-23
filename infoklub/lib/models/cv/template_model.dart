@@ -1,11 +1,13 @@
 class Template {
-  final String id;
+  final int id;
   final String name;
-  final String thumbnailPath;
+  final String thumbnail;
+  final String description;
 
   Template({
     required this.id,
     required this.name,
-    required this.thumbnailPath,
+    required this.thumbnail,
+    required this.description,
   });
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:infoklub/models/user/user_profile_model.dart';
+import 'package:infoklub/services/firebase_services/auth_service.dart';
 import 'package:infoklub/viewmodels/profile_setup/finishprofile_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
@@ -95,51 +96,32 @@ class ProfileSetupViewModel with ChangeNotifier {
   }
 
   // Save Profile to Hive
+  // ProfileSetupViewModel mein save method update karo
   Future<void> saveProfileLocally() async {
-    final box = await Hive.openBox<UserProfileModel>('userProfile');
+    try {
+      final box = Hive.box('userBox');
+      final String userKey = 'localUser_${AuthService.getCurrentUserKey()}';
 
-    final model = UserProfileModel(
-      name: _name,
-      email: _email,
-      phone: '+$_selectedCode $_phone',
-      dob: _dob,
-      city: _city,
-      bio: _bio,
-      profileImagePath: _selectedImage?.path ?? '',
-      flag: _selectedFlag,
-      dialCode: _selectedCode,
-    );
+      final model = UserProfileModel(
+        name: _name,
+        email: _email,
+        phone: '+$_selectedCode $_phone',
+        dob: _dob,
+        city: _city,
+        bio: _bio,
+        profileImagePath: _selectedImage?.path ?? '',
+        flag: _selectedFlag,
+        dialCode: _selectedCode,
+      );
 
-    await box.put('localUser', model);
-    if (kDebugMode) {
-      print('Saved to Hive:');
-    }
-    if (kDebugMode) {
-      print('Name: ${model.name}');
-    }
-    if (kDebugMode) {
-      print('Email: ${model.email}');
-    }
-    if (kDebugMode) {
-      print('Phone: ${model.phone}');
-    }
-    if (kDebugMode) {
-      print('DOB: ${model.dob}');
-    }
-    if (kDebugMode) {
-      print('City: ${model.city}');
-    }
-    if (kDebugMode) {
-      print('Bio: ${model.bio}');
-    }
-    if (kDebugMode) {
-      print('Image Path: ${model.profileImagePath}');
-    }
-    if (kDebugMode) {
-      print('Flag: ${model.flag}');
-    }
-    if (kDebugMode) {
-      print('Dial Code: ${model.dialCode}');
+      await box.put(userKey, model);
+
+      if (kDebugMode) {
+        print('✅ Saved user profile with key: $userKey');
+        print('✅ User data: ${model.toJson()}');
+      }
+    } catch (e) {
+      print('❌ Error saving profile to Hive: $e');
     }
   }
 

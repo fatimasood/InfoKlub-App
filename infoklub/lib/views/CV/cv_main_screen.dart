@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/views/CV/CV_creation/contact_info_screen.dart';
 import 'package:infoklub/views/CV/template_selection_screen.dart';
@@ -31,28 +32,17 @@ class CVPage extends StatelessWidget {
               const SizedBox(height: 15),
               Image.asset(
                 "lib/assets/Images/cvwelcome.png",
-                height: 290,
+                height: 330,
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.only(left: 75, right: 75),
                 child: CustomButton(
-                  text: "Import from LinkedIn",
-                  color: AppTheme.purpleAccent,
-                  borderRadius: 9.86,
-                  height: 40.0,
-                  onPressed: () => _importFromLinkedIn(context),
-                ),
-              ),
-              const SizedBox(height: 5.0),
-              Padding(
-                padding: const EdgeInsets.only(left: 75, right: 75),
-                child: CustomButton(
                   text: "Create a new CV",
                   borderRadius: 9.86,
                   height: 40.0,
-                  color: AppTheme.tealAccent,
+                  color: AppTheme.purpleAccent,
                   onPressed: () => _createNewCV(context),
                 ),
               ),
@@ -79,41 +69,19 @@ class CVPage extends StatelessWidget {
     );
   }
 
-  void _importFromLinkedIn(BuildContext context) {
-    // 1. Show loading indicator
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(
-        child: CircularProgressIndicator(
-          color: AppTheme.primaryColor,
-        ),
-      ),
-    );
-
-    // 2. Call ViewModel method
-    context.read<CvViewModel>().importFromLinkedIn().then((_) {
-      // 3. Navigate to editor on success
-      Navigator.pop(context); // Close loading dialog
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => ContactInfoScreen()),
-      );
-    }).catchError((error) {
-      // 4. Show error if fails
-      Navigator.pop(context); // Close loading dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to import: $error')),
-      );
-    });
-  }
-
+  // views/CV/cv_page.dart
   void _createNewCV(BuildContext context) {
-    // Create with default template
-    context.read<CvViewModel>().createNewCV();
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ContactInfoScreen()),
-    );
+    final cvViewModel = context.read<CvViewModel>();
+    final cvCreationViewModel = context.read<CvCreationViewModel>();
+
+    // Create new CV and load user data
+    cvViewModel.createNewCV();
+
+    // Wait for data to load then navigate
+    Future.delayed(const Duration(milliseconds: 100), () {
+      // ignore: use_build_context_synchronously
+      Navigator.push(context,
+          MaterialPageRoute(builder: (_) => const ContactInfoScreen()));
+    });
   }
 }

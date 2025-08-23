@@ -29,4 +29,15 @@ class EducationInfo extends HiveObject {
     required this.achievements,
     required this.uploadedDocs,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'degree': degree,
+      'institution': institution,
+      'totalGrade': totalGrade,
+      'scoreGrade': scoreGrade,
+      'achievements': achievements,
+      'uploadedDocs': uploadedDocs,
+    };
+  }
 }

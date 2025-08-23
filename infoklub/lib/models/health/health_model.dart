@@ -22,4 +22,12 @@ class HealthModel extends HiveObject {
     required this.documentPaths,
     required this.allergies,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      'bloodType': bloodType,
+      'medications': medications,
+      'documentPaths': documentPaths,
+      'allergies': allergies,
+    };
+  }
 }
