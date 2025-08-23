@@ -131,7 +131,8 @@ class CvViewModel extends ChangeNotifier {
       // Work Experience with null checks
       final experiences = career['experiences'] as List? ?? [];
       if (kDebugMode) {
-        print('Experiences length: ${experiences.length}');
+        print(
+            'Number of career experiences loaded for CV: ${experiences.length}');
       }
 
       final expList = experiences.map((exp) {

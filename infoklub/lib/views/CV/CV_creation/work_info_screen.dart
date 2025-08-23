@@ -1,15 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/models/cv/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
+import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/views/CV/CV_creation/education_info_screen.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 
 import 'package:provider/provider.dart';
 
-class WorkInfoScreen extends StatelessWidget {
+class WorkInfoScreen extends StatefulWidget {
+  WorkInfoScreen({super.key});
+
+  @override
+  State<WorkInfoScreen> createState() => _WorkInfoScreenState();
+}
+
+class _WorkInfoScreenState extends State<WorkInfoScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  WorkInfoScreen({super.key});
+  late TextEditingController _companyController;
+  late TextEditingController _jobTitleController;
+  late TextEditingController _locationController;
+  late TextEditingController _descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers
+    _companyController = TextEditingController();
+    _jobTitleController = TextEditingController();
+    _locationController = TextEditingController();
+    _descriptionController = TextEditingController();
+
+    // Pre-fill the form with existing data
+    _prefillForm();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controllers when the widget is disposed.
+    _companyController.dispose();
+    _jobTitleController.dispose();
+    _locationController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  // Method to pre-fill the form
+  void _prefillForm() {
+    // Access the ViewModel
+    final cvViewModel = context.read<CvViewModel>();
+    final cvData = cvViewModel.cvData;
+
+    // Check if there is any work experience data
+    if (cvData.workExperience.isNotEmpty) {
+      // For simplicity, we'll take the first work experience.
+      // You might want to design a UI to manage multiple experiences.
+      WorkExperience firstJob = cvData.workExperience.first;
+
+      // Set the text of the controllers to the saved values
+      _companyController.text = firstJob.company;
+      _jobTitleController.text = firstJob.position;
+      _locationController.text = firstJob.location ?? ''; // Handle null
+      _descriptionController.text = firstJob.description ?? ''; // Handle null
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +115,8 @@ class WorkInfoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 3.0),
                     TextFormField(
+                      style: TextStyle(color: Colors.black),
+                      controller: _companyController,
                       cursorColor: AppTheme.blackColor,
                       decoration: const InputDecoration(
                         hintText: 'Company Name',
@@ -349,6 +406,8 @@ class WorkInfoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 3.0),
                     TextFormField(
+                      style: TextStyle(color: Colors.black),
+                      controller: _jobTitleController,
                       cursorColor: AppTheme.blackColor,
                       decoration: const InputDecoration(
                         hintText: 'Sales Manager',
@@ -375,6 +434,8 @@ class WorkInfoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 3.0),
                     TextFormField(
+                      style: TextStyle(color: Colors.black),
+                      controller: _locationController,
                       cursorColor: AppTheme.blackColor,
                       decoration: const InputDecoration(
                         hintText: 'xyz city, Bangladesh',
@@ -402,6 +463,8 @@ class WorkInfoScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 3.0),
                     TextFormField(
+                      style: TextStyle(color: Colors.black),
+                      controller: _descriptionController,
                       maxLines: 5,
                       cursorColor: AppTheme.blackColor,
                       decoration: const InputDecoration(

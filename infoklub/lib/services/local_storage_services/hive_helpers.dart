@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:infoklub/models/career/career_model.dart';
 import 'package:infoklub/models/goals/goal_model.dart';
@@ -12,6 +13,8 @@ class HiveHelper {
     Hive.registerAdapter(HealthModelAdapter());
   }
 
+//HEALTH_____________________________________________
+
   static String getHealthBoxName(String email) {
     return "health_${email.replaceAll('@', '_').replaceAll('.', '_')}";
   }
@@ -21,6 +24,8 @@ class HiveHelper {
     return await Hive.openBox<HealthModel>(boxName);
   }
 
+  //CAREER______________________________
+
   static String getCareerBoxName(String email) {
     return "career_${email.replaceAll('@', '_').replaceAll('.', '_')}";
   }
@@ -29,6 +34,61 @@ class HiveHelper {
     final boxName = getCareerBoxName(email);
     return await Hive.openBox<CarrerModel>(boxName);
   }
+
+  //******EXTRACT CAREER DATA***************/
+
+  static Future<CarrerModel?> getCareerData(String email) async {
+    try {
+      final box = await openCareerBox(email);
+
+      // Since you're saving with index keys, we need to get all values
+      final allCareerData = box.values.toList();
+
+      if (allCareerData.isEmpty) {
+        if (kDebugMode) {
+          print('No career data found in box');
+        }
+        return null;
+      }
+
+      // Return the most recent entry (last in the list)
+      return allCareerData.last;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting career data: $e');
+      }
+      return null;
+    }
+  }
+
+// Get ALL career entries (for listing)
+  static Future<List<CarrerModel>> getAllCareerEntries(String email) async {
+    try {
+      final box = await openCareerBox(email);
+      return box.values.toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting all career entries: $e');
+      }
+      return [];
+    }
+  }
+
+// Get career entry by index
+  static Future<CarrerModel?> getCareerEntryByIndex(
+      String email, int index) async {
+    try {
+      final box = await openCareerBox(email);
+      return box.getAt(index);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting career entry at index $index: $e');
+      }
+      return null;
+    }
+  }
+
+//REMINDER__________________________________________________
 
   static String getReminderBoxName(String email) {
     return "reminders_${email.replaceAll('@', '_').replaceAll('.', '_')}";
@@ -41,6 +101,8 @@ class HiveHelper {
         ? Hive.box<ReminderModel>(boxName)
         : await Hive.openBox<ReminderModel>(boxName);
   }
+
+  //GOALS-----------------------------------------------------
 
   static String getGoalsBoxName(String email) {
     return "goals_${email.replaceAll('@', '_').replaceAll('.', '_')}";
