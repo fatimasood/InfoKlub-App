@@ -20,7 +20,11 @@ class UserDataService {
       final dynamic userData = box.get(userKey);
 
       if (userData is UserProfileModel) {
-        return userData.toJson();
+        final jsonData = userData.toJson();
+        if (kDebugMode) {
+          print('User profile found: $jsonData');
+        }
+        return jsonData;
       } else if (userData is Map) {
         if (kDebugMode) {
           print('User data is in Map format, converting...');
@@ -29,6 +33,18 @@ class UserDataService {
       } else {
         if (kDebugMode) {
           print('User profile data not found for key: $userKey');
+
+          final String altKey = 'localUser${AuthService.getCurrentUserKey()}';
+          final dynamic altUserData = box.get(altKey);
+
+          if (altUserData != null) {
+            print('Found user data with alternative key: $altKey');
+            if (altUserData is UserProfileModel) {
+              return altUserData.toJson();
+            } else if (altUserData is Map) {
+              return Map<String, dynamic>.from(altUserData);
+            }
+          }
         }
         return {};
       }

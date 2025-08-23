@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:infoklub/models/cv/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/user_data_service.dart';
 
@@ -27,7 +27,9 @@ class CvViewModel extends ChangeNotifier {
       _populateCVData(userData);
     } catch (e) {
       _error = 'Failed to load user data: $e';
-      print(_error);
+      if (kDebugMode) {
+        print(_error);
+      }
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -39,22 +41,32 @@ class CvViewModel extends ChangeNotifier {
       try {
         _cvData = _cvData.copyWith(profileImage: File(imagePath));
       } catch (e) {
-        print('Error loading profile image: $e');
+        if (kDebugMode) {
+          print('Error loading profile image: $e');
+        }
       }
     }
   }
 
   void _populateCVData(Map<String, dynamic> userData) {
     try {
-      print('Populating CV data with: $userData');
+      if (kDebugMode) {
+        print('Populating CV data with: $userData');
+      }
 
       final profile = userData['profile'] ?? {};
       final education = userData['education'] ?? {};
       final career = userData['career'] ?? {};
 
-      print('Profile data: $profile');
-      print('Education data: $education');
-      print('Career data: $career');
+      if (kDebugMode) {
+        print('Profile data: $profile');
+      }
+      if (kDebugMode) {
+        print('Education data: $education');
+      }
+      if (kDebugMode) {
+        print('Career data: $career');
+      }
 
       if (profile.isEmpty) {
         final currentUser = FirebaseAuth.instance.currentUser;
@@ -68,34 +80,42 @@ class CvViewModel extends ChangeNotifier {
 
       // Extract name properly
       final String fullName = profile['name']?.toString() ?? '';
-      print('Full name from profile: $fullName');
-
+      if (kDebugMode) {
+        print('Full name from profile: $fullName');
+      }
+      // Better name parsing logic
+      Map<String, String> parsedName = _parseName(fullName);
       // Extract phone number (remove country code if present)
       String phone = profile['phone']?.toString() ?? '';
-      print('Original phone: $phone');
 
-      if (phone.contains(' ')) {
-        phone = phone.split(' ').last; // Remove country code
+      if (kDebugMode) {
+        print('Original phone: $phone');
       }
 
       // Personal Info with null checks
       _cvData = _cvData.copyWith(
-        firstName: _getFirstName(fullName),
-        lastName: _getLastName(fullName),
+        firstName: parsedName['firstName'] ?? '',
+        lastName: parsedName['lastName'] ?? '',
         email: profile['email']?.toString() ?? '',
         phone: phone,
         address: profile['city']?.toString() ?? '',
       );
 
-      print(
-          'CV Data after personal info: ${_cvData.firstName} ${_cvData.lastName}');
-
+      if (kDebugMode) {
+        print(
+            'Parsed name - First: "${_cvData.firstName}", Last: "${_cvData.lastName}"');
+      }
+      if (kDebugMode) {
+        print('Phone: "${_cvData.phone}", Address: "${_cvData.address}"');
+      }
       // Load profile image
       _loadProfileImage(profile['profileImagePath']?.toString());
 
       // Education with null checks
       final educationHistory = education['educationHistory'] as List? ?? [];
-      print('Education history length: ${educationHistory.length}');
+      if (kDebugMode) {
+        print('Education history length: ${educationHistory.length}');
+      }
 
       final eduList = educationHistory.map((edu) {
         return Education(
@@ -110,7 +130,9 @@ class CvViewModel extends ChangeNotifier {
 
       // Work Experience with null checks
       final experiences = career['experiences'] as List? ?? [];
-      print('Experiences length: ${experiences.length}');
+      if (kDebugMode) {
+        print('Experiences length: ${experiences.length}');
+      }
 
       final expList = experiences.map((exp) {
         return WorkExperience(
@@ -127,19 +149,25 @@ class CvViewModel extends ChangeNotifier {
 
       // Skills with null checks
       final skills = career['skills'] as List? ?? [];
-      print('Skills length: ${skills.length}');
+      if (kDebugMode) {
+        print('Skills length: ${skills.length}');
+      }
 
       _cvData = _cvData.copyWith(skills: List<String>.from(skills));
 
-      print('Final CV Data populated successfully');
+      if (kDebugMode) {
+        print('Final CV Data populated successfully');
+      }
       notifyListeners();
     } catch (e) {
       _error = 'Error populating CV data: $e';
-      print(_error);
+      if (kDebugMode) {
+        print(_error);
+      }
     }
   }
 
-  String _getFirstName(String fullName) {
+  /* String _getFirstName(String fullName) {
     if (fullName.isEmpty) return '';
     return fullName.split(' ').first;
   }
@@ -148,7 +176,7 @@ class CvViewModel extends ChangeNotifier {
     if (fullName.isEmpty) return '';
     final parts = fullName.split(' ');
     return parts.length > 1 ? parts.sublist(1).join(' ') : '';
-  }
+  } */
 
   void updateCVData(CVModel newData) {
     _cvData = newData;
@@ -163,5 +191,39 @@ class CvViewModel extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  Map<String, String> _parseName(String fullName) {
+    if (fullName.isEmpty) return {'firstName': '', 'lastName': ''};
+
+    final nameParts = fullName.trim().split(' ');
+
+    if (nameParts.length == 1) {
+      return {'firstName': nameParts[0], 'lastName': ''};
+    }
+
+    // Handle cases like "Zahra Noor" or "ZahraNoor"
+    if (nameParts.length >= 2) {
+      // Check if it's actually one word (like "ZahraNoor")
+      if (nameParts.length == 1 && fullName.contains(RegExp(r'[a-z][A-Z]'))) {
+        // CamelCase detection like "ZahraNoor"
+        final match = RegExp(r'([a-z])([A-Z])').firstMatch(fullName);
+        if (match != null) {
+          final index = match.start + 1;
+          return {
+            'firstName': fullName.substring(0, index),
+            'lastName': fullName.substring(index)
+          };
+        }
+      }
+
+      // Regular space-separated names
+      return {
+        'firstName': nameParts.first,
+        'lastName': nameParts.sublist(1).join(' ')
+      };
+    }
+
+    return {'firstName': fullName, 'lastName': ''};
   }
 }

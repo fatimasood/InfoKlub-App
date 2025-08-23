@@ -1,4 +1,5 @@
 // views/CV/CV_creation/contact_info_screen.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
@@ -35,6 +36,21 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
     final cvCreationViewModel = context.read<CvCreationViewModel>();
 
     final cvData = cvViewModel.cvData;
+    if (kDebugMode) {
+      print('Populating form with CV data:');
+    }
+    if (kDebugMode) {
+      print('First: ${cvData.firstName}, Last: ${cvData.lastName}');
+    }
+    if (kDebugMode) {
+      print('Email: ${cvData.email}');
+    }
+    if (kDebugMode) {
+      print('Phone: ${cvData.phone}');
+    }
+    if (kDebugMode) {
+      print('Address: ${cvData.address}');
+    }
 
     // Set values in controllers
     _firstNameController.text = cvData.firstName ?? '';
@@ -237,6 +253,8 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
           cursorColor: AppTheme.blackColor,
           decoration: InputDecoration(
             hintText: hint,
+            // ignore: deprecated_member_use
+            hintStyle: TextStyle(color: Colors.black.withOpacity(0.2)),
             border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10.0)),
             ),

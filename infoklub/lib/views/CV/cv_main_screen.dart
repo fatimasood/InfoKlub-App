@@ -17,52 +17,54 @@ class CVPage extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
-          child: Column(
-            //mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                "Create a unique resume\n with your phone!",
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.normal,
-                      color: AppTheme.blackColor,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 15),
-              Image.asset(
-                "lib/assets/Images/cvwelcome.png",
-                height: 330,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.only(left: 75, right: 75),
-                child: CustomButton(
-                  text: "Create a new CV",
-                  borderRadius: 9.86,
-                  height: 40.0,
-                  color: AppTheme.purpleAccent,
-                  onPressed: () => _createNewCV(context),
+          child: SingleChildScrollView(
+            child: Column(
+              //mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  "Create a unique resume\n with your phone!",
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.normal,
+                        color: AppTheme.blackColor,
+                      ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              const SizedBox(height: 5.0),
-              Padding(
-                padding: const EdgeInsets.only(left: 75, right: 75),
-                child: CustomButton(
-                  text: "View Templates",
-                  color: AppTheme.coralAccent,
-                  borderRadius: 9.86,
-                  height: 40.0,
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const TemplateSelectionScreen(),
+                const SizedBox(height: 15),
+                Image.asset(
+                  "lib/assets/Images/cvwelcome.png",
+                  height: 330,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(left: 75, right: 75),
+                  child: CustomButton(
+                    text: "Generate CV",
+                    borderRadius: 9.86,
+                    height: 40.0,
+                    color: AppTheme.purpleAccent,
+                    onPressed: () => _createNewCV(context),
+                  ),
+                ),
+                const SizedBox(height: 5.0),
+                Padding(
+                  padding: const EdgeInsets.only(left: 75, right: 75),
+                  child: CustomButton(
+                    text: "View Templates",
+                    color: AppTheme.coralAccent,
+                    borderRadius: 9.86,
+                    height: 40.0,
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const TemplateSelectionScreen(),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -72,7 +74,7 @@ class CVPage extends StatelessWidget {
   // views/CV/cv_page.dart
   void _createNewCV(BuildContext context) {
     final cvViewModel = context.read<CvViewModel>();
-    final cvCreationViewModel = context.read<CvCreationViewModel>();
+    context.read<CvCreationViewModel>();
 
     // Create new CV and load user data
     cvViewModel.createNewCV();

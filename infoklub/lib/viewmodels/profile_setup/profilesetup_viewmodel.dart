@@ -96,19 +96,19 @@ class ProfileSetupViewModel with ChangeNotifier {
   }
 
   // Save Profile to Hive
-  // ProfileSetupViewModel mein save method update karo
+
   Future<void> saveProfileLocally() async {
     try {
       final box = Hive.box('userBox');
       final String userKey = 'localUser_${AuthService.getCurrentUserKey()}';
 
       final model = UserProfileModel(
-        name: _name,
-        email: _email,
-        phone: '+$_selectedCode $_phone',
-        dob: _dob,
-        city: _city,
-        bio: _bio,
+        name: _name.trim(),
+        email: _email.trim(),
+        phone: '+$_selectedCode $_phone'.trim(),
+        dob: _dob.trim(),
+        city: _city.trim(),
+        bio: _bio.trim(),
         profileImagePath: _selectedImage?.path ?? '',
         flag: _selectedFlag,
         dialCode: _selectedCode,
