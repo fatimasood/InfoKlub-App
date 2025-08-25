@@ -5,7 +5,6 @@ import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/views/CV/CV_creation/education_info_screen.dart';
 import 'package:infoklub/widgets/custom_button.dart';
-
 import 'package:provider/provider.dart';
 
 class WorkInfoScreen extends StatefulWidget {
@@ -17,11 +16,19 @@ class WorkInfoScreen extends StatefulWidget {
 
 class _WorkInfoScreenState extends State<WorkInfoScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool _showAddForm = false;
 
   late TextEditingController _companyController;
   late TextEditingController _jobTitleController;
   late TextEditingController _locationController;
   late TextEditingController _descriptionController;
+
+  // Add controllers for dates
+  String? _startMonth;
+  String? _startYear;
+  String? _endMonth;
+  String? _endYear;
+  bool _isCurrentJob = false;
 
   @override
   void initState() {
@@ -55,20 +62,86 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
     // Check if there is any work experience data
     if (cvData.workExperience.isNotEmpty) {
       // For simplicity, we'll take the first work experience.
-      // You might want to design a UI to manage multiple experiences.
       WorkExperience firstJob = cvData.workExperience.first;
 
       // Set the text of the controllers to the saved values
       _companyController.text = firstJob.company;
       _jobTitleController.text = firstJob.position;
-      _locationController.text = firstJob.location ?? ''; // Handle null
-      _descriptionController.text = firstJob.description ?? ''; // Handle null
+      _locationController.text = firstJob.location ?? '';
+      _descriptionController.text = firstJob.description ?? '';
+
+      // Parse the duration string to extract dates
+      _parseDuration(firstJob.duration);
+    }
+  }
+
+  void _parseDuration(String duration) {
+    if (duration.contains('Present')) {
+      _isCurrentJob = true;
+      // Extract start date from duration like "Jan 2020 - Present"
+      final parts = duration.split(' - ');
+      if (parts.isNotEmpty) {
+        final startParts = parts[0].split(' ');
+        if (startParts.length >= 2) {
+          _startMonth = startParts[0];
+          _startYear = startParts[1];
+        }
+      }
+    } else if (duration.contains('-')) {
+      // Extract dates from duration like "Jan 2020 - Dec 2022"
+      final parts = duration.split(' - ');
+      if (parts.length >= 2) {
+        final startParts = parts[0].split(' ');
+        final endParts = parts[1].split(' ');
+
+        if (startParts.length >= 2) {
+          _startMonth = startParts[0];
+          _startYear = startParts[1];
+        }
+
+        if (endParts.length >= 2) {
+          _endMonth = endParts[0];
+          _endYear = endParts[1];
+        }
+      }
+    }
+  }
+
+  String _getMonthName(int month) {
+    switch (month) {
+      case 1:
+        return 'Jan';
+      case 2:
+        return 'Feb';
+      case 3:
+        return 'Mar';
+      case 4:
+        return 'Apr';
+      case 5:
+        return 'May';
+      case 6:
+        return 'Jun';
+      case 7:
+        return 'Jul';
+      case 8:
+        return 'Aug';
+      case 9:
+        return 'Sep';
+      case 10:
+        return 'Oct';
+      case 11:
+        return 'Nov';
+      case 12:
+        return 'Dec';
+      default:
+        return 'Jan';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<CvCreationViewModel>();
+    final cvViewModel = context.watch<CvViewModel>();
 
     return Scaffold(
       appBar: AppBar(
@@ -93,414 +166,521 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      'Work Experience',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Display existing career entries with dividers
+                  if (cvViewModel.cvData.workExperience.isNotEmpty) ...[
+                    Text(
+                      'Your Work Experiences',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: AppTheme.primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ..._buildCareerList(cvViewModel.cvData.workExperience),
+                    const SizedBox(height: 20),
+                  ],
+
+                  // Add New Experience button and form
+                  if (!_showAddForm &&
+                      cvViewModel.cvData.workExperience.isNotEmpty)
                     Center(
-                      child: Text(
-                        'Work Experience',
-                        style: Theme.of(context).textTheme.headlineSmall,
+                      child: SizedBox(
+                        width: 150,
+                        child: CustomButton(
+                          icon: const Icon(
+                            Icons.add_circle_outline,
+                            color: AppTheme.skyBlue,
+                            size: 20,
+                          ),
+                          borderRadius: 15,
+                          color: AppTheme.primaryColor,
+                          text: "Add new",
+                          textColor: AppTheme.skyBlue,
+                          onPressed: () {
+                            setState(() {
+                              _showAddForm = true;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+
+                  if (_showAddForm ||
+                      cvViewModel.cvData.workExperience.isEmpty) ...[
+                    if (cvViewModel.cvData.workExperience.isNotEmpty) ...[
+                      Divider(thickness: 2, color: Colors.grey[300]),
+                      const SizedBox(height: 20),
+                    ],
+                    Text(
+                      'Add New Experience',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: AppTheme.primaryColor,
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      "Employer",
-                      style: TextStyle(
-                        color: AppTheme.blackColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 3.0),
-                    TextFormField(
-                      style: TextStyle(color: Colors.black),
-                      controller: _companyController,
-                      cursorColor: AppTheme.blackColor,
-                      decoration: const InputDecoration(
-                        hintText: 'Company Name',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10.0),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Employer",
+                            style: TextStyle(
+                              color: AppTheme.blackColor,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                      ),
-                      onChanged: (value) =>
-                          viewModel.updateContactInfo(firstName: value),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Start Date",
-                                style: TextStyle(
-                                  color: AppTheme.blackColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13,
+                          const SizedBox(height: 3.0),
+                          TextFormField(
+                            style: TextStyle(color: Colors.black),
+                            controller: _companyController,
+                            cursorColor: AppTheme.blackColor,
+                            decoration: const InputDecoration(
+                              hintText: 'Company Name',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0),
                                 ),
                               ),
-                              const SizedBox(height: 3.0),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: DropdownButtonFormField<String>(
-                                      isExpanded: true,
-                                      value: null,
-                                      hint: const Text('Jan'),
-                                      items: [
-                                        'Jan',
-                                        'Feb',
-                                        'Mar',
-                                        'Apr',
-                                        'May',
-                                        'Jun',
-                                        'Jul',
-                                        'Aug',
-                                        'Sep',
-                                        'Oct',
-                                        'Nov',
-                                        'Dec'
-                                      ]
-                                          .map((month) => DropdownMenuItem(
-                                                value: month,
-                                                child: Text(month),
-                                              ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        // Handle start month selection
-                                      },
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 5),
-                                      ),
-                                      dropdownColor: AppTheme.whiteColor,
-                                      menuMaxHeight: 200,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: DropdownButtonFormField<String>(
-                                      isExpanded: true,
-                                      value: null,
-                                      hint: const Text('Year'),
-                                      items: List.generate(
-                                              50,
-                                              (index) =>
-                                                  (DateTime.now().year - index)
-                                                      .toString())
-                                          .map((year) => DropdownMenuItem(
-                                                value: year,
-                                                child: Text(year),
-                                              ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        // Handle start year selection
-                                      },
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 5),
-                                      ),
-                                      dropdownColor: Colors.white,
-                                      icon: const Icon(Icons.arrow_drop_down,
-                                          color: Colors.grey),
-                                      style:
-                                          const TextStyle(color: Colors.black),
-                                      menuMaxHeight:
-                                          200, // Limits dropdown height
-                                    ),
-                                  ),
-                                ],
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "End Date",
-                                style: TextStyle(
-                                  color: AppTheme.blackColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(height: 3.0),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: DropdownButtonFormField<String>(
-                                      isExpanded: true,
-                                      value: null,
-                                      hint: const Text('Jan'),
-                                      items: [
-                                        'Jan',
-                                        'Feb',
-                                        'Mar',
-                                        'Apr',
-                                        'May',
-                                        'Jun',
-                                        'Jul',
-                                        'Aug',
-                                        'Sep',
-                                        'Oct',
-                                        'Nov',
-                                        'Dec'
-                                      ]
-                                          .map((month) => DropdownMenuItem(
-                                                value: month,
-                                                child: Text(month),
-                                              ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        // Handle end month selection
-                                      },
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 5),
-                                      ),
-                                      dropdownColor: Colors.white,
-                                      icon: const Icon(Icons.arrow_drop_down,
-                                          color: Colors.grey),
-                                      style:
-                                          const TextStyle(color: Colors.black),
-                                      menuMaxHeight:
-                                          200, // Limits dropdown height
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: DropdownButtonFormField<String>(
-                                      isExpanded: true,
-                                      value: null,
-                                      hint: const Text('Year'),
-                                      items: List.generate(
-                                              50,
-                                              (index) =>
-                                                  (DateTime.now().year - index)
-                                                      .toString())
-                                          .map((year) => DropdownMenuItem(
-                                                value: year,
-                                                child: Text(year),
-                                              ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        // Handle end year selection
-                                      },
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15.0),
-                                          ),
-                                          borderSide:
-                                              BorderSide(color: Colors.grey),
-                                        ),
-                                        contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 5),
-                                      ),
+                          const SizedBox(height: 10),
 
-                                      dropdownColor: Colors.white,
-                                      icon: const Icon(Icons.arrow_drop_down,
-                                          color: Colors.grey),
-                                      style:
-                                          const TextStyle(color: Colors.black),
-                                      menuMaxHeight:
-                                          200, // Limits dropdown height
+                          // Date Selection Row
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Dates",
+                                style: TextStyle(
+                                  color: AppTheme.blackColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const SizedBox(height: 3.0),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          "Start Date",
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: DropdownButtonFormField<
+                                                  String>(
+                                                isExpanded: true,
+                                                value: _startMonth,
+                                                hint: const Text('Month',
+                                                    style: TextStyle(
+                                                        fontSize: 12)),
+                                                items: [
+                                                  'Jan',
+                                                  'Feb',
+                                                  'Mar',
+                                                  'Apr',
+                                                  'May',
+                                                  'Jun',
+                                                  'Jul',
+                                                  'Aug',
+                                                  'Sep',
+                                                  'Oct',
+                                                  'Nov',
+                                                  'Dec'
+                                                ]
+                                                    .map((month) =>
+                                                        DropdownMenuItem(
+                                                          value: month,
+                                                          child: Text(month,
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      12)),
+                                                        ))
+                                                    .toList(),
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    _startMonth = value;
+                                                  });
+                                                },
+                                                decoration:
+                                                    const InputDecoration(
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10.0)),
+                                                    borderSide: BorderSide(
+                                                        color: Colors.grey),
+                                                  ),
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4),
+                                                  isDense: true,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: DropdownButtonFormField<
+                                                  String>(
+                                                isExpanded: true,
+                                                value: _startYear,
+                                                hint: const Text('Year',
+                                                    style: TextStyle(
+                                                        fontSize: 12)),
+                                                items: List.generate(
+                                                        50,
+                                                        (index) =>
+                                                            (DateTime.now()
+                                                                        .year -
+                                                                    index)
+                                                                .toString())
+                                                    .map((year) =>
+                                                        DropdownMenuItem(
+                                                          value: year,
+                                                          child: Text(year,
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      12)),
+                                                        ))
+                                                    .toList(),
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    _startYear = value;
+                                                  });
+                                                },
+                                                decoration:
+                                                    const InputDecoration(
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10.0)),
+                                                    borderSide: BorderSide(
+                                                        color: Colors.grey),
+                                                  ),
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4),
+                                                  isDense: true,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          "End Date",
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        if (!_isCurrentJob)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: DropdownButtonFormField<
+                                                    String>(
+                                                  isExpanded: true,
+                                                  value: _endMonth,
+                                                  hint: const Text('Month',
+                                                      style: TextStyle(
+                                                          fontSize: 12)),
+                                                  items: [
+                                                    'Jan',
+                                                    'Feb',
+                                                    'Mar',
+                                                    'Apr',
+                                                    'May',
+                                                    'Jun',
+                                                    'Jul',
+                                                    'Aug',
+                                                    'Sep',
+                                                    'Oct',
+                                                    'Nov',
+                                                    'Dec'
+                                                  ]
+                                                      .map((month) =>
+                                                          DropdownMenuItem(
+                                                            value: month,
+                                                            child: Text(month,
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        12)),
+                                                          ))
+                                                      .toList(),
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      _endMonth = value;
+                                                    });
+                                                  },
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  10.0)),
+                                                      borderSide: BorderSide(
+                                                          color: Colors.grey),
+                                                    ),
+                                                    contentPadding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 4),
+                                                    isDense: true,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: DropdownButtonFormField<
+                                                    String>(
+                                                  isExpanded: true,
+                                                  value: _endYear,
+                                                  hint: const Text('Year',
+                                                      style: TextStyle(
+                                                          fontSize: 12)),
+                                                  items: List.generate(
+                                                          50,
+                                                          (index) => (DateTime
+                                                                          .now()
+                                                                      .year -
+                                                                  index)
+                                                              .toString())
+                                                      .map((year) =>
+                                                          DropdownMenuItem(
+                                                            value: year,
+                                                            child: Text(year,
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        12)),
+                                                          ))
+                                                      .toList(),
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      _endYear = value;
+                                                    });
+                                                  },
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  10.0)),
+                                                      borderSide: BorderSide(
+                                                          color: Colors.grey),
+                                                    ),
+                                                    contentPadding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 4),
+                                                    isDense: true,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        else
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4.0),
+                                            child: Text(
+                                              "Present",
+                                              style: TextStyle(
+                                                color: AppTheme.primaryColor,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
+                              const SizedBox(width: 4),
+                              Checkbox(
+                                activeColor: AppTheme.primaryColor,
+                                value: _isCurrentJob,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isCurrentJob = value ?? false;
+                                  });
+                                },
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              const Text(
+                                "Currently Working ?",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      "Job Title",
-                      style: TextStyle(
-                        color: AppTheme.blackColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 3.0),
-                    TextFormField(
-                      style: TextStyle(color: Colors.black),
-                      controller: _jobTitleController,
-                      cursorColor: AppTheme.blackColor,
-                      decoration: const InputDecoration(
-                        hintText: 'Sales Manager',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10.0),
+                          const SizedBox(height: 10),
+
+                          const Text(
+                            "Job Title",
+                            style: TextStyle(
+                              color: AppTheme.blackColor,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                      ),
-                      onChanged: (value) =>
-                          viewModel.updateContactInfo(lastName: value),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Location",
-                      style: TextStyle(
-                        color: AppTheme.blackColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 3.0),
-                    TextFormField(
-                      style: TextStyle(color: Colors.black),
-                      controller: _locationController,
-                      cursorColor: AppTheme.blackColor,
-                      decoration: const InputDecoration(
-                        hintText: 'xyz city, Bangladesh',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10.0),
+                          const SizedBox(height: 3.0),
+                          TextFormField(
+                            style: TextStyle(color: Colors.black),
+                            controller: _jobTitleController,
+                            cursorColor: AppTheme.blackColor,
+                            decoration: const InputDecoration(
+                              hintText: 'Sales Manager',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      onChanged: (value) =>
-                          viewModel.updateContactInfo(email: value),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Description",
-                      style: TextStyle(
-                        color: AppTheme.blackColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 3.0),
-                    TextFormField(
-                      style: TextStyle(color: Colors.black),
-                      controller: _descriptionController,
-                      maxLines: 5,
-                      cursorColor: AppTheme.blackColor,
-                      decoration: const InputDecoration(
-                        hintText:
-                            'Describe your tasks, responsibilities related to this work experience',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10.0),
+                          const SizedBox(height: 16),
+
+                          const Text(
+                            "Location",
+                            style: TextStyle(
+                              color: AppTheme.blackColor,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
+                          const SizedBox(height: 3.0),
+                          TextFormField(
+                            style: TextStyle(color: Colors.black),
+                            controller: _locationController,
+                            cursorColor: AppTheme.blackColor,
+                            decoration: const InputDecoration(
+                              hintText: 'xyz city, Bangladesh',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          const Text(
+                            "Description",
+                            style: TextStyle(
+                              color: AppTheme.blackColor,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: 3.0),
+                          TextFormField(
+                            style: TextStyle(color: Colors.black),
+                            controller: _descriptionController,
+                            maxLines: 5,
+                            cursorColor: AppTheme.blackColor,
+                            decoration: const InputDecoration(
+                              hintText:
+                                  'Describe your tasks, responsibilities related to this work experience',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomButton(
+                                  height: 45,
+                                  text: "Cancel",
+                                  color: Colors.grey[300]!,
+                                  textColor: Colors.black,
+                                  onPressed: () {
+                                    setState(() {
+                                      _showAddForm = false;
+                                      _clearForm();
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: CustomButton(
+                                  height: 45,
+                                  text: "Save",
+                                  color: AppTheme.primaryColor,
+                                  onPressed: () {
+                                    _addWorkExperience(cvViewModel);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      keyboardType: TextInputType.text,
-                      onChanged: (value) =>
-                          viewModel.updateContactInfo(phone: value),
                     ),
                   ],
-                ),
+                ],
               ),
-            ),
-          ),
-          SizedBox(
-            width: 130,
-            //height: 50,
-            child: CustomButton(
-              icon: const Icon(
-                Icons.add_circle_outline,
-                color: AppTheme.skyBlue,
-              ),
-              borderRadius: 15,
-              color: AppTheme.primaryColor,
-              text: "Add new",
-              textColor: AppTheme.skyBlue,
-              onPressed: () {},
             ),
           ),
           Padding(
@@ -510,10 +690,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
               color: AppTheme.secondaryColor,
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  // Proceed to next step
                   viewModel.nextStep();
-
-                  // Navigate to education screen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -527,6 +704,161 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
         ],
       ),
     );
+  }
+
+  void _clearForm() {
+    _companyController.clear();
+    _jobTitleController.clear();
+    _locationController.clear();
+    _descriptionController.clear();
+    setState(() {
+      _startMonth = null;
+      _startYear = null;
+      _endMonth = null;
+      _endYear = null;
+      _isCurrentJob = false;
+    });
+  }
+
+  List<Widget> _buildCareerList(List<WorkExperience> experiences) {
+    List<Widget> widgets = [];
+
+    for (int i = 0; i < experiences.length; i++) {
+      final experience = experiences[i];
+
+      widgets.add(Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            experience.company,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          Text(
+            experience.position,
+            style: TextStyle(
+              color: Colors.grey[700],
+            ),
+          ),
+          Row(
+            children: [
+              Text(
+                experience.duration,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 12,
+                ),
+              ),
+              if (experience.location != null &&
+                  experience.location!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    "•",
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              if (experience.location != null &&
+                  experience.location!.isNotEmpty)
+                Text(
+                  experience.location!,
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+            ],
+          ),
+          if (experience.description != null &&
+              experience.description!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                experience.description!,
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 12,
+                ),
+              ),
+            ),
+        ],
+      ));
+
+      // Add divider if not the last item
+      if (i < experiences.length - 1) {
+        widgets.add(Divider(thickness: 1, color: Colors.grey[300]));
+        widgets.add(SizedBox(height: 16));
+      }
+    }
+
+    return widgets;
+  }
+
+  void _addWorkExperience(CvViewModel cvViewModel) {
+    if (_companyController.text.isEmpty || _jobTitleController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Please enter company and job title")));
+      return;
+    }
+
+    if (_startMonth == null || _startYear == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Please select start date")));
+      return;
+    }
+
+    if (!_isCurrentJob && (_endMonth == null || _endYear == null)) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Please select end date or mark as current job")));
+      return;
+    }
+
+    // Create duration string
+    String duration = '$_startMonth $_startYear';
+    if (_isCurrentJob) {
+      duration += ' - Present';
+    } else {
+      duration += ' - $_endMonth $_endYear';
+    }
+
+    // Create new work experience
+    final newExperience = WorkExperience(
+      company: _companyController.text,
+      position: _jobTitleController.text,
+      location:
+          _locationController.text.isNotEmpty ? _locationController.text : null,
+      description: _descriptionController.text.isNotEmpty
+          ? _descriptionController.text
+          : null,
+      duration: duration,
+    );
+
+    // Add to view model
+    _addWorkExperienceToViewModel(cvViewModel, newExperience);
+
+    // Clear the form and hide it
+    setState(() {
+      _showAddForm = false;
+      _clearForm();
+    });
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("Work experience added")));
+  }
+
+  void _addWorkExperienceToViewModel(
+      CvViewModel cvViewModel, WorkExperience experience) {
+    // Create a new CVModel with the added experience
+    final newCvData = cvViewModel.cvData.copyWith(
+        workExperience: [...cvViewModel.cvData.workExperience, experience]);
+
+    // Update the view model
+    cvViewModel.updateCVData(newCvData);
   }
 
   Widget _buildProgressIndicator(BuildContext context) {
