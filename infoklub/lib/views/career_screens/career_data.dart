@@ -97,7 +97,6 @@ class _CareerInfoView extends StatelessWidget {
   final TextEditingController endDateController;
   final TextEditingController skillsController;
   const _CareerInfoView({
-    super.key,
     required this.companyNameController,
     required this.jobTitleController,
     required this.addressController,
@@ -245,7 +244,9 @@ class _CareerInfoView extends StatelessWidget {
                       endDateController: endDateController,
                       skillsController: skillsController,
                       onFileUpload: () {
-                        print("File upload clicked");
+                        if (kDebugMode) {
+                          print("File upload clicked");
+                        }
                       },
                     ),
                     const SizedBox(height: 100),

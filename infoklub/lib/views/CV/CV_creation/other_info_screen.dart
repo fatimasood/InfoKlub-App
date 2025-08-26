@@ -5,6 +5,7 @@ import 'package:infoklub/views/CV/CV_creation/cv_widgets/cv_other_details.dart';
 import 'package:infoklub/views/CV/CV_download/cv_download.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OtherInfoScreen extends StatefulWidget {
   const OtherInfoScreen({super.key});
@@ -20,6 +21,10 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
   bool showSkills = false;
   bool showCertificates = false;
 
+  // Track button states
+  Map<String, bool> certificateButtonStates = {};
+  bool skillsButtonDone = false;
+
   // Controllers for text fields
   final TextEditingController _activityNameController = TextEditingController();
   final TextEditingController _activityDescController = TextEditingController();
@@ -31,6 +36,83 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
   final TextEditingController _certificateUrlController =
       TextEditingController();
   final TextEditingController _summaryController = TextEditingController();
+
+  // SharedPreferences instance
+  late SharedPreferences _prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSharedPreferences();
+  }
+
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    _loadSavedData();
+  }
+
+  void _loadSavedData() {
+    // Load summary
+    final savedSummary = _prefs.getString('cv_summary');
+    if (savedSummary != null) {
+      _summaryController.text = savedSummary;
+    }
+
+    // Load languages
+    final savedLanguages = _prefs.getStringList('cv_languages');
+    if (savedLanguages != null && savedLanguages.isNotEmpty) {
+      final viewModel = context.read<CvCreationViewModel>();
+      for (var lang in savedLanguages) {
+        final parts = lang.split('|');
+        if (parts.length == 2) {
+          viewModel.addLanguage(language: parts[0], level: parts[1]);
+        }
+      }
+    }
+
+    // Load skills
+    final savedSkills = _prefs.getStringList('cv_skills');
+    if (savedSkills != null && savedSkills.isNotEmpty) {
+      final viewModel = context.read<CvCreationViewModel>();
+      viewModel.addSkills(savedSkills.toSet().toList()); // Remove duplicates
+    }
+
+    // Load certificates
+    final savedCertificates = _prefs.getStringList('cv_certificates');
+    if (savedCertificates != null && savedCertificates.isNotEmpty) {
+      final viewModel = context.read<CvCreationViewModel>();
+      for (var cert in savedCertificates) {
+        final parts = cert.split('|');
+        if (parts.length == 2) {
+          viewModel.addCertificate(name: parts[0], url: parts[1]);
+          certificateButtonStates[parts[0]] = true; // Mark as done
+        }
+      }
+    }
+  }
+
+  void _saveDataToPreferences() {
+    final viewModel = context.read<CvCreationViewModel>();
+
+    // Save summary
+    _prefs.setString('cv_summary', viewModel.cvData.summary ?? '');
+
+    // Save languages
+    final languages = viewModel.cvData.languages
+        .map((lang) => '${lang.language}|${lang.level}')
+        .toList();
+    _prefs.setStringList('cv_languages', languages);
+
+    // Save skills (remove duplicates)
+    final uniqueSkills = viewModel.cvData.skills.toSet().toList();
+    _prefs.setStringList('cv_skills', uniqueSkills);
+
+    // Save certificates
+    final certificates = viewModel.cvData.certificates
+        .map((cert) => '${cert.name}|${cert.url}')
+        .toList();
+    _prefs.setStringList('cv_certificates', certificates);
+  }
 
   @override
   void dispose() {
@@ -226,6 +308,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                                   );
                                   _languageController.clear();
                                   setState(() {});
+                                  _saveDataToPreferences(); // Save to SharedPreferences
                                 }
                               },
                             ),
@@ -241,6 +324,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                                 onPressed: () {
                                   viewModel.removeLanguage(language);
                                   setState(() {});
+                                  _saveDataToPreferences(); // Save to SharedPreferences
                                 },
                               ),
                             ),
@@ -284,10 +368,12 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                           Align(
                             alignment: Alignment.centerRight,
                             child: CustomButton(
-                              text: "Add Skill",
+                              text: skillsButtonDone ? "Done" : "Add Skill",
                               height: 45,
                               borderRadius: 15,
-                              color: AppTheme.primaryColor,
+                              color: skillsButtonDone
+                                  ? Colors.green
+                                  : AppTheme.primaryColor,
                               textColor: AppTheme.skyBlue,
                               onPressed: () {
                                 if (_skillsController.text.isNotEmpty) {
@@ -295,19 +381,33 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                                       .split(',')
                                       .map((s) => s.trim())
                                       .where((s) => s.isNotEmpty)
+                                      .toSet() // Remove duplicates
                                       .toList();
 
                                   if (skills.isNotEmpty) {
                                     viewModel.addSkills(skills);
                                     _skillsController.clear();
-                                    setState(() {});
+                                    setState(() {
+                                      skillsButtonDone = true;
+                                    });
+                                    _saveDataToPreferences(); // Save to SharedPreferences
+
+                                    // Reset button after 2 seconds
+                                    Future.delayed(const Duration(seconds: 2),
+                                        () {
+                                      setState(() {
+                                        skillsButtonDone = false;
+                                      });
+                                    });
                                   }
                                 }
                               },
                             ),
                           ),
                           _buildAddedItemsList(
-                            items: viewModel.cvData.skills,
+                            items: viewModel.cvData.skills
+                                .toSet()
+                                .toList(), // Show unique skills
                             itemBuilder: (skill) => ListTile(
                               title: Text(skill),
                               trailing: IconButton(
@@ -316,6 +416,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                                 onPressed: () {
                                   viewModel.removeSkill(skill);
                                   setState(() {});
+                                  _saveDataToPreferences(); // Save to SharedPreferences
                                 },
                               ),
                             ),
@@ -356,10 +457,18 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                           Align(
                             alignment: Alignment.centerRight,
                             child: CustomButton(
-                              text: "Add Certificate",
+                              text: certificateButtonStates[
+                                          _certificateNameController.text] ??
+                                      false
+                                  ? "Done"
+                                  : "Add Certificate",
                               height: 45,
                               borderRadius: 15,
-                              color: AppTheme.primaryColor,
+                              color: certificateButtonStates[
+                                          _certificateNameController.text] ??
+                                      false
+                                  ? Colors.green
+                                  : AppTheme.primaryColor,
                               textColor: AppTheme.skyBlue,
                               onPressed: () {
                                 if (_certificateNameController
@@ -368,9 +477,24 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                                     name: _certificateNameController.text,
                                     url: _certificateUrlController.text,
                                   );
+
+                                  setState(() {
+                                    certificateButtonStates[
+                                        _certificateNameController.text] = true;
+                                  });
+
                                   _certificateNameController.clear();
                                   _certificateUrlController.clear();
-                                  setState(() {});
+                                  _saveDataToPreferences(); // Save to SharedPreferences
+
+                                  // Reset button after 2 seconds
+                                  Future.delayed(const Duration(seconds: 2),
+                                      () {
+                                    setState(() {
+                                      certificateButtonStates.remove(
+                                          _certificateNameController.text);
+                                    });
+                                  });
                                 }
                               },
                             ),
@@ -387,7 +511,11 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                                     const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () {
                                   viewModel.removeCertificate(certificate);
-                                  setState(() {});
+                                  setState(() {
+                                    certificateButtonStates
+                                        .remove(certificate.name);
+                                  });
+                                  _saveDataToPreferences(); // Save to SharedPreferences
                                 },
                               ),
                             ),
@@ -420,7 +548,10 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                           borderSide: BorderSide(color: AppTheme.primaryColor),
                         ),
                       ),
-                      onChanged: (value) => viewModel.updateSummary(value),
+                      onChanged: (value) {
+                        viewModel.updateSummary(value);
+                        _saveDataToPreferences(); // Save to SharedPreferences
+                      },
                     ),
                   ],
                 ),
@@ -435,6 +566,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   viewModel.nextStep();
+                  _saveDataToPreferences(); // Save all data before navigating
                   Navigator.push(
                     context,
                     MaterialPageRoute(

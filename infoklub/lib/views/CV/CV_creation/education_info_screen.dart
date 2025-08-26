@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/main.dart';
 import 'package:infoklub/models/cv/cv_creation_view_model.dart';
+import 'package:infoklub/models/education/education_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
+import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/views/CV/CV_creation/other_info_screen.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
@@ -20,16 +23,9 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
 
   late TextEditingController _institutionController;
   late TextEditingController _degreeController;
-  late TextEditingController _fieldOfStudyController;
-  late TextEditingController _locationController;
-  late TextEditingController _descriptionController;
-
-  // Add controllers for dates
-  String? _startMonth;
-  String? _startYear;
-  String? _endMonth;
-  String? _endYear;
-  bool _isCurrentEducation = false;
+  late TextEditingController _totalGradeController;
+  late TextEditingController _scoreGradeController;
+  late TextEditingController _achievementsController;
 
   @override
   void initState() {
@@ -37,12 +33,12 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
     // Initialize controllers
     _institutionController = TextEditingController();
     _degreeController = TextEditingController();
-    _fieldOfStudyController = TextEditingController();
-    _locationController = TextEditingController();
-    _descriptionController = TextEditingController();
+    _totalGradeController = TextEditingController();
+    _scoreGradeController = TextEditingController();
+    _achievementsController = TextEditingController();
 
-    // Pre-fill the form with existing data
-    _prefillForm();
+    // Load education data from Hive
+    _loadEducationData();
   }
 
   @override
@@ -50,71 +46,42 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
     // Clean up the controllers when the widget is disposed.
     _institutionController.dispose();
     _degreeController.dispose();
-    _fieldOfStudyController.dispose();
-    _locationController.dispose();
-    _descriptionController.dispose();
+    _totalGradeController.dispose();
+    _scoreGradeController.dispose();
+    _achievementsController.dispose();
     super.dispose();
   }
 
-  // Method to pre-fill the form
-  void _prefillForm() {
-    // Access the ViewModel
-    final cvViewModel = context.read<CvViewModel>();
-    final cvData = cvViewModel.cvData;
+  Future<void> _loadEducationData() async {
+    final eduViewModel = Provider.of<EduinfoViewmodel>(context, listen: false);
+    final cvViewModel = Provider.of<CvViewModel>(context, listen: false);
 
-    // Check if there is any education data
-    if (cvData.education.isNotEmpty) {
-      // For simplicity, we'll take the first education.
-      Education firstEducation = cvData.education.first;
+    // Load education data from Hive
+    await eduViewModel.loadEducationData(userMail);
 
-      // Set the text of the controllers to the saved values
-      _institutionController.text = firstEducation.institution;
-      _degreeController.text = firstEducation.degree;
-      _fieldOfStudyController.text = firstEducation.fieldOfStudy ?? '';
-      _locationController.text = '';
-      _descriptionController.text = '';
+    // Update CV data with loaded education info
+    final educationEntries = eduViewModel.getAllEducationEntries(userMail);
+    final cvEducationList = educationEntries.map((eduInfo) {
+      return Education(
+        institution: eduInfo.institution,
+        degree: eduInfo.degree,
+        year: 'Education Period', // Placeholder
+        fieldOfStudy: null,
+      );
+    }).toList();
 
-      // Parse the year string to extract dates
-      _parseDuration(firstEducation.year);
-    }
-  }
-
-  void _parseDuration(String year) {
-    if (year.contains('Present')) {
-      _isCurrentEducation = true;
-      // Extract start date from duration like "Jan 2020 - Present"
-      final parts = year.split(' - ');
-      if (parts.isNotEmpty) {
-        final startParts = parts[0].split(' ');
-        if (startParts.length >= 2) {
-          _startMonth = startParts[0];
-          _startYear = startParts[1];
-        }
-      }
-    } else if (year.contains('-')) {
-      // Extract dates from duration like "Jan 2020 - Dec 2022"
-      final parts = year.split(' - ');
-      if (parts.length >= 2) {
-        final startParts = parts[0].split(' ');
-        final endParts = parts[1].split(' ');
-
-        if (startParts.length >= 2) {
-          _startMonth = startParts[0];
-          _startYear = startParts[1];
-        }
-
-        if (endParts.length >= 2) {
-          _endMonth = endParts[0];
-          _endYear = endParts[1];
-        }
-      }
-    }
+    cvViewModel
+        .updateCVData(cvViewModel.cvData.copyWith(education: cvEducationList));
   }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<CvCreationViewModel>();
-    final cvViewModel = context.watch<CvViewModel>();
+
+    final eduViewModel = context.watch<EduinfoViewmodel>();
+
+    // Get actual education data from Hive
+    final educationEntries = eduViewModel.getAllEducationEntries(userMail);
 
     return Scaffold(
       appBar: AppBar(
@@ -151,7 +118,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                   const SizedBox(height: 20),
 
                   // Display existing education entries with dividers
-                  if (cvViewModel.cvData.education.isNotEmpty) ...[
+                  if (educationEntries.isNotEmpty) ...[
                     Text(
                       'Your Education',
                       style: TextStyle(
@@ -161,12 +128,12 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    ..._buildEducationList(cvViewModel.cvData.education),
+                    ..._buildEducationList(educationEntries),
                     const SizedBox(height: 20),
                   ],
 
                   // Add New Education button and form
-                  if (!_showAddForm && cvViewModel.cvData.education.isNotEmpty)
+                  if (!_showAddForm && educationEntries.isNotEmpty)
                     Center(
                       child: SizedBox(
                         width: 150,
@@ -189,13 +156,15 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                       ),
                     ),
 
-                  if (_showAddForm || cvViewModel.cvData.education.isEmpty) ...[
-                    if (cvViewModel.cvData.education.isNotEmpty) ...[
+                  if (_showAddForm || educationEntries.isEmpty) ...[
+                    if (educationEntries.isNotEmpty) ...[
                       Divider(thickness: 2, color: Colors.grey[300]),
                       const SizedBox(height: 20),
                     ],
                     Text(
-                      'Add New Education',
+                      educationEntries.isEmpty
+                          ? 'Add Education'
+                          : 'Add New Education',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -222,7 +191,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                             controller: _institutionController,
                             cursorColor: AppTheme.blackColor,
                             decoration: const InputDecoration(
-                              hintText: 'University Name',
+                              hintText: 'University/School Name',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10.0),
@@ -242,7 +211,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                           const SizedBox(height: 10),
 
                           const Text(
-                            "Degree",
+                            "Degree/Certificate",
                             style: TextStyle(
                               color: AppTheme.blackColor,
                               fontWeight: FontWeight.w500,
@@ -255,7 +224,8 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                             controller: _degreeController,
                             cursorColor: AppTheme.blackColor,
                             decoration: const InputDecoration(
-                              hintText: 'Bachelor of Science',
+                              hintText:
+                                  'Bachelor of Science, High School, etc.',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10.0),
@@ -267,345 +237,91 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter degree';
+                                return 'Please enter degree/certificate';
                               }
                               return null;
                             },
                           ),
                           const SizedBox(height: 10),
 
-                          const Text(
-                            "Field of Study",
-                            style: TextStyle(
-                              color: AppTheme.blackColor,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 3.0),
-                          TextFormField(
-                            style: TextStyle(color: Colors.black),
-                            controller: _fieldOfStudyController,
-                            cursorColor: AppTheme.blackColor,
-                            decoration: const InputDecoration(
-                              hintText: 'Computer Science',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-
-                          // Date Selection Row
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          // Grades Section
+                          Row(
                             children: [
-                              const Text(
-                                "Dates",
-                                style: TextStyle(
-                                  color: AppTheme.blackColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Total Marks",
+                                      style: TextStyle(
+                                        color: AppTheme.blackColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3.0),
+                                    TextFormField(
+                                      style: TextStyle(color: Colors.black),
+                                      controller: _totalGradeController,
+                                      cursorColor: AppTheme.blackColor,
+                                      keyboardType: TextInputType.number,
+                                      decoration: const InputDecoration(
+                                        hintText: 'e.g: 1000',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0),
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 3.0),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "Start Date",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 12,
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Obtained Marks",
+                                      style: TextStyle(
+                                        color: AppTheme.blackColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3.0),
+                                    TextFormField(
+                                      style: TextStyle(color: Colors.black),
+                                      controller: _scoreGradeController,
+                                      cursorColor: AppTheme.blackColor,
+                                      keyboardType: TextInputType.number,
+                                      decoration: const InputDecoration(
+                                        hintText: 'e.g: 850',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0),
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: DropdownButtonFormField<
-                                                  String>(
-                                                isExpanded: true,
-                                                value: _startMonth,
-                                                hint: const Text('Month',
-                                                    style: TextStyle(
-                                                        fontSize: 12)),
-                                                items: [
-                                                  'Jan',
-                                                  'Feb',
-                                                  'Mar',
-                                                  'Apr',
-                                                  'May',
-                                                  'Jun',
-                                                  'Jul',
-                                                  'Aug',
-                                                  'Sep',
-                                                  'Oct',
-                                                  'Nov',
-                                                  'Dec'
-                                                ]
-                                                    .map((month) =>
-                                                        DropdownMenuItem(
-                                                          value: month,
-                                                          child: Text(month,
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      12)),
-                                                        ))
-                                                    .toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    _startMonth = value;
-                                                  });
-                                                },
-                                                decoration:
-                                                    const InputDecoration(
-                                                  border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10.0)),
-                                                    borderSide: BorderSide(
-                                                        color: Colors.grey),
-                                                  ),
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal: 8,
-                                                          vertical: 4),
-                                                  isDense: true,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: DropdownButtonFormField<
-                                                  String>(
-                                                isExpanded: true,
-                                                value: _startYear,
-                                                hint: const Text('Year',
-                                                    style: TextStyle(
-                                                        fontSize: 12)),
-                                                items: List.generate(
-                                                        50,
-                                                        (index) =>
-                                                            (DateTime.now()
-                                                                        .year -
-                                                                    index)
-                                                                .toString())
-                                                    .map((year) =>
-                                                        DropdownMenuItem(
-                                                          value: year,
-                                                          child: Text(year,
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      12)),
-                                                        ))
-                                                    .toList(),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    _startYear = value;
-                                                  });
-                                                },
-                                                decoration:
-                                                    const InputDecoration(
-                                                  border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                10.0)),
-                                                    borderSide: BorderSide(
-                                                        color: Colors.grey),
-                                                  ),
-                                                  contentPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal: 8,
-                                                          vertical: 4),
-                                                  isDense: true,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.grey),
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "End Date",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        if (!_isCurrentEducation)
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: DropdownButtonFormField<
-                                                    String>(
-                                                  isExpanded: true,
-                                                  value: _endMonth,
-                                                  hint: const Text('Month',
-                                                      style: TextStyle(
-                                                          fontSize: 12)),
-                                                  items: [
-                                                    'Jan',
-                                                    'Feb',
-                                                    'Mar',
-                                                    'Apr',
-                                                    'May',
-                                                    'Jun',
-                                                    'Jul',
-                                                    'Aug',
-                                                    'Sep',
-                                                    'Oct',
-                                                    'Nov',
-                                                    'Dec'
-                                                  ]
-                                                      .map((month) =>
-                                                          DropdownMenuItem(
-                                                            value: month,
-                                                            child: Text(month,
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12)),
-                                                          ))
-                                                      .toList(),
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _endMonth = value;
-                                                    });
-                                                  },
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border: OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  10.0)),
-                                                      borderSide: BorderSide(
-                                                          color: Colors.grey),
-                                                    ),
-                                                    contentPadding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 4),
-                                                    isDense: true,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Expanded(
-                                                child: DropdownButtonFormField<
-                                                    String>(
-                                                  isExpanded: true,
-                                                  value: _endYear,
-                                                  hint: const Text('Year',
-                                                      style: TextStyle(
-                                                          fontSize: 12)),
-                                                  items: List.generate(
-                                                          50,
-                                                          (index) => (DateTime
-                                                                          .now()
-                                                                      .year -
-                                                                  index)
-                                                              .toString())
-                                                      .map((year) =>
-                                                          DropdownMenuItem(
-                                                            value: year,
-                                                            child: Text(year,
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12)),
-                                                          ))
-                                                      .toList(),
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _endYear = value;
-                                                    });
-                                                  },
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    border: OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  10.0)),
-                                                      borderSide: BorderSide(
-                                                          color: Colors.grey),
-                                                    ),
-                                                    contentPadding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 4),
-                                                    isDense: true,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        else
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 4.0),
-                                            child: Text(
-                                              "Present",
-                                              style: TextStyle(
-                                                color: AppTheme.primaryColor,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 4),
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    activeColor: AppTheme.primaryColor,
-                                    value: _isCurrentEducation,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _isCurrentEducation = value ?? false;
-                                      });
-                                    },
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                  ),
-                                  const Text(
-                                    "Currently Studying",
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 10),
 
                           const Text(
-                            "Location",
+                            "Achievements",
                             style: TextStyle(
                               color: AppTheme.blackColor,
                               fontWeight: FontWeight.w500,
@@ -615,39 +331,12 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                           const SizedBox(height: 3.0),
                           TextFormField(
                             style: TextStyle(color: Colors.black),
-                            controller: _locationController,
-                            cursorColor: AppTheme.blackColor,
-                            decoration: const InputDecoration(
-                              hintText: 'City, Country',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          const Text(
-                            "Description",
-                            style: TextStyle(
-                              color: AppTheme.blackColor,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 3.0),
-                          TextFormField(
-                            style: TextStyle(color: Colors.black),
-                            controller: _descriptionController,
-                            maxLines: 5,
+                            controller: _achievementsController,
+                            maxLines: 3,
                             cursorColor: AppTheme.blackColor,
                             decoration: const InputDecoration(
                               hintText:
-                                  'Describe your education, achievements, or relevant coursework',
+                                  'Any achievements, honors, or special recognition',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(10.0),
@@ -683,7 +372,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                                   text: "Save",
                                   color: AppTheme.primaryColor,
                                   onPressed: () {
-                                    _addEducation(cvViewModel);
+                                    _addEducation();
                                   },
                                 ),
                               ),
@@ -721,23 +410,16 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
   void _clearForm() {
     _institutionController.clear();
     _degreeController.clear();
-    _fieldOfStudyController.clear();
-    _locationController.clear();
-    _descriptionController.clear();
-    setState(() {
-      _startMonth = null;
-      _startYear = null;
-      _endMonth = null;
-      _endYear = null;
-      _isCurrentEducation = false;
-    });
+    _totalGradeController.clear();
+    _scoreGradeController.clear();
+    _achievementsController.clear();
   }
 
-  List<Widget> _buildEducationList(List<Education> educations) {
+  List<Widget> _buildEducationList(List<EducationInfo> educationEntries) {
     List<Widget> widgets = [];
 
-    for (int i = 0; i < educations.length; i++) {
-      final education = educations[i];
+    for (int i = 0; i < educationEntries.length; i++) {
+      final education = educationEntries[i];
 
       widgets.add(Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -755,27 +437,45 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
               color: Colors.grey[700],
             ),
           ),
-          if (education.fieldOfStudy != null &&
-              education.fieldOfStudy!.isNotEmpty)
+          // Display actual grades from EducationInfo
+          if (education.totalGrade.isNotEmpty &&
+              education.scoreGrade.isNotEmpty)
             Text(
-              education.fieldOfStudy!,
+              "Grades: ${education.scoreGrade}/${education.totalGrade}",
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            )
+          else if (education.totalGrade.isNotEmpty)
+            Text(
+              "Total Marks: ${education.totalGrade}",
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            )
+          else if (education.scoreGrade.isNotEmpty)
+            Text(
+              "Obtained Marks: ${education.scoreGrade}",
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 14,
               ),
             ),
-          Text(
-            education.year,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 12,
+          if (education.achievements.isNotEmpty)
+            Text(
+              "Achievements: ${education.achievements}",
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 12,
+              ),
             ),
-          ),
         ],
       ));
 
       // Add divider if not the last item
-      if (i < educations.length - 1) {
+      if (i < educationEntries.length - 1) {
         widgets.add(Divider(thickness: 1, color: Colors.grey[300]));
         widgets.add(SizedBox(height: 16));
       }
@@ -784,64 +484,57 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
     return widgets;
   }
 
-  void _addEducation(CvViewModel cvViewModel) {
+  Future<void> _addEducation() async {
     if (_institutionController.text.isEmpty || _degreeController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Please enter institution and degree")));
       return;
     }
 
-    if (_startMonth == null || _startYear == null) {
+    try {
+      final eduViewModel =
+          Provider.of<EduinfoViewmodel>(context, listen: false);
+      final cvViewModel = Provider.of<CvViewModel>(context, listen: false);
+
+      // Create EducationInfo for Hive storage
+      final educationInfo = EducationInfo(
+        degree: _degreeController.text,
+        institution: _institutionController.text,
+        totalGrade: _totalGradeController.text,
+        scoreGrade: _scoreGradeController.text,
+        achievements: _achievementsController.text,
+        uploadedDocs: [],
+      );
+
+      // Save to Hive
+      await eduViewModel.saveEducationInfo(userMail, educationInfo);
+
+      // Also update CV data for immediate display
+      final newEducation = Education(
+        institution: _institutionController.text,
+        degree: _degreeController.text,
+        year: 'Education Period',
+        fieldOfStudy: null,
+      );
+
+      final updatedEducation =
+          List<Education>.from(cvViewModel.cvData.education)..add(newEducation);
+
+      cvViewModel.updateCVData(
+          cvViewModel.cvData.copyWith(education: updatedEducation));
+
+      // Clear the form and hide it
+      setState(() {
+        _showAddForm = false;
+        _clearForm();
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Education added successfully")));
+    } catch (e) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Please select start date")));
-      return;
+          .showSnackBar(SnackBar(content: Text("Error adding education: $e")));
     }
-
-    if (!_isCurrentEducation && (_endMonth == null || _endYear == null)) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content:
-              Text("Please select end date or mark as current education")));
-      return;
-    }
-
-    // Create duration string
-    String duration = '$_startMonth $_startYear';
-    if (_isCurrentEducation) {
-      duration += ' - Present';
-    } else {
-      duration += ' - $_endMonth $_endYear';
-    }
-
-    // Create new education
-    final newEducation = Education(
-      institution: _institutionController.text,
-      degree: _degreeController.text,
-      fieldOfStudy: _fieldOfStudyController.text.isNotEmpty
-          ? _fieldOfStudyController.text
-          : null,
-      year: duration,
-    );
-
-    // Add to view model
-    _addEducationToViewModel(cvViewModel, newEducation);
-
-    // Clear the form and hide it
-    setState(() {
-      _showAddForm = false;
-      _clearForm();
-    });
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Education added")));
-  }
-
-  void _addEducationToViewModel(CvViewModel cvViewModel, Education education) {
-    // Create a new CVModel with the added education
-    final newCvData = cvViewModel.cvData
-        .copyWith(education: [...cvViewModel.cvData.education, education]);
-
-    // Update the view model
-    cvViewModel.updateCVData(newCvData);
   }
 
   Widget _buildProgressIndicator(BuildContext context) {
@@ -853,12 +546,10 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             children: [
-              // Progress line with circles
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Stack(
                   children: [
-                    // Connecting line background
                     Positioned(
                       left: 0,
                       right: 0,
@@ -868,7 +559,6 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                         color: Colors.grey[300],
                       ),
                     ),
-                    // Progress line (colored part)
                     Positioned(
                       left: 0,
                       top: 10,
@@ -880,7 +570,6 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                         color: Theme.of(context).primaryColor,
                       ),
                     ),
-                    // Circles and labels
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: steps.asMap().entries.map((entry) {
