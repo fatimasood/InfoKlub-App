@@ -6,6 +6,7 @@ import 'package:infoklub/models/education/education_model.dart';
 import 'package:infoklub/models/career/career_model.dart';
 import 'package:infoklub/services/firebase_services/auth_service.dart';
 import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
+import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 
 class UserDataService {
   // Get user profile data for currently logged-in user
@@ -60,37 +61,26 @@ class UserDataService {
   // Get education data for currently logged-in user
   static Future<Map<String, dynamic>> getEducationInfo() async {
     try {
-      final box = Hive.box('userBox');
-      final String eduKey =
-          'eduInfo_${AuthService.getCurrentUserEmail() ?? 'unknown'}';
-
-      if (kDebugMode) {
-        print('Looking for education data with key: $eduKey');
-      }
-
-      final dynamic educationData = box.get(eduKey);
-
-      if (educationData == null) {
-        print('No education data found for key: $eduKey');
-        return {'educationHistory': []};
-      }
-
-      if (educationData is EducationInfo) {
-        return educationData.toJson();
-      } else if (educationData is List &&
-          educationData.isNotEmpty &&
-          educationData.first is EducationInfo) {
-        // Handle case where it's stored as List<EducationInfo>
-        final eduList = educationData as List<EducationInfo>;
-        return {'educationHistory': eduList.map((e) => e.toJson()).toList()};
-      } else if (educationData is Map) {
-        return Map<String, dynamic>.from(educationData);
-      } else {
+      final String? userEmail = AuthService.getCurrentUserEmail();
+      if (userEmail == null) {
         if (kDebugMode) {
-          print('Education data not found for key: $eduKey');
+          print('No user email found for education data');
         }
         return {'educationHistory': []};
       }
+
+      // Create an instance of EduinfoViewmodel and get all entries
+      final eduViewModel = EduinfoViewmodel();
+      final List<EducationInfo> educationEntries =
+          eduViewModel.getAllEducationEntries(userEmail);
+
+      if (kDebugMode) {
+        print('Found ${educationEntries.length} education entries');
+      }
+
+      return {
+        'educationHistory': educationEntries.map((e) => e.toJson()).toList()
+      };
     } catch (e) {
       if (kDebugMode) {
         print('Error getting education info: $e');
@@ -99,7 +89,6 @@ class UserDataService {
     }
   }
 
-  // Get career data for currently logged-in user
   // Get career data for currently logged-in user
   static Future<Map<String, dynamic>> getCareerInfo() async {
     try {
