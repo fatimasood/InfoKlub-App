@@ -89,37 +89,30 @@ class _CvDownloadState extends State<CvDownload> {
                       },
                       child: const Icon(
                         Icons.download,
-                        color: AppTheme.forestGreen,
+                        color: AppTheme.redAccent,
                         size: 25,
                       ),
                     ),
                     const Text(
                       "Save as PDF",
                       style: TextStyle(
-                          color: AppTheme.forestGreen,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: const Icon(
-                        Icons.share,
-                        color: AppTheme.redAccent,
-                        size: 25,
-                      ),
-                    ),
-                    const Text(
-                      "Share",
-                      style: TextStyle(
                           color: AppTheme.redAccent,
                           fontSize: 20,
                           fontWeight: FontWeight.bold),
                     ),
                   ],
+                ),
+                GestureDetector(
+                  onTap: () {
+                    // all templates show here
+                  },
+                  child: const Text(
+                    "More Templates",
+                    style: TextStyle(
+                        color: AppTheme.textColor,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
