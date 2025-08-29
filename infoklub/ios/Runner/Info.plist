@@ -28,6 +28,8 @@
 	<string>LaunchScreen</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library to upload profile pictures.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Need access to save CV files</string>
 
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>

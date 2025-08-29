@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:infoklub/services/firebase_services/auth_service.dart';
 import '../../models/user/user_profile_model.dart';
 
 class AddLinkViewModel extends ChangeNotifier {
@@ -28,8 +29,9 @@ class AddLinkViewModel extends ChangeNotifier {
   }
 
   Future<bool> saveLinksToHive() async {
-    final box = await Hive.openBox<UserProfileModel>('userProfile');
-    final user = box.get('localUser');
+    final box = Hive.box('userBox');
+    final String userKey = 'localUser_${AuthService.getCurrentUserKey()}';
+    final UserProfileModel? user = box.get(userKey);
 
     if (user != null) {
       user.behance = behanceController.text.trim();

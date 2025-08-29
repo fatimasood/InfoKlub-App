@@ -5,196 +5,113 @@ import 'package:infoklub/models/cv/cv_creation_view_model.dart';
 
 class PdfGenerationService {
   static Future<File> generateCV(CVModel cvData) async {
-    final pdf = pw.Document();
+    try {
+      final pdf = pw.Document();
 
-    // Add CV content based on user data
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              // Personal Information
-              _buildPersonalInfoSection(cvData),
-              pw.SizedBox(height: 20),
+      // Add CV content with professional design
+      pdf.addPage(
+        pw.Page(
+          margin: const pw.EdgeInsets.all(30),
+          build: (pw.Context context) {
+            return _buildCVContent(cvData);
+          },
+        ),
+      );
 
-              // Work Experience
-              _buildWorkExperienceSection(cvData.workExperience),
-              pw.SizedBox(height: 20),
+      // Get directory for saving
+      final directory = await getDownloadsDirectory();
 
-              // Education
-              _buildEducationSection(cvData.education),
-              pw.SizedBox(height: 20),
+      if (directory == null) {
+        throw Exception('Could not access downloads directory');
+      }
 
-              // Skills
-              _buildSkillsSection(cvData.skills),
+      final cvDirectory = Directory('${directory.path}/CVs');
+      if (!await cvDirectory.exists()) {
+        await cvDirectory.create(recursive: true);
+      }
 
-              // Add other sections as needed
-              if (cvData.languages.isNotEmpty) ...[
-                pw.SizedBox(height: 20),
-                _buildLanguagesSection(cvData.languages),
-              ],
+      final fileName =
+          'CV_${cvData.firstName ?? 'User'}_${cvData.lastName ?? 'CV'}.pdf'
+              .replaceAll(' ', '_')
+              .replaceAll(RegExp(r'[^a-zA-Z0-9_.]'), '');
 
-              if (cvData.certificates.isNotEmpty) ...[
-                pw.SizedBox(height: 20),
-                _buildCertificatesSection(cvData.certificates),
-              ],
-            ],
-          );
-        },
-      ),
-    );
+      final file = File('${directory.path}/$fileName');
 
-    // Get directory for saving
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File(
-        '${directory.path}/cv_${DateTime.now().millisecondsSinceEpoch}.pdf');
+      // Save the PDF
+      final bytes = await pdf.save();
+      await file.writeAsBytes(bytes);
 
-    // Save the PDF
-    await file.writeAsBytes(await pdf.save());
+      print('PDF saved successfully at: ${file.path}');
+      print('File size: ${bytes.length} bytes');
 
-    return file;
+      return file;
+    } catch (e, stackTrace) {
+      print('Error generating PDF: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
   }
 
-  static pw.Widget _buildPersonalInfoSection(CVModel cvData) {
+  static pw.Widget _buildCVContent(CVModel cvData) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
+        // Simple header for testing
         pw.Text(
-          'Personal Information',
-          style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+          '${cvData.firstName ?? ''} ${cvData.lastName ?? ''}',
+          style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
         ),
-        pw.Divider(),
-        if (cvData.firstName?.isNotEmpty ?? false)
-          pw.Text('Name: ${cvData.firstName ?? ''} ${cvData.lastName ?? ''}'),
-        if (cvData.email?.isNotEmpty ?? false)
-          pw.Text('Email: ${cvData.email}'),
-        if (cvData.phone?.isNotEmpty ?? false)
-          pw.Text('Phone: ${cvData.phone}'),
-        if (cvData.address?.isNotEmpty ?? false)
-          pw.Text('Address: ${cvData.address}'),
-      ],
-    );
-  }
+        pw.SizedBox(height: 10),
 
-  static pw.Widget _buildWorkExperienceSection(
-      List<WorkExperience> workExperiences) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text(
-          'Work Experience',
-          style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
-        ),
-        pw.Divider(),
-        if (workExperiences.isNotEmpty)
-          ...workExperiences
+        // Basic contact info
+        if (cvData.email != null) pw.Text('Email: ${cvData.email}'),
+        if (cvData.phone != null) pw.Text('Phone: ${cvData.phone}'),
+        pw.SizedBox(height: 20),
+
+        // Work Experience
+        if (cvData.workExperience.isNotEmpty) ...[
+          pw.Text('Work Experience',
+              style:
+                  pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 10),
+          ...cvData.workExperience
               .map((work) => pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Text('Company: ${work.company}',
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      pw.Text('Position: ${work.position}'),
+                      pw.Text('${work.position} at ${work.company}'),
                       pw.Text('Duration: ${work.duration}'),
-                      if (work.location?.isNotEmpty ?? false)
-                        pw.Text('Location: ${work.location}'),
-                      if (work.description?.isNotEmpty ?? false)
-                        pw.Text('Description: ${work.description}'),
-                      pw.SizedBox(height: 10),
+                      pw.SizedBox(height: 5),
                     ],
                   ))
-              .toList()
-        else
-          pw.Text('No work experience provided'),
-      ],
-    );
-  }
+              .toList(),
+        ],
 
-  static pw.Widget _buildEducationSection(List<Education> educations) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text(
-          'Education',
-          style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
-        ),
-        pw.Divider(),
-        if (educations.isNotEmpty)
-          ...educations
-              .map((education) => pw.Column(
+        // Education
+        if (cvData.education.isNotEmpty) ...[
+          pw.Text('Education',
+              style:
+                  pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 10),
+          ...cvData.education
+              .map((edu) => pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Text('Institution: ${education.institution}',
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      pw.Text('Degree: ${education.degree}'),
-                      if (education.fieldOfStudy?.isNotEmpty ?? false)
-                        pw.Text('Field of Study: ${education.fieldOfStudy}'),
-                      pw.Text('Year: ${education.year}'),
-                      pw.SizedBox(height: 10),
+                      pw.Text('${edu.degree} - ${edu.institution}'),
+                      pw.Text('Year: ${edu.year}'),
+                      pw.SizedBox(height: 5),
                     ],
                   ))
-              .toList()
-        else
-          pw.Text('No education information provided'),
-      ],
-    );
-  }
+              .toList(),
+        ],
 
-  static pw.Widget _buildSkillsSection(List<String> skills) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text(
-          'Skills',
-          style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
-        ),
-        pw.Divider(),
-        if (skills.isNotEmpty)
-          pw.Text(skills.join(', '))
-        else
-          pw.Text('No skills provided'),
-      ],
-    );
-  }
-
-  static pw.Widget _buildLanguagesSection(List<Language> languages) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text(
-          'Languages',
-          style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
-        ),
-        pw.Divider(),
-        ...languages
-            .map((language) => pw.Text(
-                  '${language.language}: ${language.level}',
-                ))
-            .toList(),
-      ],
-    );
-  }
-
-  static pw.Widget _buildCertificatesSection(List<Certificate> certificates) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text(
-          'Certificates',
-          style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
-        ),
-        pw.Divider(),
-        ...certificates
-            .map((certificate) => pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text('Name: ${certificate.name}'),
-                    if (certificate.url.isNotEmpty)
-                      pw.Text('URL: ${certificate.url}'),
-                    pw.SizedBox(height: 5),
-                  ],
-                ))
-            .toList(),
+        // Skills
+        if (cvData.skills.isNotEmpty) ...[
+          pw.Text('Skills',
+              style:
+                  pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 10),
+          pw.Text(cvData.skills.join(', ')),
+        ],
       ],
     );
   }
