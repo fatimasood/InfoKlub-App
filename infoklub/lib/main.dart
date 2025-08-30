@@ -19,7 +19,6 @@ import 'package:infoklub/models/health/health_model.dart';
 import 'package:infoklub/models/education/education_model.dart';
 
 // ViewModels
-import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/viewmodels/authentication/login_viewmodel.dart';
 import 'package:infoklub/viewmodels/authentication/phone_viewmodel.dart';
@@ -115,7 +114,6 @@ class MyApp extends StatelessWidget {
           create: (_) => HomeViewModel(userEmail: userMail),
         ),
         ChangeNotifierProvider(create: (_) => CvViewModel()),
-        ChangeNotifierProvider(create: (_) => CvCreationViewModel()),
         ChangeNotifierProvider(
             create: (_) => RemindersViewModel(userEmail: userMail)),
         ChangeNotifierProvider(

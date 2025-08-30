@@ -227,6 +227,16 @@ class _CvDownloadState extends State<CvDownload> {
   }
 
   Widget _buildDataPreview(CVModel cvData) {
+    // Debug print
+
+    final cvViewModel = context.watch<CvViewModel>();
+    print('Languages in CvViewModel: ${cvViewModel.cvData.languages.length}');
+    print('Languages: ${cvViewModel.cvData.languages}');
+
+    // Also check if there's data in CvCreationViewModel
+    final cvCreationViewModel = context.read<CvViewModel>();
+    print(
+        'Languages in CvCreationViewModel: ${cvCreationViewModel.cvData.languages.length}');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -241,6 +251,7 @@ class _CvDownloadState extends State<CvDownload> {
         Text('Work Experiences: ${cvData.workExperience.length}'),
         Text('Education: ${cvData.education.length} entries'),
         Text('Skills: ${cvData.skills.length} skills'),
+        Text("Languages: ${cvData.languages.length} languages"),
         const SizedBox(height: 10),
         if (cvData.workExperience.isNotEmpty) ...[
           const Text('Recent Work:',

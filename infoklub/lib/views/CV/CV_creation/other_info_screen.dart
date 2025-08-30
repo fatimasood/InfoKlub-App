@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
+import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/views/CV/CV_creation/cv_widgets/cv_other_details.dart';
 import 'package:infoklub/views/CV/CV_download/cv_download.dart';
 import 'package:infoklub/widgets/custom_button.dart';
@@ -61,7 +61,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
     // Load languages
     final savedLanguages = _prefs.getStringList('cv_languages');
     if (savedLanguages != null && savedLanguages.isNotEmpty) {
-      final viewModel = context.read<CvCreationViewModel>();
+      final viewModel = context.read<CvViewModel>();
       for (var lang in savedLanguages) {
         final parts = lang.split('|');
         if (parts.length == 2) {
@@ -73,14 +73,14 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
     // Load skills
     final savedSkills = _prefs.getStringList('cv_skills');
     if (savedSkills != null && savedSkills.isNotEmpty) {
-      final viewModel = context.read<CvCreationViewModel>();
+      final viewModel = context.read<CvViewModel>();
       viewModel.addSkills(savedSkills.toSet().toList()); // Remove duplicates
     }
 
     // Load certificates
     final savedCertificates = _prefs.getStringList('cv_certificates');
     if (savedCertificates != null && savedCertificates.isNotEmpty) {
-      final viewModel = context.read<CvCreationViewModel>();
+      final viewModel = context.read<CvViewModel>();
       for (var cert in savedCertificates) {
         final parts = cert.split('|');
         if (parts.length == 2) {
@@ -92,7 +92,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
   }
 
   void _saveDataToPreferences() {
-    final viewModel = context.read<CvCreationViewModel>();
+    final viewModel = context.read<CvViewModel>();
 
     // Save summary
     _prefs.setString('cv_summary', viewModel.cvData.summary ?? '');
@@ -128,7 +128,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<CvCreationViewModel>();
+    final viewModel = context.watch<CvViewModel>();
 
     return Scaffold(
       appBar: AppBar(
@@ -567,6 +567,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                 if (_formKey.currentState!.validate()) {
                   viewModel.nextStep();
                   _saveDataToPreferences(); // Save all data before navigating
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -693,7 +694,7 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
   Widget _buildProgressIndicator(BuildContext context) {
     final steps = ['Contact', 'Work', 'Education', 'Others', 'Save'];
 
-    return Consumer<CvCreationViewModel>(
+    return Consumer<CvViewModel>(
       builder: (context, viewModel, _) {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 16),

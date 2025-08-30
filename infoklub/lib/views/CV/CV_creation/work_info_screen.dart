@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/models/cv/cv_creation_view_model.dart';
-import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/views/CV/CV_creation/education_info_screen.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
 class WorkInfoScreen extends StatefulWidget {
-  WorkInfoScreen({super.key});
+  const WorkInfoScreen({super.key});
 
   @override
   State<WorkInfoScreen> createState() => _WorkInfoScreenState();
@@ -109,7 +108,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<CvCreationViewModel>();
+    final viewModel = context.watch<CvViewModel>();
     final cvViewModel = context.watch<CvViewModel>();
 
     return Scaffold(
@@ -831,7 +830,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
   Widget _buildProgressIndicator(BuildContext context) {
     final steps = ['Contact', 'Work', 'Education', 'Others', 'Save'];
 
-    return Consumer<CvCreationViewModel>(
+    return Consumer<CvViewModel>(
       builder: (context, viewModel, _) {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 16),

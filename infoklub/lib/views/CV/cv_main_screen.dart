@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/views/CV/CV_creation/contact_info_screen.dart';
 import 'package:infoklub/views/CV/template_selection_screen.dart';
@@ -74,7 +73,7 @@ class CVPage extends StatelessWidget {
   // views/CV/cv_page.dart
   void _createNewCV(BuildContext context) {
     final cvViewModel = context.read<CvViewModel>();
-    context.read<CvCreationViewModel>();
+    context.read<CvViewModel>();
 
     // Create new CV and load user data
     cvViewModel.createNewCV();

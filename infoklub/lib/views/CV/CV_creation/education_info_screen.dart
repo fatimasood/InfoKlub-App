@@ -3,7 +3,6 @@ import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/main.dart';
 import 'package:infoklub/models/cv/cv_creation_view_model.dart';
 import 'package:infoklub/models/education/education_model.dart';
-import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/views/CV/CV_creation/other_info_screen.dart';
@@ -76,7 +75,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<CvCreationViewModel>();
+    final viewModel = context.watch<CvViewModel>();
 
     final eduViewModel = context.watch<EduinfoViewmodel>();
 
@@ -540,7 +539,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
   Widget _buildProgressIndicator(BuildContext context) {
     final steps = ['Contact', 'Work', 'Education', 'Others', 'Save'];
 
-    return Consumer<CvCreationViewModel>(
+    return Consumer<CvViewModel>(
       builder: (context, viewModel, _) {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 16),

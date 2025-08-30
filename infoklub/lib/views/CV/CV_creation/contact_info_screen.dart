@@ -1,8 +1,6 @@
-// views/CV/CV_creation/contact_info_screen.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/viewmodels/CV/cv_creation_view_model.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/views/CV/CV_creation/work_info_screen.dart';
 import 'package:infoklub/widgets/custom_button.dart';
@@ -33,7 +31,6 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
 
   void _populateFormData() {
     final cvViewModel = context.read<CvViewModel>();
-    final cvCreationViewModel = context.read<CvCreationViewModel>();
 
     final cvData = cvViewModel.cvData;
     if (kDebugMode) {
@@ -60,7 +57,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
     _addressController.text = cvData.address ?? '';
 
     // Also update the creation viewmodel
-    cvCreationViewModel.updateContactInfo(
+    cvViewModel.updateContactInfo(
       firstName: cvData.firstName,
       lastName: cvData.lastName,
       email: cvData.email,
@@ -81,7 +78,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<CvCreationViewModel>();
+    final viewModel = context.watch<CvViewModel>();
     final cvViewModel = context.watch<CvViewModel>();
 
     return Scaffold(
@@ -205,7 +202,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
                 label: "First Name",
                 hint: "Fatema",
                 onChanged: (value) => context
-                    .read<CvCreationViewModel>()
+                    .read<CvViewModel>()
                     .updateContactInfo(firstName: value),
               ),
               const SizedBox(height: 10),
@@ -214,7 +211,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
                 label: "Last Name",
                 hint: "BiBi",
                 onChanged: (value) => context
-                    .read<CvCreationViewModel>()
+                    .read<CvViewModel>()
                     .updateContactInfo(lastName: value),
               ),
             ],
@@ -272,7 +269,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
   Widget _buildProgressIndicator(BuildContext context) {
     final steps = ['Contact', 'Work', 'Education', 'Others', 'Save'];
 
-    return Consumer<CvCreationViewModel>(
+    return Consumer<CvViewModel>(
       builder: (context, viewModel, _) {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
