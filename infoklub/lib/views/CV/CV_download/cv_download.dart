@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/models/cv/cv_creation_view_model.dart';
 import 'package:infoklub/services/pdf_generating_service/template1.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
+import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:open_file/open_file.dart';
@@ -151,19 +151,18 @@ class _CvDownloadState extends State<CvDownload> {
                       // Template preview
                       Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: AppTheme.primaryColor),
-                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: AppTheme.primaryColor, width: 2),
                         ),
                         child: Image.asset(
                           "lib/assets/cv_tem/cvtemp1.png",
                           fit: BoxFit.cover,
                           width: double.infinity,
-                          height: 200,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      //const SizedBox(height: 20),
                       // Data preview
-                      _buildDataPreview(cvViewModel.cvData),
+                      // _buildDataPreview(cvViewModel.cvData),
                     ],
                   ),
                 ),
@@ -226,7 +225,7 @@ class _CvDownloadState extends State<CvDownload> {
     );
   }
 
-  Widget _buildDataPreview(CVModel cvData) {
+  /*Widget _buildDataPreview(CVModel cvData) {
     // Debug print
 
     final cvViewModel = context.watch<CvViewModel>();
@@ -264,7 +263,7 @@ class _CvDownloadState extends State<CvDownload> {
       ],
     );
   }
-
+*/
   void _showDownloadSuccess(BuildContext context, File pdfFile) {
     // Get a user-friendly path display
     String userVisiblePath = pdfFile.path;
@@ -278,50 +277,27 @@ class _CvDownloadState extends State<CvDownload> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.whiteColor,
         title: const Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 24),
+            Icon(Icons.check_circle, color: Colors.green, size: 20),
             SizedBox(width: 10),
             Text('CV Ready!'),
           ],
         ),
-        content: SingleChildScrollView(
-          // Add this to prevent overflow
+        content: const SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Your professional CV has been saved.'),
-              const SizedBox(height: 15),
-              const Text(
-                'Location:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 5),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  userVisiblePath,
-                  style: const TextStyle(
-                    fontSize: 11, // Smaller font
-                    color: Colors.blue,
-                    fontFamily: 'Monospace',
-                  ),
-                  overflow: TextOverflow.ellipsis, // Prevent overflow
-                  maxLines: 2,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
+              Text('Your professional CV has been saved.'),
+              SizedBox(height: 10),
+              Text(
                 'To access your CV:',
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 5),
-              const Text(
+              SizedBox(height: 5),
+              Text(
                 '• Use "Open CV" button below\n• Or find in Downloads folder',
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
@@ -329,22 +305,15 @@ class _CvDownloadState extends State<CvDownload> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          ElevatedButton.icon(
+          CustomButton(
+            height: 40,
+            color: AppTheme.secondaryColor,
+            text: "Open CV",
             onPressed: () {
               Navigator.pop(context);
               _openPdfFile(pdfFile);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            icon: const Icon(Icons.open_in_new, size: 18),
-            label: const Text('Open CV'),
-          ),
+          )
         ],
       ),
     );
