@@ -21,7 +21,7 @@ class CarrerModelAdapter extends TypeAdapter<CarrerModel> {
       companyName: fields[1] as String,
       startDate: fields[2] as String,
       endDate: fields[3] as String,
-      skills: fields[4] as String,
+      responsibilities: fields[4] as String,
       location: fields[5] as String,
       documentPaths: (fields[6] as List).cast<String>(),
     );
@@ -40,7 +40,7 @@ class CarrerModelAdapter extends TypeAdapter<CarrerModel> {
       ..writeByte(3)
       ..write(obj.endDate)
       ..writeByte(4)
-      ..write(obj.skills)
+      ..write(obj.responsibilities)
       ..writeByte(5)
       ..write(obj.location)
       ..writeByte(6)

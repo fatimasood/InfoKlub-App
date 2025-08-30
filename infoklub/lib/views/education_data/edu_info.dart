@@ -17,12 +17,16 @@ class EduInfo extends StatefulWidget {
   final String totalGrade;
   final String scoreGrade;
   final String achievements;
+  final String startYear;
+  final String endYear;
   const EduInfo(
       {super.key,
       required this.degreeName,
       required this.institutionName,
       required this.totalGrade,
       required this.scoreGrade,
+      required this.startYear,
+      required this.endYear,
       required this.achievements});
 
   @override
@@ -37,6 +41,8 @@ class _EduInfoState extends State<EduInfo> {
   late TextEditingController totalGradeController;
   late TextEditingController scoreGradeController;
   late TextEditingController achievementsController;
+  late TextEditingController startYearController;
+  late TextEditingController endYearController;
 
   @override
   void initState() {
@@ -47,6 +53,8 @@ class _EduInfoState extends State<EduInfo> {
     viewModel.totalGradeName(widget.totalGrade);
     viewModel.scoreGradeName(widget.scoreGrade);
     viewModel.achievementsName(widget.achievements);
+    viewModel.startYearName(widget.startYear);
+    viewModel.endYearName(widget.endYear);
     viewModel.uploadedDocs = [];
 
     degreeController = TextEditingController(text: widget.degreeName);
@@ -54,6 +62,8 @@ class _EduInfoState extends State<EduInfo> {
     totalGradeController = TextEditingController(text: widget.totalGrade);
     scoreGradeController = TextEditingController(text: widget.scoreGrade);
     achievementsController = TextEditingController(text: widget.achievements);
+    startYearController = TextEditingController(text: widget.startYear);
+    endYearController = TextEditingController(text: widget.endYear);
   }
 
   @override
@@ -63,6 +73,8 @@ class _EduInfoState extends State<EduInfo> {
     totalGradeController.dispose();
     scoreGradeController.dispose();
     achievementsController.dispose();
+    startYearController.dispose();
+    endYearController.dispose();
     super.dispose();
   }
 
@@ -76,6 +88,8 @@ class _EduInfoState extends State<EduInfo> {
         totalGradeController: totalGradeController,
         scoreGradeController: scoreGradeController,
         achievementsController: achievementsController,
+        startYearController: startYearController,
+        endYearController: endYearController,
         viewModel: viewModel,
       ),
     );
@@ -88,15 +102,18 @@ class _EducationInfoView extends StatelessWidget {
   final TextEditingController totalGradeController;
   final TextEditingController scoreGradeController;
   final TextEditingController achievementsController;
+  final TextEditingController startYearController;
+  final TextEditingController endYearController;
   final EduinfoViewmodel viewModel;
 
   const _EducationInfoView({
-    super.key,
     required this.degreeController,
     required this.institutionController,
     required this.totalGradeController,
     required this.scoreGradeController,
     required this.achievementsController,
+    required this.startYearController,
+    required this.endYearController,
     required this.viewModel,
   });
 
@@ -236,6 +253,8 @@ class _EducationInfoView extends StatelessWidget {
                       totalGradeController: totalGradeController,
                       scoreGradeController: scoreGradeController,
                       achievementsController: achievementsController,
+                      startYearController: startYearController,
+                      endYearController: endYearController,
                       uploadedDocs: viewModel.uploadedDocs,
                     ),
                   ],
@@ -266,6 +285,8 @@ class _EducationInfoView extends StatelessWidget {
                         totalGrade: totalGradeController.text.trim(),
                         scoreGrade: scoreGradeController.text.trim(),
                         achievements: achievementsController.text.trim(),
+                        startYear: startYearController.text.trim(),
+                        endYear: endYearController.text.trim(),
                         uploadedDocs: viewmodel.uploadedDocs,
                       );
 
@@ -276,6 +297,8 @@ class _EducationInfoView extends StatelessWidget {
                         print("📊 Total Grade: ${info.totalGrade}");
                         print("📈 Score Grade: ${info.scoreGrade}");
                         print("🏆 Achievements: ${info.achievements}");
+                        print("📅 Start Year: ${info.startYear}");
+                        print("📅 End Year: ${info.endYear}");
                         print(
                             "📂 Uploaded Docs: ${info.uploadedDocs.join(', ')}");
                       }

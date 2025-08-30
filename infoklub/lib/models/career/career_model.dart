@@ -17,7 +17,7 @@ class CarrerModel extends HiveObject {
   final String endDate;
 
   @HiveField(4)
-  final String skills;
+  final String responsibilities;
 
   @HiveField(5)
   final String location;
@@ -30,7 +30,7 @@ class CarrerModel extends HiveObject {
     required this.companyName,
     required this.startDate,
     required this.endDate,
-    required this.skills,
+    required this.responsibilities,
     required this.location,
     required this.documentPaths,
   });
@@ -40,7 +40,7 @@ class CarrerModel extends HiveObject {
       'companyName': companyName,
       'startDate': startDate,
       'endDate': endDate,
-      'skills': skills,
+      'responsibilities': responsibilities,
       'location': location,
       'documentPaths': documentPaths,
     };

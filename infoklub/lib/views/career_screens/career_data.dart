@@ -18,7 +18,7 @@ class CareerData extends StatefulWidget {
   final String address;
   final String startDate;
   final String endDate;
-  final String skills;
+  final String responsibilities;
   final String document;
 
   const CareerData({
@@ -28,7 +28,7 @@ class CareerData extends StatefulWidget {
     this.address = '',
     this.startDate = '',
     this.endDate = '',
-    this.skills = '',
+    this.responsibilities = '',
     this.document = '',
   });
 
@@ -44,7 +44,7 @@ class _CareerDataState extends State<CareerData> {
   late TextEditingController addressController;
   late TextEditingController startDateController;
   late TextEditingController endDateController;
-  late TextEditingController skillsController;
+  late TextEditingController responsibilitiesController;
 
   @override
   void initState() {
@@ -59,7 +59,8 @@ class _CareerDataState extends State<CareerData> {
     addressController = TextEditingController(text: widget.address);
     startDateController = TextEditingController(text: widget.startDate);
     endDateController = TextEditingController(text: widget.endDate);
-    skillsController = TextEditingController(text: widget.skills);
+    responsibilitiesController =
+        TextEditingController(text: widget.responsibilities);
   }
 
   @override
@@ -69,7 +70,7 @@ class _CareerDataState extends State<CareerData> {
     addressController.dispose();
     startDateController.dispose();
     endDateController.dispose();
-    skillsController.dispose();
+    responsibilitiesController.dispose();
     super.dispose();
   }
 
@@ -83,7 +84,7 @@ class _CareerDataState extends State<CareerData> {
           addressController: addressController,
           startDateController: startDateController,
           endDateController: endDateController,
-          skillsController: skillsController,
+          responsibilitiesController: responsibilitiesController,
           careerViewmodel: careerViewmodel,
         ));
   }
@@ -95,14 +96,14 @@ class _CareerInfoView extends StatelessWidget {
   final TextEditingController addressController;
   final TextEditingController startDateController;
   final TextEditingController endDateController;
-  final TextEditingController skillsController;
+  final TextEditingController responsibilitiesController;
   const _CareerInfoView({
     required this.companyNameController,
     required this.jobTitleController,
     required this.addressController,
     required this.startDateController,
     required this.endDateController,
-    required this.skillsController,
+    required this.responsibilitiesController,
     required CareerViewmodel careerViewmodel,
   });
 
@@ -242,7 +243,7 @@ class _CareerInfoView extends StatelessWidget {
                       addressController: addressController,
                       startDateController: startDateController,
                       endDateController: endDateController,
-                      skillsController: skillsController,
+                      responsibilitiesController: responsibilitiesController,
                       onFileUpload: () {
                         if (kDebugMode) {
                           print("File upload clicked");
@@ -277,7 +278,8 @@ class _CareerInfoView extends StatelessWidget {
                         companyName: companyNameController.text.trim(),
                         startDate: startDateController.text.trim(),
                         endDate: endDateController.text.trim(),
-                        skills: skillsController.text.trim(),
+                        responsibilities:
+                            responsibilitiesController.text.trim(),
                         location: addressController.text.trim(),
                         documentPaths: viewModel.uploadedDocs,
                       );
@@ -289,7 +291,8 @@ class _CareerInfoView extends StatelessWidget {
                         print("Address: ${viewModel.location}");
                         print("Start Date: ${viewModel.startDate}");
                         print("End Date: ${viewModel.endDate}");
-                        print("Skills: ${viewModel.skills}");
+                        print(
+                            "responsibilities: ${viewModel.responsibilities}");
                         print(viewModel.uploadedDocs);
                       }
                       viewModel.clearCareerData();

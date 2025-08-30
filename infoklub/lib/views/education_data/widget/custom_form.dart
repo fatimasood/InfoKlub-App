@@ -9,6 +9,8 @@ class ReusableForm extends StatelessWidget {
   final TextEditingController totalGradeController;
   final TextEditingController scoreGradeController;
   final TextEditingController achievementsController;
+  final TextEditingController startYearController;
+  final TextEditingController endYearController;
 
   const ReusableForm({
     super.key,
@@ -17,6 +19,8 @@ class ReusableForm extends StatelessWidget {
     required this.totalGradeController,
     required this.scoreGradeController,
     required this.achievementsController,
+    required this.startYearController,
+    required this.endYearController,
     required List<String> uploadedDocs,
   });
 
@@ -90,6 +94,38 @@ class ReusableForm extends StatelessWidget {
           CustomInput(
             hintText: "3.5",
             controller: scoreGradeController,
+            keyboardType: TextInputType.number,
+            textColor: Colors.black,
+            onChanged: (val) {},
+          ),
+          const SizedBox(height: 12.0),
+          Text(
+            "Start Year*",
+            style: AppTheme.getResponsiveTextTheme(context).displaySmall,
+          ),
+          const SizedBox(
+            height: 5.0,
+          ),
+          // Score Grade
+          CustomInput(
+            hintText: "2020",
+            controller: startYearController,
+            keyboardType: TextInputType.datetime,
+            textColor: Colors.black,
+            onChanged: (val) {},
+          ),
+          const SizedBox(height: 12.0),
+          Text(
+            "End Year*",
+            style: AppTheme.getResponsiveTextTheme(context).displaySmall,
+          ),
+          const SizedBox(
+            height: 5.0,
+          ),
+          // Score Grade
+          CustomInput(
+            hintText: "2024",
+            controller: endYearController,
             keyboardType: TextInputType.number,
             textColor: Colors.black,
             onChanged: (val) {},

@@ -18,7 +18,7 @@ class CareerViewmodel extends ChangeNotifier {
   String companyName = '';
   String startDate = '';
   String endDate = '';
-  String skills = '';
+  String responsibilities = '';
   String location = '';
 
   // 🔥 Career entries list
@@ -29,7 +29,7 @@ class CareerViewmodel extends ChangeNotifier {
   void company(String val) => companyName = val;
   void startDateName(String val) => startDate = val;
   void endDateName(String val) => endDate = val;
-  void skillsName(String val) => skills = val;
+  void responsibilitiesName(String val) => responsibilities = val;
   void locationName(String val) => location = val;
 
   // 📂 Pick files
@@ -68,7 +68,7 @@ class CareerViewmodel extends ChangeNotifier {
     print("Company: ${info.companyName}");
     print("Start: ${info.startDate}");
     print("End: ${info.endDate}");
-    print("Skills: ${info.skills}");
+    print("responsibilities: ${info.responsibilities}");
     print("Location: ${info.location}");
     print("Docs: ${info.documentPaths}");
     print("──────────────────────────────");
@@ -124,7 +124,7 @@ class CareerViewmodel extends ChangeNotifier {
       companyName = latest.companyName;
       startDate = latest.startDate;
       endDate = latest.endDate;
-      skills = latest.skills;
+      responsibilities = latest.responsibilities;
       location = latest.location;
 
       notifyListeners();
@@ -138,7 +138,7 @@ class CareerViewmodel extends ChangeNotifier {
         companyName.isNotEmpty ||
         startDate.isNotEmpty ||
         endDate.isNotEmpty ||
-        skills.isNotEmpty ||
+        responsibilities.isNotEmpty ||
         uploadedDocs.isNotEmpty;
   }
 
@@ -148,7 +148,7 @@ class CareerViewmodel extends ChangeNotifier {
     companyName = '';
     startDate = '';
     endDate = '';
-    skills = '';
+    responsibilities = '';
     location = '';
     uploadedDocs.clear();
     notifyListeners();

@@ -9,12 +9,26 @@ class PdfGenerationService {
     try {
       final pdf = pw.Document();
 
-      // Add CV content with professional design
+      // Use MultiPage for automatic pagination
       pdf.addPage(
-        pw.Page(
-          margin: const pw.EdgeInsets.all(10.0),
-          build: (pw.Context context) {
-            return _buildCVContent(cvData);
+        pw.MultiPage(
+          margin:
+              const pw.EdgeInsets.symmetric(vertical: 30.0, horizontal: 25.0),
+          build: (pw.Context context) => [
+            _buildCVContent(cvData),
+          ],
+          footer: (pw.Context context) {
+            return pw.Container(
+              alignment: pw.Alignment.centerRight,
+              margin: const pw.EdgeInsets.only(top: 20),
+              child: pw.Text(
+                'Page ${context.pageNumber} of ${context.pagesCount}',
+                style: const pw.TextStyle(
+                  fontSize: 10,
+                  color: PdfColors.grey600,
+                ),
+              ),
+            );
           },
         ),
       );
@@ -60,31 +74,34 @@ class PdfGenerationService {
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           // Header Section Name + Designation
-          pw.Text(
-            '${cvData.firstName ?? ''} ${cvData.lastName ?? ''}',
-            style: pw.TextStyle(
-              fontSize: 24,
-              fontWeight: pw.FontWeight.bold,
-              color: PdfColors.black,
-            ),
-          ),
-          if (cvData.workExperience.isNotEmpty)
-            pw.Text(
-              cvData.workExperience.first.position.toUpperCase(),
-              style: const pw.TextStyle(
-                fontSize: 16,
-                color: PdfColors.grey700,
+          pw.Center(
+            child: pw.Text(
+              '${cvData.firstName ?? ''} ${cvData.lastName ?? ''}',
+              style: pw.TextStyle(
+                fontSize: 30,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.black,
               ),
             ),
-          pw.SizedBox(height: 20),
+          ),
+          pw.SizedBox(height: 10),
+          if (cvData.workExperience.isNotEmpty)
+            pw.Center(
+              child: pw.Text(
+                cvData.workExperience.first.position.toUpperCase(),
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  color: PdfColors.black,
+                  fontWeight: pw.FontWeight.normal,
+                ),
+              ),
+            ),
+          pw.SizedBox(height: 25),
 
           // Contact Info Section
           pw.Container(
-            height: 80,
-            decoration: const pw.BoxDecoration(
-              border: pw.Border(
-                top: pw.BorderSide(color: PdfColors.black, width: 1),
-              ),
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: PdfColors.black, width: 1),
             ),
             child: pw.Padding(
               padding: const pw.EdgeInsets.all(5.0),
@@ -92,55 +109,55 @@ class PdfGenerationService {
                 mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
                 children: [
                   if (cvData.email != null)
-                    pw.Text('${cvData.email}',
+                    pw.Text('mail: ${cvData.email}',
                         style: const pw.TextStyle(
                           fontSize: 10,
-                          color: PdfColors.grey800,
+                          color: PdfColors.black,
                         )),
                   if (cvData.phone != null)
-                    pw.Text('${cvData.phone}',
+                    pw.Text('phone: ${cvData.phone}',
                         style: const pw.TextStyle(
                           fontSize: 10,
                           color: PdfColors.grey800,
                         )),
                   if (cvData.address != null)
-                    pw.Text('${cvData.address}',
+                    pw.Text('location: ${cvData.address}',
                         style: const pw.TextStyle(
                           fontSize: 10,
-                          color: PdfColors.grey800,
+                          color: PdfColors.black,
                         )),
                 ],
               ),
             ),
           ),
-          pw.SizedBox(height: 15),
+          pw.SizedBox(height: 20),
 
           // Profile Info
           pw.Row(
             children: [
-              pw.Text("PROFILE INFO ",
+              pw.Text("PROFILE INFO\t",
                   style: pw.TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: pw.FontWeight.bold,
                       color: PdfColors.black)),
               pw.Expanded(
                   child: pw.Divider(color: PdfColors.black, thickness: 1)),
             ],
           ),
-
+          pw.SizedBox(height: 15),
           // Profile Content
-          if (cvData.summary != null)
+          if (cvData.summary != null && cvData.summary!.isNotEmpty)
             pw.Text(
-              cvData.summary!,
+              cvData.summary ?? '',
               style: const pw.TextStyle(
-                fontSize: 12,
+                fontSize: 13,
                 color: PdfColors.black,
                 lineSpacing: 1.5,
               ),
               textAlign: pw.TextAlign.justify,
             ),
 
-          pw.SizedBox(height: 15),
+          pw.SizedBox(height: 20),
 
           // Two Column Layout for Education and Work Experience
           pw.Row(
@@ -152,11 +169,11 @@ class PdfGenerationService {
                 child: _buildLeftColumn(cvData),
               ),
               pw.SizedBox(width: 10),
-              // Vertical Divider
+              // Vertical Divider - FIXED: Use Container instead of Divider
               pw.Container(
                 width: 1,
                 color: PdfColors.black,
-                height: 600, // Adjust height as needed
+                height: _calculateColumnHeight(cvData), // Dynamic height
               ),
               pw.SizedBox(width: 10),
               // Right Column
@@ -169,6 +186,25 @@ class PdfGenerationService {
         ],
       ),
     );
+  }
+
+  // Helper method to calculate dynamic height for the divider
+  static double _calculateColumnHeight(CVModel cvData) {
+    double height = 0;
+
+    // Education section height
+    height += 30; // Title + spacing
+    height += cvData.education.length * 60; // Each education item
+
+    // Skills section height
+    height += 30; // Title + spacing
+    height += cvData.skills.length * 20; // Each skill
+
+    // Languages section height
+    height += 30; // Title + spacing
+    height += cvData.languages.length * 20; // Each language
+
+    return height;
   }
 
   static pw.Widget _buildLeftColumn(CVModel cvData) {
@@ -188,37 +224,33 @@ class PdfGenerationService {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text(
-                        edu.year,
-                        style: pw.TextStyle(
-                          fontSize: 12,
-                          color: PdfColors.black,
-                          fontWeight: pw.FontWeight.bold,
-                        ),
-                      ),
-                      pw.SizedBox(height: 5),
-                      pw.Text(
-                        edu.institution.toUpperCase(),
+                        (edu.institution).toUpperCase(),
                         style: pw.TextStyle(
                           fontSize: 12,
                           fontWeight: pw.FontWeight.bold,
                           color: PdfColors.black,
                         ),
                       ),
-                      pw.Text(
-                        edu.degree,
-                        style: const pw.TextStyle(
-                          fontSize: 12,
-                          color: PdfColors.black,
-                        ),
-                      ),
-                      if (edu.fieldOfStudy?.isNotEmpty ?? false)
-                        pw.Text(
-                          edu.fieldOfStudy!,
-                          style: const pw.TextStyle(
-                            fontSize: 12,
-                            color: PdfColors.grey600,
-                          ),
-                        ),
+                      pw.SizedBox(height: 2),
+                      pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text(
+                              edu.degree,
+                              style: const pw.TextStyle(
+                                fontSize: 12,
+                                color: PdfColors.black,
+                              ),
+                            ),
+                            pw.Text(
+                              edu.year,
+                              style: pw.TextStyle(
+                                fontSize: 12,
+                                color: PdfColors.grey600,
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
+                          ]),
                       pw.SizedBox(height: 12),
                     ],
                   ),
@@ -234,7 +266,7 @@ class PdfGenerationService {
             ),
           ),
 
-        pw.SizedBox(height: 15),
+        pw.SizedBox(height: 10),
 
         // Skills
         _buildSectionTitle('SKILLS', PdfColors.black),
@@ -248,7 +280,7 @@ class PdfGenerationService {
                   (skill) => pw.Padding(
                     padding: const pw.EdgeInsets.only(bottom: 4),
                     child: pw.Text(
-                      '• $skill',
+                      skill,
                       style: const pw.TextStyle(
                         fontSize: 12,
                         color: PdfColors.black,
@@ -259,7 +291,7 @@ class PdfGenerationService {
                 .toList(),
           ),
 
-        pw.SizedBox(height: 15),
+        pw.SizedBox(height: 10),
 
         // Languages
         _buildSectionTitle('LANGUAGES', PdfColors.black),
@@ -273,7 +305,7 @@ class PdfGenerationService {
                   (lang) => pw.Padding(
                     padding: const pw.EdgeInsets.only(bottom: 4),
                     child: pw.Text(
-                      '• ${lang.language} (${lang.level})',
+                      '${lang.language} (${lang.level})',
                       style: const pw.TextStyle(
                         fontSize: 12,
                         color: PdfColors.black,
@@ -309,8 +341,8 @@ class PdfGenerationService {
                           pw.Text(
                             work.company,
                             style: const pw.TextStyle(
-                              fontSize: 10,
-                              color: PdfColors.grey700,
+                              fontSize: 12,
+                              color: PdfColors.black,
                             ),
                           ),
                           pw.Text(
@@ -322,6 +354,7 @@ class PdfGenerationService {
                           ),
                         ],
                       ),
+                      pw.SizedBox(height: 5),
                       pw.Text(
                         work.position,
                         style: pw.TextStyle(
@@ -330,15 +363,16 @@ class PdfGenerationService {
                           color: PdfColors.black,
                         ),
                       ),
-                      if (work.description?.isNotEmpty ?? false)
+                      pw.SizedBox(height: 3),
+                      if ((work.description ?? '').isNotEmpty)
                         pw.Padding(
                           padding: const pw.EdgeInsets.only(top: 4),
                           child: pw.Text(
-                            work.description!,
+                            work.description ?? '',
                             style: const pw.TextStyle(
-                              fontSize: 10,
-                              color: PdfColors.grey800,
-                              lineSpacing: 1.3,
+                              fontSize: 12,
+                              color: PdfColors.black,
+                              lineSpacing: 1.5,
                             ),
                           ),
                         ),

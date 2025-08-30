@@ -25,6 +25,8 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
   late TextEditingController _totalGradeController;
   late TextEditingController _scoreGradeController;
   late TextEditingController _achievementsController;
+  late TextEditingController _startYearController;
+  late TextEditingController _endYearController;
 
   @override
   void initState() {
@@ -35,6 +37,8 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
     _totalGradeController = TextEditingController();
     _scoreGradeController = TextEditingController();
     _achievementsController = TextEditingController();
+    _startYearController = TextEditingController();
+    _endYearController = TextEditingController();
 
     // Load education data from Hive
     _loadEducationData();
@@ -48,6 +52,8 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
     _totalGradeController.dispose();
     _scoreGradeController.dispose();
     _achievementsController.dispose();
+    _startYearController.dispose();
+    _endYearController.dispose();
     super.dispose();
   }
 
@@ -64,7 +70,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
       return Education(
         institution: eduInfo.institution,
         degree: eduInfo.degree,
-        year: 'Education Period', // Placeholder
+        year: "${eduInfo.startYear}-${eduInfo.endYear}",
         fieldOfStudy: null,
       );
     }).toList();
@@ -118,7 +124,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
 
                   // Display existing education entries with dividers
                   if (educationEntries.isNotEmpty) ...[
-                    Text(
+                    const Text(
                       'Your Education',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -164,7 +170,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                       educationEntries.isEmpty
                           ? 'Add Education'
                           : 'Add New Education',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                         color: AppTheme.primaryColor,
@@ -186,7 +192,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                           ),
                           const SizedBox(height: 3.0),
                           TextFormField(
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                             controller: _institutionController,
                             cursorColor: AppTheme.blackColor,
                             decoration: const InputDecoration(
@@ -219,7 +225,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                           ),
                           const SizedBox(height: 3.0),
                           TextFormField(
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                             controller: _degreeController,
                             cursorColor: AppTheme.blackColor,
                             decoration: const InputDecoration(
@@ -260,7 +266,8 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                                     ),
                                     const SizedBox(height: 3.0),
                                     TextFormField(
-                                      style: TextStyle(color: Colors.black),
+                                      style:
+                                          const TextStyle(color: Colors.black),
                                       controller: _totalGradeController,
                                       cursorColor: AppTheme.blackColor,
                                       keyboardType: TextInputType.number,
@@ -295,7 +302,8 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                                     ),
                                     const SizedBox(height: 3.0),
                                     TextFormField(
-                                      style: TextStyle(color: Colors.black),
+                                      style:
+                                          const TextStyle(color: Colors.black),
                                       controller: _scoreGradeController,
                                       cursorColor: AppTheme.blackColor,
                                       keyboardType: TextInputType.number,
@@ -329,7 +337,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                           ),
                           const SizedBox(height: 3.0),
                           TextFormField(
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                             controller: _achievementsController,
                             maxLines: 3,
                             cursorColor: AppTheme.blackColor,
@@ -412,6 +420,8 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
     _totalGradeController.clear();
     _scoreGradeController.clear();
     _achievementsController.clear();
+    _startYearController.clear();
+    _endYearController.clear();
   }
 
   List<Widget> _buildEducationList(List<EducationInfo> educationEntries) {
@@ -425,7 +435,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
         children: [
           Text(
             education.institution,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -462,6 +472,23 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
                 fontSize: 14,
               ),
             ),
+          if (education.startYear.isNotEmpty)
+            Text(
+              "Start Year: ${education.startYear}",
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
+
+          if (education.endYear.isNotEmpty)
+            Text(
+              "End Year: ${education.endYear}",
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
           if (education.achievements.isNotEmpty)
             Text(
               "Achievements: ${education.achievements}",
@@ -476,7 +503,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
       // Add divider if not the last item
       if (i < educationEntries.length - 1) {
         widgets.add(Divider(thickness: 1, color: Colors.grey[300]));
-        widgets.add(SizedBox(height: 16));
+        widgets.add(const SizedBox(height: 16));
       }
     }
 
@@ -486,7 +513,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
   Future<void> _addEducation() async {
     if (_institutionController.text.isEmpty || _degreeController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Please enter institution and degree")));
+          const SnackBar(content: Text("Please enter institution and degree")));
       return;
     }
 
@@ -502,6 +529,8 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
         totalGrade: _totalGradeController.text,
         scoreGrade: _scoreGradeController.text,
         achievements: _achievementsController.text,
+        startYear: _startYearController.text,
+        endYear: _endYearController.text,
         uploadedDocs: [],
       );
 
@@ -512,7 +541,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
       final newEducation = Education(
         institution: _institutionController.text,
         degree: _degreeController.text,
-        year: 'Education Period',
+        year: "${_startYearController.text}-${_endYearController.text}",
         fieldOfStudy: null,
       );
 
@@ -529,7 +558,7 @@ class _EducationInfoScreenState extends State<EducationInfoScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Education added successfully")));
+          const SnackBar(content: Text("Education added successfully")));
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Error adding education: $e")));

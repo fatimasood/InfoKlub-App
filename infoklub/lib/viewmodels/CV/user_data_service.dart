@@ -119,8 +119,7 @@ class UserDataService {
           'startDate': career.startDate,
           'endDate': career.endDate,
           'location': career.location,
-          'description': career
-              .skills, // Note: You are using 'skills' as description. Consider if you need a separate field.
+          'description': career.responsibilities,
         };
       }).toList();
 
@@ -130,7 +129,7 @@ class UserDataService {
       List<String> allSkills = [];
       if (careerEntries.isNotEmpty) {
         // Example: Split the skills string from the latest entry
-        String latestSkills = careerEntries.last.skills;
+        String latestSkills = careerEntries.last.responsibilities;
         allSkills =
             latestSkills.split(',').map((skill) => skill.trim()).toList();
       }

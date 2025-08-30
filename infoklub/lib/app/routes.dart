@@ -8,7 +8,6 @@ import 'package:infoklub/views/create_profile/add_info_dashboard.dart';
 import 'package:infoklub/views/create_profile/addlink.dart';
 import 'package:infoklub/views/education_data/edu_info.dart';
 import 'package:infoklub/views/health_screens/health_data.dart';
-import '../views/career_screens/career_dashboard.dart';
 import '../views/career_screens/career_data.dart';
 import '../views/career_screens/carrer_all_info.dart';
 import '../views/create_profile/profile_setup.dart';
@@ -83,6 +82,8 @@ class AppRoutes {
             totalGrade: '',
             scoreGrade: '',
             achievements: '',
+            startYear: '',
+            endYear: '',
           ),
         );
 
@@ -90,8 +91,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const EduSave());
       case career:
         return MaterialPageRoute(builder: (_) => const CareerData());
-      case careerdashboard:
-        return MaterialPageRoute(builder: (_) => const CareerDashboard());
+
       case careerInfo:
         return MaterialPageRoute(builder: (_) => const CarrerAllInfo());
       case finishScreen:

@@ -18,6 +18,8 @@ class EduinfoViewmodel extends ChangeNotifier {
   String totalGrade = '';
   String scoreGrade = '';
   String achievements = '';
+  String startYear = '';
+  String endYear = '';
 
   String get userEmail => Email;
 
@@ -26,6 +28,8 @@ class EduinfoViewmodel extends ChangeNotifier {
   void totalGradeName(String val) => totalGrade = val;
   void scoreGradeName(String val) => scoreGrade = val;
   void achievementsName(String val) => achievements = val;
+  void startYearName(String val) => startYear = val;
+  void endYearName(String val) => endYear = val;
 
   /// Save new education info to the list associated with the user's email
   Future<void> saveEducationInfo(String email, EducationInfo info) async {
@@ -60,6 +64,8 @@ class EduinfoViewmodel extends ChangeNotifier {
       print("📊 Total Grade: ${edu.totalGrade}");
       print("📈 Score Grade: ${edu.scoreGrade}");
       print("🏆 Achievements: ${edu.achievements}");
+      print("📅 Start Year: ${edu.startYear}");
+      print("📅 End Year: ${edu.endYear}");
       print("📂 Uploaded Docs: ${edu.uploadedDocs.join(', ')}");
       print("──────────────────────────────");
     }
@@ -134,6 +140,8 @@ class EduinfoViewmodel extends ChangeNotifier {
       totalGrade = latestEntry.totalGrade;
       scoreGrade = latestEntry.scoreGrade;
       achievements = latestEntry.achievements;
+      startYear = latestEntry.startYear;
+      endYear = latestEntry.endYear;
 
       notifyListeners();
     } catch (e) {

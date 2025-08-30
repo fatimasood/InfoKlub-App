@@ -21,6 +21,12 @@ class EducationInfo extends HiveObject {
   @HiveField(5)
   final List<String> uploadedDocs;
 
+  @HiveField(6)
+  final String startYear;
+
+  @HiveField(7)
+  final String endYear;
+
   EducationInfo({
     required this.degree,
     required this.institution,
@@ -28,6 +34,8 @@ class EducationInfo extends HiveObject {
     required this.scoreGrade,
     required this.achievements,
     required this.uploadedDocs,
+    required this.startYear,
+    required this.endYear,
   });
 
   Map<String, dynamic> toJson() {
@@ -38,6 +46,8 @@ class EducationInfo extends HiveObject {
       'scoreGrade': scoreGrade,
       'achievements': achievements,
       'uploadedDocs': uploadedDocs,
+      'startYear': startYear,
+      'endYear': endYear,
     };
   }
 }

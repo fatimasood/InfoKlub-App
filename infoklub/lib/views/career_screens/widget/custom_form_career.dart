@@ -9,7 +9,7 @@ class ReusableFormCareer extends StatelessWidget {
   final TextEditingController addressController;
   final TextEditingController startDateController;
   final TextEditingController endDateController;
-  final TextEditingController skillsController;
+  final TextEditingController responsibilitiesController;
   final VoidCallback onFileUpload;
 
   const ReusableFormCareer({
@@ -19,7 +19,7 @@ class ReusableFormCareer extends StatelessWidget {
     required this.addressController,
     required this.startDateController,
     required this.endDateController,
-    required this.skillsController,
+    required this.responsibilitiesController,
     required this.onFileUpload,
   });
 
@@ -93,7 +93,7 @@ class ReusableFormCareer extends StatelessWidget {
           CustomInput(
             hintText: "12 Oct 2024",
             controller: startDateController,
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.datetime,
             textColor: Colors.black,
             onChanged: (val) {},
           ),
@@ -109,24 +109,25 @@ class ReusableFormCareer extends StatelessWidget {
           CustomInput(
             hintText: "01 Dec 2024",
             controller: endDateController,
-            keyboardType: TextInputType.number,
+            keyboardType: TextInputType.datetime,
             textColor: Colors.black,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
           Text(
-            "Skills",
+            "Your Responsibilities*",
             style: AppTheme.getResponsiveTextTheme(context).displaySmall,
           ),
           const SizedBox(
             height: 5.0,
           ),
 
-          // Achievements
+          // responsibilities
           CustomInput(
-            hintText: "Java",
-            controller: skillsController,
-            keyboardType: TextInputType.text,
+            hintText:
+                " Develop and execute comprehensive marketing strategies and campaigns that align with the company's goals and objectives",
+            controller: responsibilitiesController,
+            keyboardType: TextInputType.multiline,
             textColor: Colors.black,
             onChanged: (val) {},
           ),
