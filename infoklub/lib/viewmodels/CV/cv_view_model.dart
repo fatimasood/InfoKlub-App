@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:infoklub/models/cv/cv_creation_view_model.dart';
@@ -153,7 +151,7 @@ class CvViewModel extends ChangeNotifier {
   void _loadProfileImage(String? imagePath) {
     if (imagePath != null && imagePath.isNotEmpty) {
       try {
-        _cvData = _cvData.copyWith(profileImage: File(imagePath));
+        _cvData = _cvData.copyWith(profileImage: imagePath);
       } catch (e) {
         if (kDebugMode) {
           print('Error loading profile image: $e');

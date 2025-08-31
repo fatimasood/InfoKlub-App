@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
@@ -158,7 +160,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => WorkInfoScreen()));
+                          builder: (context) => const WorkInfoScreen()));
                 }
               },
             ),
@@ -181,7 +183,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
             color: Colors.grey[200],
             image: cvViewModel.cvData.profileImage != null
                 ? DecorationImage(
-                    image: FileImage(cvViewModel.cvData.profileImage!),
+                    image: FileImage(File(cvViewModel.cvData.profileImage!)),
                     fit: BoxFit.cover,
                   )
                 : null,

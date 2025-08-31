@@ -45,8 +45,14 @@ class PdfGenerationService {
         await cvDirectory.create(recursive: true);
       }
 
+      String getFormattedTimestamp() {
+        final now = DateTime.now();
+        return '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
+      }
+
+      final timestamp = getFormattedTimestamp();
       final fileName =
-          'CV_${cvData.firstName ?? 'User'}_${cvData.lastName ?? 'CV'}.pdf'
+          'CV_${cvData.firstName ?? 'User'}_${cvData.lastName ?? 'CV'}_$timestamp.pdf'
               .replaceAll(' ', '_')
               .replaceAll(RegExp(r'[^a-zA-Z0-9_.]'), '');
 
@@ -78,19 +84,19 @@ class PdfGenerationService {
             child: pw.Text(
               '${cvData.firstName ?? ''} ${cvData.lastName ?? ''}',
               style: pw.TextStyle(
-                fontSize: 30,
+                fontSize: 18,
                 fontWeight: pw.FontWeight.bold,
                 color: PdfColors.black,
               ),
             ),
           ),
-          pw.SizedBox(height: 10),
+          pw.SizedBox(height: 5),
           if (cvData.workExperience.isNotEmpty)
             pw.Center(
               child: pw.Text(
                 cvData.workExperience.first.position.toUpperCase(),
                 style: pw.TextStyle(
-                  fontSize: 14,
+                  fontSize: 13,
                   color: PdfColors.black,
                   fontWeight: pw.FontWeight.normal,
                 ),
@@ -104,26 +110,27 @@ class PdfGenerationService {
               border: pw.Border.all(color: PdfColors.black, width: 1),
             ),
             child: pw.Padding(
-              padding: const pw.EdgeInsets.all(5.0),
+              padding: const pw.EdgeInsets.symmetric(
+                  horizontal: 5.0, vertical: 10.0),
               child: pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
                 children: [
                   if (cvData.email != null)
                     pw.Text('mail: ${cvData.email}',
                         style: const pw.TextStyle(
-                          fontSize: 10,
+                          fontSize: 9.5,
                           color: PdfColors.black,
                         )),
                   if (cvData.phone != null)
                     pw.Text('phone: ${cvData.phone}',
                         style: const pw.TextStyle(
-                          fontSize: 10,
+                          fontSize: 9.5,
                           color: PdfColors.grey800,
                         )),
                   if (cvData.address != null)
                     pw.Text('location: ${cvData.address}',
                         style: const pw.TextStyle(
-                          fontSize: 10,
+                          fontSize: 9.5,
                           color: PdfColors.black,
                         )),
                 ],
@@ -137,7 +144,7 @@ class PdfGenerationService {
             children: [
               pw.Text("PROFILE INFO\t",
                   style: pw.TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: pw.FontWeight.bold,
                       color: PdfColors.black)),
               pw.Expanded(
@@ -150,7 +157,7 @@ class PdfGenerationService {
             pw.Text(
               cvData.summary ?? '',
               style: const pw.TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: PdfColors.black,
                 lineSpacing: 1.5,
               ),
@@ -385,6 +392,54 @@ class PdfGenerationService {
         else
           pw.Text(
             'No work experience available',
+            style: const pw.TextStyle(
+              fontSize: 10,
+              color: PdfColors.grey600,
+            ),
+          ),
+
+        //certifications
+        pw.SizedBox(height: 10),
+        if (cvData.certificates.isNotEmpty)
+          _buildSectionTitle('CERTIFICATIONS', PdfColors.black),
+        pw.SizedBox(height: 10),
+
+        if (cvData.certificates.isNotEmpty)
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: cvData.certificates
+                .map(
+                  (certificate) => pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            certificate.name,
+                            style: const pw.TextStyle(
+                              fontSize: 12,
+                              color: PdfColors.black,
+                            ),
+                          ),
+                          pw.Text(
+                            certificate.url,
+                            style: const pw.TextStyle(
+                              fontSize: 10,
+                              color: PdfColors.grey600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      pw.SizedBox(height: 3),
+                    ],
+                  ),
+                )
+                .toList(),
+          )
+        else
+          pw.Text(
+            'No certificates available',
             style: const pw.TextStyle(
               fontSize: 10,
               color: PdfColors.grey600,

@@ -9,14 +9,30 @@ class Template2PdfService {
     try {
       final pdf = pw.Document();
 
+      pw.MemoryImage? profileImage;
+
+      if (cvData.profileImage != null && cvData.profileImage!.isNotEmpty) {
+        try {
+          final file = File(cvData.profileImage!);
+          if (await file.exists()) {
+            final imageData = await file.readAsBytes();
+            profileImage = pw.MemoryImage(imageData);
+          }
+        } catch (e) {
+          print('Error loading profile image: $e');
+        }
+      }
+
       // Use MultiPage for automatic pagination
       pdf.addPage(
         pw.MultiPage(
           margin:
-              const pw.EdgeInsets.symmetric(vertical: 30.0, horizontal: 25.0),
-          build: (pw.Context context) => [
-            _buildCVContent(cvData),
-          ],
+              const pw.EdgeInsets.symmetric(vertical: 28.0, horizontal: 22.0),
+          build: (pw.Context context) {
+            return [
+              _buildCVContent(cvData, profileImage),
+            ];
+          },
           footer: (pw.Context context) {
             return pw.Container(
               alignment: pw.Alignment.centerRight,
@@ -44,9 +60,14 @@ class Template2PdfService {
       if (!await cvDirectory.exists()) {
         await cvDirectory.create(recursive: true);
       }
+      String getFormattedTimestamp() {
+        final now = DateTime.now();
+        return '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
+      }
 
+      final timestamp = getFormattedTimestamp();
       final fileName =
-          'CV_${cvData.firstName ?? 'User'}_${cvData.lastName ?? 'CV'}.pdf'
+          'CV_${cvData.firstName ?? 'User'}_${cvData.lastName ?? 'CV'}_$timestamp.pdf'
               .replaceAll(' ', '_')
               .replaceAll(RegExp(r'[^a-zA-Z0-9_.]'), '');
 
@@ -67,119 +88,36 @@ class Template2PdfService {
     }
   }
 
-  static pw.Widget _buildCVContent(CVModel cvData) {
+  static pw.Widget _buildCVContent(
+      CVModel cvData, pw.MemoryImage? profileImage) {
     return pw.Container(
       color: PdfColors.white,
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          // Header Section Name + Designation
-          pw.Center(
-            child: pw.Text(
-              '${cvData.firstName ?? ''} ${cvData.lastName ?? ''}',
-              style: pw.TextStyle(
-                fontSize: 30,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColors.black,
-              ),
-            ),
-          ),
-          pw.SizedBox(height: 10),
-          if (cvData.workExperience.isNotEmpty)
-            pw.Center(
-              child: pw.Text(
-                cvData.workExperience.first.position.toUpperCase(),
-                style: pw.TextStyle(
-                  fontSize: 14,
-                  color: PdfColors.black,
-                  fontWeight: pw.FontWeight.normal,
-                ),
-              ),
-            ),
-          pw.SizedBox(height: 25),
-
-          // Contact Info Section
-          pw.Container(
-            decoration: pw.BoxDecoration(
-              border: pw.Border.all(color: PdfColors.black, width: 1),
-            ),
-            child: pw.Padding(
-              padding: const pw.EdgeInsets.all(5.0),
-              child: pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-                children: [
-                  if (cvData.email != null)
-                    pw.Text('mail: ${cvData.email}',
-                        style: const pw.TextStyle(
-                          fontSize: 10,
-                          color: PdfColors.black,
-                        )),
-                  if (cvData.phone != null)
-                    pw.Text('phone: ${cvData.phone}',
-                        style: const pw.TextStyle(
-                          fontSize: 10,
-                          color: PdfColors.grey800,
-                        )),
-                  if (cvData.address != null)
-                    pw.Text('location: ${cvData.address}',
-                        style: const pw.TextStyle(
-                          fontSize: 10,
-                          color: PdfColors.black,
-                        )),
-                ],
-              ),
-            ),
-          ),
-          pw.SizedBox(height: 20),
-
-          // Profile Info
-          pw.Row(
-            children: [
-              pw.Text("PROFILE INFO\t",
-                  style: pw.TextStyle(
-                      fontSize: 18,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.black)),
-              pw.Expanded(
-                  child: pw.Divider(color: PdfColors.black, thickness: 1)),
-            ],
-          ),
-          pw.SizedBox(height: 15),
-          // Profile Content
-          if (cvData.summary != null && cvData.summary!.isNotEmpty)
-            pw.Text(
-              cvData.summary ?? '',
-              style: const pw.TextStyle(
-                fontSize: 13,
-                color: PdfColors.black,
-                lineSpacing: 1.5,
-              ),
-              textAlign: pw.TextAlign.justify,
-            ),
-
-          pw.SizedBox(height: 20),
-
-          // Two Column Layout for Education and Work Experience
+          // Two sides
           pw.Row(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               // Left Column
               pw.Expanded(
                 flex: 1,
-                child: _buildLeftColumn(cvData),
+                child: pw.Container(
+                  // height: double.infinity,
+                  color: PdfColors.grey100,
+                  padding: const pw.EdgeInsets.all(15),
+                  child: _buildLeftColumn(cvData, profileImage),
+                ),
               ),
-              pw.SizedBox(width: 10),
-              // Vertical Divider - FIXED: Use Container instead of Divider
-              pw.Container(
-                width: 1,
-                color: PdfColors.black,
-                height: _calculateColumnHeight(cvData), // Dynamic height
-              ),
-              pw.SizedBox(width: 10),
+
               // Right Column
               pw.Expanded(
                 flex: 2,
-                child: _buildRightColumn(cvData),
+                child: pw.Container(
+                  color: PdfColors.white,
+                  padding: const pw.EdgeInsets.only(left: 10),
+                  child: _buildRightColumn(cvData),
+                ),
               ),
             ],
           ),
@@ -188,32 +126,63 @@ class Template2PdfService {
     );
   }
 
-  // Helper method to calculate dynamic height for the divider
-  static double _calculateColumnHeight(CVModel cvData) {
-    double height = 0;
-
-    // Education section height
-    height += 30; // Title + spacing
-    height += cvData.education.length * 60; // Each education item
-
-    // Skills section height
-    height += 30; // Title + spacing
-    height += cvData.skills.length * 20; // Each skill
-
-    // Languages section height
-    height += 30; // Title + spacing
-    height += cvData.languages.length * 20; // Each language
-
-    return height;
-  }
-
-  static pw.Widget _buildLeftColumn(CVModel cvData) {
+  static pw.Widget _buildLeftColumn(
+      CVModel cvData, pw.MemoryImage? profileImage) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        // Education
-        _buildSectionTitle('EDUCATION', PdfColors.black),
         pw.SizedBox(height: 10),
+        // profile picture
+        if (profileImage != null)
+          pw.Center(
+            child: pw.Container(
+              width: 100,
+              height: 100,
+              decoration: pw.BoxDecoration(
+                shape: pw.BoxShape.circle,
+                image: pw.DecorationImage(
+                  image: profileImage,
+                  fit: pw.BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+        //contact info
+        pw.SizedBox(height: 15),
+        _buildSectionTitle('CONTACT', PdfColors.cyan900),
+        pw.Divider(color: PdfColors.cyan900),
+        pw.SizedBox(height: 3),
+        pw.Column(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            if (cvData.email != null)
+              pw.Text('${cvData.email}',
+                  style: const pw.TextStyle(
+                    fontSize: 9.5,
+                    color: PdfColors.grey800,
+                  )),
+            pw.SizedBox(height: 2),
+            if (cvData.phone != null)
+              pw.Text('${cvData.phone}',
+                  style: const pw.TextStyle(
+                    fontSize: 9.5,
+                    color: PdfColors.grey800,
+                  )),
+            pw.SizedBox(height: 2),
+            if (cvData.address != null)
+              pw.Text('${cvData.address}',
+                  style: const pw.TextStyle(
+                    fontSize: 9.5,
+                    color: PdfColors.grey800,
+                  )),
+          ],
+        ),
+        // Education
+        pw.SizedBox(height: 10),
+        _buildSectionTitle('EDUCATION', PdfColors.cyan900),
+        pw.Divider(color: PdfColors.cyan900),
+        pw.SizedBox(height: 3),
 
         if (cvData.education.isNotEmpty)
           pw.Column(
@@ -224,6 +193,15 @@ class Template2PdfService {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text(
+                        edu.year,
+                        style: pw.TextStyle(
+                          fontSize: 12,
+                          color: PdfColors.black,
+                          fontWeight: pw.FontWeight.normal,
+                        ),
+                      ),
+                      pw.SizedBox(height: 3),
+                      pw.Text(
                         (edu.institution).toUpperCase(),
                         style: pw.TextStyle(
                           fontSize: 12,
@@ -231,26 +209,14 @@ class Template2PdfService {
                           color: PdfColors.black,
                         ),
                       ),
-                      pw.SizedBox(height: 2),
-                      pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                          children: [
-                            pw.Text(
-                              edu.degree,
-                              style: const pw.TextStyle(
-                                fontSize: 12,
-                                color: PdfColors.black,
-                              ),
-                            ),
-                            pw.Text(
-                              edu.year,
-                              style: pw.TextStyle(
-                                fontSize: 12,
-                                color: PdfColors.grey600,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                          ]),
+                      pw.SizedBox(height: 3),
+                      pw.Text(
+                        edu.degree,
+                        style: const pw.TextStyle(
+                          fontSize: 12,
+                          color: PdfColors.black,
+                        ),
+                      ),
                       pw.SizedBox(height: 12),
                     ],
                   ),
@@ -266,12 +232,10 @@ class Template2PdfService {
             ),
           ),
 
-        pw.SizedBox(height: 10),
-
-        // Skills
-        _buildSectionTitle('SKILLS', PdfColors.black),
-        pw.SizedBox(height: 10),
-
+        pw.SizedBox(height: 3),
+        _buildSectionTitle('SKILLS', PdfColors.cyan900),
+        pw.Divider(color: PdfColors.cyan900),
+        pw.SizedBox(height: 3),
         if (cvData.skills.isNotEmpty)
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -291,11 +255,10 @@ class Template2PdfService {
                 .toList(),
           ),
 
-        pw.SizedBox(height: 10),
-
-        // Languages
-        _buildSectionTitle('LANGUAGES', PdfColors.black),
-        pw.SizedBox(height: 10),
+        pw.SizedBox(height: 5),
+        _buildSectionTitle('LANGUAGES', PdfColors.cyan900),
+        pw.Divider(color: PdfColors.cyan900),
+        pw.SizedBox(height: 3),
 
         if (cvData.languages.isNotEmpty)
           pw.Column(
@@ -323,9 +286,59 @@ class Template2PdfService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        // Work Experience
-        _buildSectionTitle('WORK EXPERIENCE', PdfColors.black),
+        // name and title
+        pw.Container(
+          padding: const pw.EdgeInsets.all(10),
+          color: PdfColors.cyan900,
+          child: pw.Center(
+            child: pw.Column(
+              children: [
+                pw.SizedBox(height: 15),
+                //name
+                pw.Text(
+                  '${cvData.firstName ?? ''} ${cvData.lastName ?? ''}',
+                  style: pw.TextStyle(
+                    fontSize: 18,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.white,
+                  ),
+                ),
+                pw.SizedBox(height: 7),
+                if (cvData.workExperience.isNotEmpty)
+                  pw.Text(
+                    cvData.workExperience.first.position.toUpperCase(),
+                    style: pw.TextStyle(
+                      fontSize: 13,
+                      color: PdfColors.white,
+                      fontWeight: pw.FontWeight.normal,
+                    ),
+                  ),
+                pw.SizedBox(height: 15),
+              ],
+            ),
+          ),
+        ),
+        //Summary
         pw.SizedBox(height: 10),
+        _buildSectionTitle('PROFILE', PdfColors.cyan900),
+        pw.Divider(color: PdfColors.cyan900),
+        pw.SizedBox(height: 5),
+        if (cvData.summary != null && cvData.summary!.isNotEmpty)
+          pw.Text(
+            cvData.summary ?? '',
+            style: const pw.TextStyle(
+              fontSize: 12,
+              color: PdfColors.black,
+              lineSpacing: 1.5,
+            ),
+            textAlign: pw.TextAlign.justify,
+          ),
+        pw.SizedBox(height: 20),
+
+        // Work Experience
+        _buildSectionTitle('WORK EXPERIENCE', PdfColors.cyan900),
+        pw.Divider(color: PdfColors.cyan900),
+        pw.SizedBox(height: 5),
 
         if (cvData.workExperience.isNotEmpty)
           pw.Column(
@@ -340,10 +353,10 @@ class Template2PdfService {
                         children: [
                           pw.Text(
                             work.company,
-                            style: const pw.TextStyle(
-                              fontSize: 12,
-                              color: PdfColors.black,
-                            ),
+                            style: pw.TextStyle(
+                                fontSize: 12,
+                                color: PdfColors.black,
+                                fontWeight: pw.FontWeight.normal),
                           ),
                           pw.Text(
                             work.duration,
@@ -390,6 +403,55 @@ class Template2PdfService {
               color: PdfColors.grey600,
             ),
           ),
+
+        //certifications
+        pw.SizedBox(height: 5),
+        if (cvData.certificates.isNotEmpty)
+          _buildSectionTitle('CERTIFICATIONS', PdfColors.cyan900),
+        pw.Divider(color: PdfColors.cyan900),
+        pw.SizedBox(height: 5),
+
+        if (cvData.certificates.isNotEmpty)
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: cvData.certificates
+                .map(
+                  (certificate) => pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            certificate.name,
+                            style: const pw.TextStyle(
+                              fontSize: 12,
+                              color: PdfColors.black,
+                            ),
+                          ),
+                          pw.Text(
+                            certificate.url,
+                            style: const pw.TextStyle(
+                              fontSize: 10,
+                              color: PdfColors.grey600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      pw.SizedBox(height: 3),
+                    ],
+                  ),
+                )
+                .toList(),
+          )
+        else
+          pw.Text(
+            'No certificates available',
+            style: const pw.TextStyle(
+              fontSize: 10,
+              color: PdfColors.grey600,
+            ),
+          ),
       ],
     );
   }
@@ -399,6 +461,7 @@ class Template2PdfService {
       title,
       style: pw.TextStyle(
         fontSize: 14,
+        letterSpacing: 2,
         fontWeight: pw.FontWeight.bold,
         color: color,
       ),

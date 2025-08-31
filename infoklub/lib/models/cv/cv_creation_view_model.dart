@@ -1,5 +1,3 @@
-import 'dart:io' show File;
-
 class Activity {
   final String name;
   final String description;
@@ -58,7 +56,10 @@ class CVModel {
   String? email;
   String? phone;
   String? address;
-  File? profileImage;
+  String? profileImage;
+  String? linkedIn;
+  String? github;
+  String? website;
 
   // Work Experience
   List<WorkExperience> workExperience = [];
@@ -90,6 +91,9 @@ class CVModel {
     this.phone,
     this.address,
     this.profileImage,
+    this.linkedIn,
+    this.github,
+    this.website,
     List<WorkExperience>? workExperience,
     List<Education>? education,
     List<String>? skills,
@@ -117,7 +121,10 @@ class CVModel {
     String? email,
     String? phone,
     String? address,
-    File? profileImage,
+    String? profileImage,
+    String? linkedIn,
+    String? github,
+    String? website,
     List<WorkExperience>? workExperience,
     List<Education>? education,
     List<String>? skills,
@@ -128,6 +135,9 @@ class CVModel {
     List<Certificate>? certificates,
   }) {
     return CVModel(
+      linkedIn: linkedIn ?? this.linkedIn,
+      github: github ?? this.github,
+      website: website ?? this.website,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       email: email ?? this.email,
