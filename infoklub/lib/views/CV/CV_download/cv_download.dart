@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/services/pdf_generating_service/template1.dart';
+import 'package:infoklub/services/template_services/template_service.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
+import 'package:infoklub/views/CV/template_selection_screen.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +21,9 @@ class _CvDownloadState extends State<CvDownload> {
   final _formKey = GlobalKey<FormState>();
   bool _isGeneratingPdf = false;
   String? _errorMessage;
+
+  // tempalte selection
+  CVTemplate _selectedTemplate = TemplateService.getDefaultTemplate();
 
   @override
   void initState() {
@@ -41,22 +46,42 @@ class _CvDownloadState extends State<CvDownload> {
     });
 
     try {
-      print('Starting PDF generation...');
-      print(
-          'CV Data: ${cvViewModel.cvData.firstName} ${cvViewModel.cvData.lastName}');
-      print('Work experiences: ${cvViewModel.cvData.workExperience.length}');
-      print('Education: ${cvViewModel.cvData.education.length}');
-      print('Skills: ${cvViewModel.cvData.skills.length}');
+      if (kDebugMode) {
+        print('Starting PDF generation...');
+      }
+      if (kDebugMode) {
+        print(
+            'Starting PDF generation with template: ${_selectedTemplate.name}');
+      }
+      if (kDebugMode) {
+        print(
+            'CV Data: ${cvViewModel.cvData.firstName} ${cvViewModel.cvData.lastName}');
+      }
+      if (kDebugMode) {
+        print('Work experiences: ${cvViewModel.cvData.workExperience.length}');
+      }
+      if (kDebugMode) {
+        print('Education: ${cvViewModel.cvData.education.length}');
+      }
+      if (kDebugMode) {
+        print('Skills: ${cvViewModel.cvData.skills.length}');
+      }
 
-      final pdfFile = await PdfGenerationService.generateCV(cvViewModel.cvData);
+      final pdfFile = await _selectedTemplate.generateCV(cvViewModel.cvData);
 
-      print('PDF generated successfully: ${pdfFile.path}');
+      if (kDebugMode) {
+        print('PDF generated successfully: ${pdfFile.path}');
+      }
 
       // Show success dialog
       _showDownloadSuccess(context, pdfFile);
     } catch (e, stackTrace) {
-      print('Error generating PDF: $e');
-      print('Stack trace: $stackTrace');
+      if (kDebugMode) {
+        print('Error generating PDF: $e');
+      }
+      if (kDebugMode) {
+        print('Stack trace: $stackTrace');
+      }
 
       setState(() {
         _errorMessage = 'Failed to generate PDF: $e';
@@ -96,6 +121,83 @@ class _CvDownloadState extends State<CvDownload> {
         ),
       );
     }
+  }
+
+  void _showTemplateSelection(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Template'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: GridView.builder(
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 0.7,
+            ),
+            itemCount: TemplateService.templates.length,
+            itemBuilder: (context, index) {
+              final template = TemplateService.templates[index];
+              return _buildTemplateCard(template);
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTemplateCard(CVTemplate template) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedTemplate = template;
+        });
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Selected template: ${template.name}'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: _selectedTemplate.name == template.name
+                ? AppTheme.primaryColor
+                : Colors.grey[300]!,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: Image.asset(
+                template.imageAsset,
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                template.name,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: _selectedTemplate.name == template.name
+                      ? AppTheme.primaryColor
+                      : Colors.black,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -148,6 +250,15 @@ class _CvDownloadState extends State<CvDownload> {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      // Selected Template Preview
+                      Text(
+                        'Selected Template: ${_selectedTemplate.name}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       // Template preview
                       Container(
                         decoration: BoxDecoration(
@@ -155,14 +266,11 @@ class _CvDownloadState extends State<CvDownload> {
                               color: AppTheme.primaryColor, width: 2),
                         ),
                         child: Image.asset(
-                          "lib/assets/cv_tem/cvtemp1.png",
+                          _selectedTemplate.imageAsset,
                           fit: BoxFit.cover,
                           width: double.infinity,
                         ),
                       ),
-                      //const SizedBox(height: 20),
-                      // Data preview
-                      // _buildDataPreview(cvViewModel.cvData),
                     ],
                   ),
                 ),
@@ -315,33 +423,6 @@ class _CvDownloadState extends State<CvDownload> {
             },
           )
         ],
-      ),
-    );
-  }
-
-  void _showTemplateSelection(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Template'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.description),
-                title: const Text('Professional Template'),
-                onTap: () => Navigator.pop(context),
-              ),
-              ListTile(
-                leading: const Icon(Icons.description),
-                title: const Text('Creative Template'),
-                onTap: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
