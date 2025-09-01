@@ -98,13 +98,14 @@ class Template3PdfService {
           // Two sides
           pw.Row(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               // Left Column
               if (profileImage != null)
                 pw.Center(
                   child: pw.Container(
-                    width: 100,
-                    height: 100,
+                    width: 150,
+                    height: 150,
                     decoration: pw.BoxDecoration(
                       shape: pw.BoxShape.circle,
                       image: pw.DecorationImage(
@@ -115,11 +116,11 @@ class Template3PdfService {
                   ),
                 ),
 
+              pw.SizedBox(width: 30),
               // Right Column
               pw.Expanded(
                 flex: 2,
                 child: pw.Container(
-                  color: PdfColors.white,
                   padding: const pw.EdgeInsets.only(left: 10),
                   child: _introPart(cvData),
                 ),
@@ -128,7 +129,7 @@ class Template3PdfService {
           ),
 
           // bottom part
-
+          pw.SizedBox(height: 20),
           pw.Row(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
@@ -136,18 +137,14 @@ class Template3PdfService {
               pw.Expanded(
                 flex: 1,
                 child: pw.Container(
-                  // height: double.infinity,
-                  color: PdfColors.grey100,
-                  padding: const pw.EdgeInsets.all(15),
-                  child: _buildLeftColumn(cvData, profileImage),
+                  child: _buildLeftColumn(cvData),
                 ),
               ),
-
+              pw.SizedBox(width: 20),
               // Right Column
               pw.Expanded(
                 flex: 2,
                 child: pw.Container(
-                  color: PdfColors.white,
                   padding: const pw.EdgeInsets.only(left: 10),
                   child: _buildRightColumn(cvData),
                 ),
@@ -159,28 +156,35 @@ class Template3PdfService {
     );
   }
 
+// top header part
   static pw.Widget _introPart(CVModel cvData) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         //name
-        pw.Text(
-          '${cvData.firstName ?? ''} ${cvData.lastName ?? ''}',
-          style: pw.TextStyle(
-            fontSize: 18,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColors.black,
+        pw.Align(
+          alignment: pw.Alignment.center,
+          child: pw.Text(
+            '${cvData.firstName ?? ''} ${cvData.lastName ?? ''}'.toUpperCase(),
+            style: pw.TextStyle(
+              fontSize: 22,
+              color: PdfColors.black,
+              fontWeight: pw.FontWeight.bold,
+            ),
           ),
         ),
-        pw.SizedBox(height: 7),
+        pw.SizedBox(height: 4),
         //designation
         if (cvData.workExperience.isNotEmpty)
-          pw.Text(
-            cvData.workExperience.first.position.toUpperCase(),
-            style: pw.TextStyle(
-              fontSize: 13,
-              color: PdfColors.white,
-              fontWeight: pw.FontWeight.normal,
+          pw.Align(
+            alignment: pw.Alignment.center,
+            child: pw.Text(
+              cvData.workExperience.first.position.toUpperCase(),
+              style: pw.TextStyle(
+                fontSize: 13,
+                color: PdfColors.black,
+                fontWeight: pw.FontWeight.normal,
+              ),
             ),
           ),
 
@@ -197,8 +201,8 @@ class Template3PdfService {
                     fontSize: 9.5,
                     color: PdfColors.grey800,
                   )),
-            if (cvData.phone != null)
-              pw.Text('${cvData.phone}',
+            if (cvData.address != null)
+              pw.Text('${cvData.address}',
                   style: const pw.TextStyle(
                     fontSize: 9.5,
                     color: PdfColors.grey800,
@@ -206,18 +210,19 @@ class Template3PdfService {
           ],
         ),
         pw.SizedBox(height: 8),
+
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            if (cvData.address != null)
-              pw.Text('${cvData.address}',
+            if (cvData.phone != null)
+              pw.Text('${cvData.phone}',
                   style: const pw.TextStyle(
                     fontSize: 9.5,
                     color: PdfColors.grey800,
                   )),
-            if (cvData.phone != null)
-              pw.Text('${cvData.phone}',
+            if (cvData.linkedIn != null)
+              pw.Text('${cvData.linkedIn}',
                   style: const pw.TextStyle(
                     fontSize: 9.5,
                     color: PdfColors.grey800,
@@ -228,50 +233,41 @@ class Template3PdfService {
     );
   }
 
-  static pw.Widget _buildLeftColumn(
-      CVModel cvData, pw.MemoryImage? profileImage) {
+  static pw.Widget _buildLeftColumn(CVModel cvData) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.SizedBox(height: 10),
-        // profile picture
-
-        //contact info
-        pw.SizedBox(height: 15),
-        _buildSectionTitle('CONTACT', PdfColors.cyan900),
-        pw.Divider(color: PdfColors.cyan900),
-        pw.SizedBox(height: 3),
-        pw.Column(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
+        //About Me
+        pw.Row(
           children: [
-            if (cvData.email != null)
-              pw.Text('${cvData.email}',
-                  style: const pw.TextStyle(
-                    fontSize: 9.5,
-                    color: PdfColors.grey800,
-                  )),
-            pw.SizedBox(height: 2),
-            if (cvData.phone != null)
-              pw.Text('${cvData.phone}',
-                  style: const pw.TextStyle(
-                    fontSize: 9.5,
-                    color: PdfColors.grey800,
-                  )),
-            pw.SizedBox(height: 2),
-            if (cvData.address != null)
-              pw.Text('${cvData.address}',
-                  style: const pw.TextStyle(
-                    fontSize: 9.5,
-                    color: PdfColors.grey800,
-                  )),
+            _buildSectionTitle('About Me\t', PdfColors.black),
+            pw.Expanded(
+                child: pw.Divider(color: PdfColors.grey600, thickness: 1)),
           ],
         ),
+
+        pw.SizedBox(height: 5),
+        if (cvData.summary != null && cvData.summary!.isNotEmpty)
+          pw.Text(
+            cvData.summary ?? '',
+            style: const pw.TextStyle(
+              fontSize: 12,
+              color: PdfColors.black,
+              lineSpacing: 1.5,
+            ),
+            textAlign: pw.TextAlign.justify,
+          ),
         // Education
         pw.SizedBox(height: 10),
-        _buildSectionTitle('EDUCATION', PdfColors.cyan900),
-        pw.Divider(color: PdfColors.cyan900),
-        pw.SizedBox(height: 3),
+        pw.Row(
+          children: [
+            _buildSectionTitle('Education\t', PdfColors.black),
+            pw.Expanded(
+                child: pw.Divider(color: PdfColors.grey600, thickness: 1)),
+          ],
+        ),
+
+        pw.SizedBox(height: 5),
 
         if (cvData.education.isNotEmpty)
           pw.Column(
@@ -281,15 +277,6 @@ class Template3PdfService {
                   (edu) => pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Text(
-                        edu.year,
-                        style: pw.TextStyle(
-                          fontSize: 12,
-                          color: PdfColors.black,
-                          fontWeight: pw.FontWeight.normal,
-                        ),
-                      ),
-                      pw.SizedBox(height: 3),
                       pw.Text(
                         (edu.institution).toUpperCase(),
                         style: pw.TextStyle(
@@ -304,6 +291,15 @@ class Template3PdfService {
                         style: const pw.TextStyle(
                           fontSize: 12,
                           color: PdfColors.black,
+                        ),
+                      ),
+                      pw.SizedBox(height: 3),
+                      pw.Text(
+                        edu.year,
+                        style: pw.TextStyle(
+                          fontSize: 12,
+                          color: PdfColors.black,
+                          fontWeight: pw.FontWeight.normal,
                         ),
                       ),
                       pw.SizedBox(height: 12),
@@ -322,8 +318,14 @@ class Template3PdfService {
           ),
 
         pw.SizedBox(height: 3),
-        _buildSectionTitle('SKILLS', PdfColors.cyan900),
-        pw.Divider(color: PdfColors.cyan900),
+        pw.Row(
+          children: [
+            _buildSectionTitle('Skills\t', PdfColors.black),
+            pw.Expanded(
+                child: pw.Divider(color: PdfColors.grey600, thickness: 1)),
+          ],
+        ),
+
         pw.SizedBox(height: 3),
         if (cvData.skills.isNotEmpty)
           pw.Column(
@@ -345,9 +347,15 @@ class Template3PdfService {
           ),
 
         pw.SizedBox(height: 5),
-        _buildSectionTitle('LANGUAGES', PdfColors.cyan900),
-        pw.Divider(color: PdfColors.cyan900),
-        pw.SizedBox(height: 3),
+        pw.Row(
+          children: [
+            _buildSectionTitle('Languages\t', PdfColors.black),
+            pw.Expanded(
+                child: pw.Divider(color: PdfColors.grey600, thickness: 1)),
+          ],
+        ),
+
+        pw.SizedBox(height: 5),
 
         if (cvData.languages.isNotEmpty)
           pw.Column(
@@ -375,114 +383,108 @@ class Template3PdfService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        // name and title
-        pw.Container(
-          padding: const pw.EdgeInsets.all(10),
-          color: PdfColors.cyan900,
-          child: pw.Center(
-            child: pw.Column(
-              children: [
-                pw.SizedBox(height: 15),
-                //name
-                pw.Text(
-                  '${cvData.firstName ?? ''} ${cvData.lastName ?? ''}',
-                  style: pw.TextStyle(
-                    fontSize: 18,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.white,
-                  ),
-                ),
-                pw.SizedBox(height: 7),
-                if (cvData.workExperience.isNotEmpty)
-                  pw.Text(
-                    cvData.workExperience.first.position.toUpperCase(),
-                    style: pw.TextStyle(
-                      fontSize: 13,
-                      color: PdfColors.white,
-                      fontWeight: pw.FontWeight.normal,
-                    ),
-                  ),
-                pw.SizedBox(height: 15),
-              ],
-            ),
-          ),
+        // Work Experience with Timeline
+        pw.Row(
+          children: [
+            _buildSectionTitle('Experience\t', PdfColors.black),
+            pw.Expanded(
+                child: pw.Divider(color: PdfColors.grey600, thickness: 1)),
+          ],
         ),
-        //Summary
-        pw.SizedBox(height: 10),
-        _buildSectionTitle('PROFILE', PdfColors.cyan900),
-        pw.Divider(color: PdfColors.cyan900),
-        pw.SizedBox(height: 5),
-        if (cvData.summary != null && cvData.summary!.isNotEmpty)
-          pw.Text(
-            cvData.summary ?? '',
-            style: const pw.TextStyle(
-              fontSize: 12,
-              color: PdfColors.black,
-              lineSpacing: 1.5,
-            ),
-            textAlign: pw.TextAlign.justify,
-          ),
-        pw.SizedBox(height: 20),
-
-        // Work Experience
-        _buildSectionTitle('WORK EXPERIENCE', PdfColors.cyan900),
-        pw.Divider(color: PdfColors.cyan900),
         pw.SizedBox(height: 5),
 
         if (cvData.workExperience.isNotEmpty)
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: cvData.workExperience
-                .map(
-                  (work) => pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                        children: [
-                          pw.Text(
-                            work.company,
-                            style: pw.TextStyle(
-                                fontSize: 12,
+          pw.Stack(
+            children: [
+              // Timeline vertical line (behind content)
+              pw.Positioned(
+                left: 4,
+                top: 0,
+                bottom: 0,
+                child: pw.Container(
+                  width: 1,
+                  color: PdfColors.black,
+                ),
+              ),
+              // Experience content
+              pw.Padding(
+                padding: const pw.EdgeInsets.only(left: 15),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: cvData.workExperience
+                      .map(
+                        (work) => pw.Row(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            // Timeline dot
+                            pw.Container(
+                              width: 5,
+                              height: 5,
+                              margin:
+                                  const pw.EdgeInsets.only(right: 8, top: 4),
+                              decoration: const pw.BoxDecoration(
+                                shape: pw.BoxShape.circle,
                                 color: PdfColors.black,
-                                fontWeight: pw.FontWeight.normal),
-                          ),
-                          pw.Text(
-                            work.duration,
-                            style: const pw.TextStyle(
-                              fontSize: 10,
-                              color: PdfColors.grey600,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      pw.SizedBox(height: 5),
-                      pw.Text(
-                        work.position,
-                        style: pw.TextStyle(
-                          fontSize: 12,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.black,
-                        ),
-                      ),
-                      pw.SizedBox(height: 3),
-                      if ((work.description ?? '').isNotEmpty)
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.only(top: 4),
-                          child: pw.Text(
-                            work.description ?? '',
-                            style: const pw.TextStyle(
-                              fontSize: 12,
-                              color: PdfColors.black,
-                              lineSpacing: 1.5,
+                            // Experience content
+                            pw.Expanded(
+                              child: pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Row(
+                                    mainAxisAlignment:
+                                        pw.MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      pw.Text(
+                                        work.company,
+                                        style: pw.TextStyle(
+                                            fontSize: 12,
+                                            color: PdfColors.black,
+                                            fontWeight: pw.FontWeight.normal),
+                                      ),
+                                      pw.Text(
+                                        work.duration,
+                                        style: const pw.TextStyle(
+                                          fontSize: 10,
+                                          color: PdfColors.grey600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  pw.SizedBox(height: 5),
+                                  pw.Text(
+                                    work.position,
+                                    style: pw.TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: pw.FontWeight.bold,
+                                      color: PdfColors.grey900,
+                                    ),
+                                  ),
+                                  pw.SizedBox(height: 3),
+                                  if ((work.description ?? '').isNotEmpty)
+                                    pw.Padding(
+                                      padding: const pw.EdgeInsets.only(top: 4),
+                                      child: pw.Text(
+                                        work.description ?? '',
+                                        style: const pw.TextStyle(
+                                          fontSize: 12,
+                                          color: PdfColors.black,
+                                          lineSpacing: 1.5,
+                                        ),
+                                      ),
+                                    ),
+                                  pw.SizedBox(height: 15),
+                                ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      pw.SizedBox(height: 15),
-                    ],
-                  ),
-                )
-                .toList(),
+                      )
+                      .toList(),
+                ),
+              ),
+            ],
           )
         else
           pw.Text(
@@ -496,8 +498,14 @@ class Template3PdfService {
         //certifications
         pw.SizedBox(height: 5),
         if (cvData.certificates.isNotEmpty)
-          _buildSectionTitle('CERTIFICATIONS', PdfColors.cyan900),
-        pw.Divider(color: PdfColors.cyan900),
+          pw.Row(
+            children: [
+              _buildSectionTitle('Certifications\t', PdfColors.black),
+              pw.Expanded(
+                  child: pw.Divider(color: PdfColors.grey600, thickness: 1)),
+            ],
+          ),
+
         pw.SizedBox(height: 5),
 
         if (cvData.certificates.isNotEmpty)
@@ -550,7 +558,6 @@ class Template3PdfService {
       title,
       style: pw.TextStyle(
         fontSize: 14,
-        letterSpacing: 2,
         fontWeight: pw.FontWeight.bold,
         color: color,
       ),
