@@ -45,13 +45,18 @@ class Tempalte4PdfService {
         await cvDirectory.create(recursive: true);
       }
 
+      String getFormattedTimestamp() {
+        final now = DateTime.now();
+        return '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
+      }
+
+      final timestamp = getFormattedTimestamp();
       final fileName =
-          'CV_${cvData.firstName ?? 'User'}_${cvData.lastName ?? 'CV'}.pdf'
+          'CV_${cvData.firstName ?? 'User'}_${cvData.lastName ?? 'CV'}_$timestamp.pdf'
               .replaceAll(' ', '_')
               .replaceAll(RegExp(r'[^a-zA-Z0-9_.]'), '');
 
       final file = File('${cvDirectory.path}/$fileName');
-
       // Save the PDF
       final bytes = await pdf.save();
       await file.writeAsBytes(bytes);
@@ -74,7 +79,8 @@ class Tempalte4PdfService {
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           // Header Section Name + Designation
-          pw.Center(
+          pw.Align(
+            alignment: pw.Alignment.topRight,
             child: pw.Text(
               '${cvData.firstName ?? ''} ${cvData.lastName ?? ''}',
               style: pw.TextStyle(
@@ -84,9 +90,21 @@ class Tempalte4PdfService {
               ),
             ),
           ),
-          pw.SizedBox(height: 10),
+          pw.SizedBox(height: 5),
+          pw.Align(
+            alignment: pw.Alignment.topRight,
+            child: pw.SizedBox(
+                width: 100,
+                height: 3,
+                child: pw.Divider(
+                  color: PdfColors.grey600,
+                  thickness: 2,
+                )),
+          ),
+          pw.SizedBox(height: 5),
           if (cvData.workExperience.isNotEmpty)
-            pw.Center(
+            pw.Align(
+              alignment: pw.Alignment.topRight,
               child: pw.Text(
                 cvData.workExperience.first.position.toUpperCase(),
                 style: pw.TextStyle(
@@ -96,11 +114,12 @@ class Tempalte4PdfService {
                 ),
               ),
             ),
-          pw.SizedBox(height: 25),
+          pw.SizedBox(height: 15),
 
           // Contact Info Section
           pw.Container(
             decoration: pw.BoxDecoration(
+              color: PdfColors.grey900,
               border: pw.Border.all(color: PdfColors.black, width: 1),
             ),
             child: pw.Padding(
@@ -112,19 +131,19 @@ class Tempalte4PdfService {
                     pw.Text('mail: ${cvData.email}',
                         style: const pw.TextStyle(
                           fontSize: 10,
-                          color: PdfColors.black,
+                          color: PdfColors.white,
                         )),
                   if (cvData.phone != null)
                     pw.Text('phone: ${cvData.phone}',
                         style: const pw.TextStyle(
                           fontSize: 10,
-                          color: PdfColors.grey800,
+                          color: PdfColors.white,
                         )),
                   if (cvData.address != null)
-                    pw.Text('location: ${cvData.address}',
+                    pw.Text('home: ${cvData.address}',
                         style: const pw.TextStyle(
                           fontSize: 10,
-                          color: PdfColors.black,
+                          color: PdfColors.white,
                         )),
                 ],
               ),
@@ -137,21 +156,21 @@ class Tempalte4PdfService {
             children: [
               pw.Text("PROFILE INFO\t",
                   style: pw.TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.black)),
+                      color: PdfColors.grey900)),
               pw.Expanded(
-                  child: pw.Divider(color: PdfColors.black, thickness: 1)),
+                  child: pw.Divider(color: PdfColors.grey900, thickness: 1)),
             ],
           ),
-          pw.SizedBox(height: 15),
+          pw.SizedBox(height: 10),
           // Profile Content
           if (cvData.summary != null && cvData.summary!.isNotEmpty)
             pw.Text(
               cvData.summary ?? '',
               style: const pw.TextStyle(
-                fontSize: 13,
-                color: PdfColors.black,
+                fontSize: 12,
+                color: PdfColors.grey900,
                 lineSpacing: 1.5,
               ),
               textAlign: pw.TextAlign.justify,
@@ -165,21 +184,16 @@ class Tempalte4PdfService {
             children: [
               // Left Column
               pw.Expanded(
-                flex: 1,
-                child: _buildLeftColumn(cvData),
-              ),
-              pw.SizedBox(width: 10),
-              // Vertical Divider - FIXED: Use Container instead of Divider
-              pw.Container(
-                width: 1,
-                color: PdfColors.black,
-                height: _calculateColumnHeight(cvData), // Dynamic height
-              ),
-              pw.SizedBox(width: 10),
-              // Right Column
-              pw.Expanded(
                 flex: 2,
                 child: _buildRightColumn(cvData),
+              ),
+
+              pw.SizedBox(width: 10),
+
+              // Right Column
+              pw.Expanded(
+                flex: 1,
+                child: _buildLeftColumn(cvData),
               ),
             ],
           ),
@@ -188,135 +202,148 @@ class Tempalte4PdfService {
     );
   }
 
-  // Helper method to calculate dynamic height for the divider
-  static double _calculateColumnHeight(CVModel cvData) {
-    double height = 0;
-
-    // Education section height
-    height += 30; // Title + spacing
-    height += cvData.education.length * 60; // Each education item
-
-    // Skills section height
-    height += 30; // Title + spacing
-    height += cvData.skills.length * 20; // Each skill
-
-    // Languages section height
-    height += 30; // Title + spacing
-    height += cvData.languages.length * 20; // Each language
-
-    return height;
-  }
-
   static pw.Widget _buildLeftColumn(CVModel cvData) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        // Education
-        _buildSectionTitle('EDUCATION', PdfColors.black),
-        pw.SizedBox(height: 10),
-
-        if (cvData.education.isNotEmpty)
-          pw.Column(
+    return pw.Container(
+        decoration: const pw.BoxDecoration(
+          color: PdfColors.grey200,
+        ),
+        child: pw.Padding(
+          padding: pw.EdgeInsets.all(20.0),
+          child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: cvData.education
-                .map(
-                  (edu) => pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text(
-                        (edu.institution).toUpperCase(),
-                        style: pw.TextStyle(
-                          fontSize: 12,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.black,
-                        ),
-                      ),
-                      pw.SizedBox(height: 2),
-                      pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              // Education
+              pw.Row(
+                children: [
+                  _buildSectionTitle('EDUCATION\t', PdfColors.grey900),
+                  pw.Expanded(
+                      child:
+                          pw.Divider(color: PdfColors.grey900, thickness: 1)),
+                ],
+              ),
+
+              pw.SizedBox(height: 10),
+
+              if (cvData.education.isNotEmpty)
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: cvData.education
+                      .map(
+                        (edu) => pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
                             pw.Text(
-                              edu.degree,
-                              style: const pw.TextStyle(
+                              (edu.institution).toUpperCase(),
+                              style: pw.TextStyle(
                                 fontSize: 12,
+                                fontWeight: pw.FontWeight.bold,
                                 color: PdfColors.black,
                               ),
                             ),
-                            pw.Text(
-                              edu.year,
-                              style: pw.TextStyle(
-                                fontSize: 12,
-                                color: PdfColors.grey600,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
+                            pw.SizedBox(height: 2),
+                            pw.Row(
+                                mainAxisAlignment:
+                                    pw.MainAxisAlignment.spaceBetween,
+                                children: [
+                                  pw.Text(
+                                    edu.degree,
+                                    style: const pw.TextStyle(
+                                      fontSize: 12,
+                                      color: PdfColors.black,
+                                    ),
+                                  ),
+                                  pw.Text(
+                                    edu.year,
+                                    style: pw.TextStyle(
+                                      fontSize: 12,
+                                      color: PdfColors.grey600,
+                                      fontWeight: pw.FontWeight.bold,
+                                    ),
+                                  ),
+                                ]),
+                            pw.SizedBox(height: 12),
+                          ],
+                        ),
+                      )
+                      .toList(),
+                )
+              else
+                pw.Text(
+                  'No education information available',
+                  style: const pw.TextStyle(
+                    fontSize: 10,
+                    color: PdfColors.grey600,
+                  ),
+                ),
+
+              pw.SizedBox(height: 10),
+
+              // Skills
+              pw.Row(
+                children: [
+                  _buildSectionTitle('SKILLS\t', PdfColors.grey900),
+                  pw.Expanded(
+                      child:
+                          pw.Divider(color: PdfColors.grey900, thickness: 1)),
+                ],
+              ),
+
+              pw.SizedBox(height: 10),
+
+              if (cvData.skills.isNotEmpty)
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: cvData.skills
+                      .map(
+                        (skill) => pw.Padding(
+                          padding: const pw.EdgeInsets.only(bottom: 4),
+                          child: pw.Text(
+                            skill,
+                            style: const pw.TextStyle(
+                              fontSize: 12,
+                              color: PdfColors.black,
                             ),
-                          ]),
-                      pw.SizedBox(height: 12),
-                    ],
-                  ),
-                )
-                .toList(),
-          )
-        else
-          pw.Text(
-            'No education information available',
-            style: const pw.TextStyle(
-              fontSize: 10,
-              color: PdfColors.grey600,
-            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+
+              pw.SizedBox(height: 10),
+
+              // Languages
+              pw.Row(
+                children: [
+                  _buildSectionTitle('LANGUAGES\t', PdfColors.grey900),
+                  pw.Expanded(
+                      child:
+                          pw.Divider(color: PdfColors.grey900, thickness: 1)),
+                ],
+              ),
+
+              pw.SizedBox(height: 10),
+
+              if (cvData.languages.isNotEmpty)
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: cvData.languages
+                      .map(
+                        (lang) => pw.Padding(
+                          padding: const pw.EdgeInsets.only(bottom: 4),
+                          child: pw.Text(
+                            '${lang.language} (${lang.level})',
+                            style: const pw.TextStyle(
+                              fontSize: 12,
+                              color: PdfColors.black,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+            ],
           ),
-
-        pw.SizedBox(height: 10),
-
-        // Skills
-        _buildSectionTitle('SKILLS', PdfColors.black),
-        pw.SizedBox(height: 10),
-
-        if (cvData.skills.isNotEmpty)
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: cvData.skills
-                .map(
-                  (skill) => pw.Padding(
-                    padding: const pw.EdgeInsets.only(bottom: 4),
-                    child: pw.Text(
-                      skill,
-                      style: const pw.TextStyle(
-                        fontSize: 12,
-                        color: PdfColors.black,
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-
-        pw.SizedBox(height: 10),
-
-        // Languages
-        _buildSectionTitle('LANGUAGES', PdfColors.black),
-        pw.SizedBox(height: 10),
-
-        if (cvData.languages.isNotEmpty)
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: cvData.languages
-                .map(
-                  (lang) => pw.Padding(
-                    padding: const pw.EdgeInsets.only(bottom: 4),
-                    child: pw.Text(
-                      '${lang.language} (${lang.level})',
-                      style: const pw.TextStyle(
-                        fontSize: 12,
-                        color: PdfColors.black,
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-      ],
-    );
+        ));
   }
 
   static pw.Widget _buildRightColumn(CVModel cvData) {
@@ -324,7 +351,14 @@ class Tempalte4PdfService {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         // Work Experience
-        _buildSectionTitle('WORK EXPERIENCE', PdfColors.black),
+        pw.Row(
+          children: [
+            _buildSectionTitle('EXPERIENCE\t', PdfColors.grey900),
+            pw.Expanded(
+                child: pw.Divider(color: PdfColors.grey900, thickness: 1)),
+          ],
+        ),
+
         pw.SizedBox(height: 10),
 
         if (cvData.workExperience.isNotEmpty)
@@ -385,6 +419,61 @@ class Tempalte4PdfService {
         else
           pw.Text(
             'No work experience available',
+            style: const pw.TextStyle(
+              fontSize: 10,
+              color: PdfColors.grey600,
+            ),
+          ),
+
+        //certifications
+        pw.SizedBox(height: 5),
+        if (cvData.certificates.isNotEmpty)
+          pw.Row(
+            children: [
+              _buildSectionTitle('Certifications\t', PdfColors.black),
+              pw.Expanded(
+                  child: pw.Divider(color: PdfColors.grey600, thickness: 1)),
+            ],
+          ),
+
+        pw.SizedBox(height: 5),
+
+        if (cvData.certificates.isNotEmpty)
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: cvData.certificates
+                .map(
+                  (certificate) => pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            certificate.name,
+                            style: const pw.TextStyle(
+                              fontSize: 12,
+                              color: PdfColors.black,
+                            ),
+                          ),
+                          pw.Text(
+                            certificate.url,
+                            style: const pw.TextStyle(
+                              fontSize: 10,
+                              color: PdfColors.grey600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      pw.SizedBox(height: 3),
+                    ],
+                  ),
+                )
+                .toList(),
+          )
+        else
+          pw.Text(
+            'No certificates available',
             style: const pw.TextStyle(
               fontSize: 10,
               color: PdfColors.grey600,
