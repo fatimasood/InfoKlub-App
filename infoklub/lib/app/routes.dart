@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/views/Rating/rating.dart';
 import 'package:infoklub/views/authentecation_view/forgot_password.dart';
-import 'package:infoklub/views/authentecation_view/phone_number_screen.dart';
 import 'package:infoklub/views/authentecation_view/signup_screen.dart';
 import 'package:infoklub/views/career_screens/finish_screen.dart';
 import 'package:infoklub/views/create_profile/add_info_dashboard.dart';
@@ -58,8 +57,6 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case signup:
         return MaterialPageRoute(builder: (_) => const SignupScreen());
-      case phone:
-        return MaterialPageRoute(builder: (_) => const PhoneNumberScreen());
 
       case forgotpsd:
         return MaterialPageRoute(builder: (_) => const ForgotPassword());

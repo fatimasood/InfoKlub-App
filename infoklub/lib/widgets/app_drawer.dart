@@ -1,17 +1,50 @@
+import 'dart:io';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/models/user/user_profile_model.dart';
+import 'package:infoklub/services/firebase_services/auth_service.dart';
+import 'package:infoklub/utils/utils.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/nav_bar_models/navigation_viewmodel.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   //final NavigationViewModel viewModel;
 
   const AppDrawer({super.key});
 
   @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  //logout
+  Future<void> logoutUser() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // Logout successful - navigate to login
+      Navigator.pushNamed(context, AppRoutes.login);
+    } catch (e) {
+      if (kDebugMode) {
+        print("Logout error: $e");
+      }
+      // Handle error if needed
+      Utils().toastMessage("Logout failed. Please try again.");
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<NavigationViewModel>(context, listen: false);
     final screenWidth = MediaQuery.of(context).size.width;
+
+    final userBox = Hive.box('userBox');
+    final String userKey = 'localUser_${AuthService.getCurrentUserKey()}';
+    final UserProfileModel? user = userBox.get(userKey);
 
     return SizedBox(
       width: screenWidth * 0.65, // Reduced width to 65% of screen
@@ -44,27 +77,32 @@ class AppDrawer extends StatelessWidget {
                   child: ListView(
                     padding: const EdgeInsets.only(top: 20.0),
                     children: [
-                      const DrawerHeader(
+                      DrawerHeader(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CircleAvatar(
                               radius: 30,
-                              backgroundImage: NetworkImage(
-                                  'https://avatar.iran.liara.run/public/girl'),
+                              backgroundImage: user
+                                          ?.profileImagePath.isNotEmpty ==
+                                      true
+                                  ? FileImage(File(user!.profileImagePath))
+                                  : const NetworkImage(
+                                          'https://avatar.iran.liara.run/public/girl')
+                                      as ImageProvider,
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             Text(
-                              'Sophia Rose',
-                              style: TextStyle(
+                              user?.name ?? 'Guest User',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              'UX/UI Designer',
-                              style: TextStyle(
+                              user?.bio ?? 'No bio added',
+                              style: const TextStyle(
                                 color: Colors.white70,
                               ),
                             ),
@@ -126,7 +164,7 @@ class AppDrawer extends StatelessWidget {
                         icon: Icons.logout_outlined,
                         title: 'Logout',
                         onTap: () {
-                          Navigator.pop(context);
+                          logoutUser();
                         },
                       ),
                     ],

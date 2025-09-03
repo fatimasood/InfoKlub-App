@@ -13,29 +13,40 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
+  final formKey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final auth = FirebaseAuth.instance;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  void reset() async {
+    try {
+      await auth.sendPasswordResetEmail(
+        email: emailController.text.trim(),
+      );
+      Utils().toastMessage(
+        'We have sent you an email to recover password, please check.',
+      );
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        Utils().toastMessage('No user found with this email.');
+      } else {
+        Utils().toastMessage(e.message ?? 'Something went wrong.');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
     //controller
-    final formKey = GlobalKey<FormState>();
-    final emailController = TextEditingController();
-    final auth = FirebaseAuth.instance;
-
-    void reset() {
-      auth
-          .sendPasswordResetEmail(email: emailController.text.toString())
-          .then((value) {
-        Utils().toastMessage(
-            'We have sent you email to recover password, please check email');
-
-        Future.delayed(const Duration(seconds: 5));
-        Navigator.pop(context);
-      }).onError((error, stackTrace) {
-        Utils().toastMessage("Try Again..!");
-      });
-    }
 
     return Scaffold(
       backgroundColor: AppTheme.secondaryColor,
@@ -112,7 +123,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           backgroundColor: AppTheme.whiteColor,
                           textColor: AppTheme.blackColor,
                           hintTextColor: AppTheme.greyColor,
-                          keyboardType: TextInputType.emailAddress,
                           controller: emailController,
                           validator: (value) {
                             if (value!.isEmpty ||

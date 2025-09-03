@@ -1,4 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:infoklub/models/user/user_profile_model.dart';
+import 'package:infoklub/services/firebase_services/auth_service.dart';
 import 'package:infoklub/viewmodels/nav_bar_models/navigation_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:infoklub/app/theme.dart';
@@ -10,6 +15,10 @@ class MainHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userBox = Hive.box('userBox');
+    final String userKey = 'localUser_${AuthService.getCurrentUserKey()}';
+    final UserProfileModel? user = userBox.get(userKey);
+
     return Scaffold(
       backgroundColor: AppTheme.halfwhite,
       appBar: AppBar(
@@ -29,13 +38,16 @@ class MainHome extends StatelessWidget {
             );
           },
         ),
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
               radius: 18,
-              backgroundImage:
-                  NetworkImage('https://avatar.iran.liara.run/public/girl'),
+              backgroundImage: user?.profileImagePath.isNotEmpty == true
+                  ? FileImage(File(user!.profileImagePath))
+                  : const NetworkImage(
+                          'https://avatar.iran.liara.run/public/girl')
+                      as ImageProvider,
             ),
           ),
         ],
