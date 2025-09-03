@@ -1,19 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:infoklub/main.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/utils/utils.dart';
-
 import 'package:infoklub/views/home_view/main_home.dart';
-
 import '../../app/routes.dart';
 import '../../app/theme.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_divider.dart';
 import '../../widgets/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-// current user
-
-String? email = FirebaseAuth.instance.currentUser!.email;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -50,9 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
       Utils().toastMessage(value.user!.email.toString());
       userMail = emailController.text;
 
-      print('login user mail: $userMail');
+      if (kDebugMode) {
+        print('login user mail: $userMail');
+      }
 
       Navigator.push(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
           builder: (context) => const MainHome(),
@@ -60,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
-      Utils().toastMessage(error.toString());
+      Utils().toastMessage("Failed to logging you in.Try Again..!");
     });
   }
 
@@ -121,11 +119,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
           Positioned(
-            top: screenHeight * 0.33, // Slightly below the white container
+            top: screenHeight * 0.34, // Slightly below the white container
             left: screenWidth * 0.1,
             width: screenWidth * 0.8,
             child: Container(
-              height: screenHeight * 0.5,
+              height: screenHeight * 0.42,
               decoration: BoxDecoration(
                 color: AppTheme.primaryColor,
                 borderRadius: BorderRadius.circular(25.0),
@@ -147,57 +145,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Center(
                   child: Column(
                     children: [
-                      CustomButton(
-                        icon: const Icon(
-                          Icons.phone,
-                          color: AppTheme.blackColor,
-                        ),
-                        text: 'Continue with Phone',
-                        onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.phone);
-                        },
-                        color: AppTheme.whiteColor,
-                        textColor: AppTheme.blackColor,
-                        borderRadius: 10.0,
-                        height: screenHeight * 0.055,
-                      ),
-                      SizedBox(height: screenHeight * 0.02),
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: CustomDivider(
-                              thickness: 1,
-                              height: 1.0,
-                              indent: 0,
-                              endIndent: 0,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.02),
-                            child: const Text(
-                              "OR",
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                color: AppTheme.whiteColor,
-                                fontSize: 14.0,
-                                fontStyle: FontStyle.normal,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                          const Expanded(
-                            child: CustomDivider(
-                              thickness: 1,
-                              height: 1.0,
-                              indent: 0,
-                              endIndent: 0,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
                       SizedBox(height: screenHeight * 0.02),
                       Form(
                         key: _formKey,
@@ -205,13 +152,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             CustomTextField(
                               controller: emailController,
-                              hintText: "person@gmail.com",
+                              hintText: "Registerd Email",
                               backgroundColor: AppTheme.whiteColor,
                               textColor: AppTheme.blackColor,
                               hintTextColor: AppTheme.greyColor,
                               validator: (value) {
-                                if (value!.isEmpty) {
-                                  Utils().toastMessage('Enter right email');
+                                if (value!.isEmpty ||
+                                    !value.endsWith('@gmail.com')) {
+                                  Utils().toastMessage(
+                                      'Enter proper email address');
                                 }
                                 return null;
                               },

@@ -42,7 +42,7 @@ class AppRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case splash:
-        return MaterialPageRoute(builder: (_) => const SplashScreens());
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
       case profile:
         return MaterialPageRoute(
             builder: (_) => const ProfileSetup(

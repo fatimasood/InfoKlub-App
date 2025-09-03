@@ -1,5 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../app/routes.dart';
+import 'package:infoklub/utils/utils.dart';
 import '../../app/theme.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_textfield.dart';
@@ -12,11 +13,29 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
-  bool _isPasswordHidden = true;
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+    //controller
+    final formKey = GlobalKey<FormState>();
+    final emailController = TextEditingController();
+    final auth = FirebaseAuth.instance;
+
+    void reset() {
+      auth
+          .sendPasswordResetEmail(email: emailController.text.toString())
+          .then((value) {
+        Utils().toastMessage(
+            'We have sent you email to recover password, please check email');
+
+        Future.delayed(const Duration(seconds: 5));
+        Navigator.pop(context);
+      }).onError((error, stackTrace) {
+        Utils().toastMessage("Try Again..!");
+      });
+    }
 
     return Scaffold(
       backgroundColor: AppTheme.secondaryColor,
@@ -46,7 +65,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             left: screenWidth * 0.1,
             width: screenWidth * 0.8,
             child: Container(
-              height: screenHeight * 0.43,
+              height: screenHeight * 0.38,
               decoration: BoxDecoration(
                 color: AppTheme.primaryColor,
                 borderRadius: BorderRadius.circular(25.0),
@@ -80,67 +99,44 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       ),
                       SizedBox(height: screenHeight * 0.01),
                       Text(
-                        "We send you Email please check\n your Mail and Complete OTP Code ",
+                        "We have sent you email to recover password\n  please check email ",
                         style:
                             AppTheme.getResponsiveTextTheme(context).bodyLarge,
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: screenHeight * 0.02),
-                      CustomTextField(
-                        hintText: "Create New Password",
-                        backgroundColor: AppTheme.whiteColor,
-                        textColor: AppTheme.blackColor,
-                        hintTextColor: AppTheme.greyColor,
-                        obscureText: _isPasswordHidden,
-                        rightWidget: IconButton(
-                          icon: Icon(
-                            _isPasswordHidden
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          color: AppTheme.greyColor,
-                          iconSize: screenHeight * 0.02,
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordHidden = !_isPasswordHidden;
-                            });
-                          },
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.02),
-                      CustomTextField(
-                        hintText: "Confirm Password",
-                        backgroundColor: AppTheme.whiteColor,
-                        textColor: AppTheme.blackColor,
-                        hintTextColor: AppTheme.greyColor,
-                        obscureText: _isPasswordHidden,
-                        rightWidget: IconButton(
-                          icon: Icon(
-                            _isPasswordHidden
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          color: AppTheme.greyColor,
-                          iconSize: screenHeight * 0.02,
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordHidden = !_isPasswordHidden;
-                            });
+                      SizedBox(height: screenHeight * 0.025),
+                      Form(
+                        key: formKey,
+                        child: CustomTextField(
+                          hintText: "Registered Email",
+                          backgroundColor: AppTheme.whiteColor,
+                          textColor: AppTheme.blackColor,
+                          hintTextColor: AppTheme.greyColor,
+                          keyboardType: TextInputType.emailAddress,
+                          controller: emailController,
+                          validator: (value) {
+                            if (value!.isEmpty ||
+                                !value.endsWith('@gmail.com')) {
+                              Utils()
+                                  .toastMessage('Enter proper email address');
+                            }
+                            return null;
                           },
                         ),
                       ),
                       SizedBox(height: screenHeight * 0.03),
                       CustomButton(
-                        text: "Create Account",
+                        text: "Reset Password",
                         onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.onboardfirst);
+                          if (formKey.currentState!.validate()) {
+                            reset();
+                          }
                         },
                         color: AppTheme.secondaryColor,
                         textColor: AppTheme.whiteColor,
                         borderRadius: 10.0,
                         height: screenHeight * 0.055,
                       ),
-                      SizedBox(height: screenHeight * 0.03),
                     ],
                   ),
                 ),

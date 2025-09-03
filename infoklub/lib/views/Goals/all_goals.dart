@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/main.dart';
 import 'package:infoklub/models/goals/goal_model.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/viewmodels/goal_viewmodel/goal_viemodel.dart';
 import 'package:infoklub/views/Goals/add_goal.dart';
 import 'package:infoklub/widgets/custom_button.dart';

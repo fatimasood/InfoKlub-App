@@ -1,19 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
-import 'package:infoklub/main.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/views/create_profile/profile_setup.dart';
 import '../../app/routes.dart';
 import '../../app/theme.dart';
 import '../../widgets/custom_button.dart';
-import '../../widgets/custom_divider.dart';
 import '../../widgets/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-//current user
-
-String? email = FirebaseAuth.instance.currentUser!.email;
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -75,7 +70,8 @@ class _SignupScreenState extends State<SignupScreen> {
       );
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
-      Utils().toastMessage(error.toString());
+      Utils()
+          .toastMessage("Failed to register your account.Try Again Later..!!");
     });
   }
 
@@ -161,7 +157,7 @@ class _SignupScreenState extends State<SignupScreen> {
             left: screenWidth * 0.1,
             width: screenWidth * 0.8,
             child: Container(
-              height: screenHeight * 0.6,
+              height: screenHeight * 0.5,
               decoration: BoxDecoration(
                 color: AppTheme.primaryColor,
                 borderRadius: BorderRadius.circular(25.0),
@@ -222,13 +218,12 @@ class _SignupScreenState extends State<SignupScreen> {
                         CustomTextField(
                           controller: emailController,
                           validator: (value) {
-                            if (value!.isEmpty) {
-                              Utils().toastMessage('Enter email address');
-                            }
-                            if (!value.endsWith('@gmail.com')) {
+                            if (value!.isEmpty ||
+                                !value.endsWith('@gmail.com')) {
                               Utils()
-                                  .toastMessage('Enter proper gmail address');
+                                  .toastMessage('Enter proper email address');
                             }
+
                             return null;
                           },
                           hintText: "Email",
@@ -240,13 +235,13 @@ class _SignupScreenState extends State<SignupScreen> {
                         CustomTextField(
                           controller: phoneNumberController,
                           validator: (value) {
-                            if (value!.isEmpty) {
-                              Utils().toastMessage('Enter phone number');
+                            if (value!.isEmpty || value.length >= 11) {
+                              Utils().toastMessage('Enter proper phone number');
                             }
 
                             return null;
                           },
-                          hintText: "$_selectedCode 726-0592",
+                          hintText: "3200784539",
                           backgroundColor: Colors.white,
                           textColor: Colors.black,
                           hintTextColor: Colors.grey,
@@ -255,6 +250,34 @@ class _SignupScreenState extends State<SignupScreen> {
                               showCountryPicker(
                                 context: context,
                                 showPhoneCode: true,
+                                countryListTheme: const CountryListThemeData(
+                                  searchTextStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
+                                  inputDecoration: InputDecoration(
+                                    fillColor: Colors.white,
+                                    filled: true,
+                                    hintText: 'Search country',
+                                    prefixIcon: Icon(
+                                      Icons.search,
+                                      color: Colors.grey,
+                                    ),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: AppTheme.primaryColor)),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: AppTheme.primaryColor)),
+                                  ),
+                                  backgroundColor: Colors.white,
+                                  textStyle: TextStyle(
+                                      color: Colors.black, fontSize: 16),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
+                                ),
                                 onSelect: (Country country) {
                                   if (kDebugMode) {
                                     print(
@@ -270,8 +293,8 @@ class _SignupScreenState extends State<SignupScreen> {
                             },
                             child: Text(
                               _selectedFlag, // Display emoji directly
-                              style:
-                                  const TextStyle(fontSize: 24), // Adjust size
+                              style: const TextStyle(
+                                  fontSize: 24, color: Colors.black),
                             ),
                           ),
                         ),
@@ -334,14 +357,11 @@ class _SignupScreenState extends State<SignupScreen> {
                         CustomTextField(
                           controller: passwordController,
                           validator: (value) {
-                            if (value!.isEmpty) {
-                              Utils().toastMessage('Kindly set any password');
-                            }
-                            if (value.length < 6) {
+                            if (value!.isEmpty || value.length < 6) {
                               Utils().toastMessage(
-                                'Password should be at least 6 characters long',
-                              );
+                                  'Kindly set any password that is atleast 6 charecters long and strong');
                             }
+
                             return null;
                           },
                           hintText: "***********",
@@ -378,57 +398,6 @@ class _SignupScreenState extends State<SignupScreen> {
                           height: screenHeight * 0.055,
                         ),
                         SizedBox(height: screenHeight * 0.01),
-                        Row(
-                          children: [
-                            const Expanded(
-                              child: CustomDivider(
-                                thickness: 1,
-                                height: 1.0,
-                                indent: 0,
-                                endIndent: 0,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: screenWidth * 0.01),
-                              child: const Text(
-                                "OR",
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  color: AppTheme.whiteColor,
-                                  fontSize: 14.0,
-                                  fontStyle: FontStyle.normal,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                            const Expanded(
-                              child: CustomDivider(
-                                thickness: 1,
-                                height: 1.0,
-                                indent: 0,
-                                endIndent: 0,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: screenHeight * 0.01),
-                        CustomButton(
-                          icon: const Icon(
-                            Icons.phone,
-                            color: AppTheme.blackColor,
-                          ),
-                          text: 'Sign up with Phone',
-                          onPressed: () {
-                            Navigator.pushNamed(context, AppRoutes.phone);
-                          },
-                          color: AppTheme.whiteColor,
-                          textColor: AppTheme.blackColor,
-                          borderRadius: 10.0,
-                          height: screenHeight * 0.055,
-                        ),
                       ],
                     ),
                   ),

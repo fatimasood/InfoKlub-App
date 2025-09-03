@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:infoklub/main.dart';
 import 'package:infoklub/models/education/education_model.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/widgets/drag_dropfile.dart';

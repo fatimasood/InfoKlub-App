@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:infoklub/models/career/career_model.dart';
 import 'package:infoklub/models/goals/goal_model.dart';
 import 'package:infoklub/models/reminder/reminder_model.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
+import 'package:infoklub/views/splash_view/splash_screens.dart';
 import 'package:provider/provider.dart';
 import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
@@ -32,12 +35,13 @@ import 'package:infoklub/viewmodels/profile_setup/finishprofile_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/link_add_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/profilesetup_viewmodel.dart';
 import 'package:infoklub/viewmodels/rating/rating_viewmodel.dart';
-import 'package:infoklub/viewmodels/splash_viewmodel.dart';
-
-String userMail = '';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
   await Firebase.initializeApp();
 
   await Hive.initFlutter();

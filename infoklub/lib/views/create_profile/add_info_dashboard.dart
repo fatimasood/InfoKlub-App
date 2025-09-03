@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/main.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
 import 'package:provider/provider.dart';
