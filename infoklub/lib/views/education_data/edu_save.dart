@@ -17,7 +17,7 @@ class EduSave extends StatefulWidget {
 class _EduSaveState extends State<EduSave> {
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<EduinfoViewmodel>(context, listen: false);
+    final viewModel = Provider.of<EduinfoViewmodel>(context);
     final educationList = viewModel.getAllEducationEntries(userMail);
 
     final screenWidth = MediaQuery.of(context).size.width;

@@ -36,7 +36,13 @@ class EduinfoViewmodel extends ChangeNotifier {
     final box = Hive.box('userBox');
 
     try {
-      final rawList = box.get("eduInfo_$email", defaultValue: []);
+      final rawList = box.get("eduInfo_$email", defaultValue: []) as List;
+
+      for (int i = 0; i < rawList.length; i++) {
+        final edu = rawList[i] as EducationInfo;
+        print("📂 Uploaded Docs: ${edu.uploadedDocs.join(', ')}");
+      }
+
       final List<EducationInfo> existingList =
           List<EducationInfo>.from(rawList);
       existingList.add(info);
@@ -80,6 +86,7 @@ class EduinfoViewmodel extends ChangeNotifier {
 
       if (index >= 0 && index < existingList.length) {
         existingList.removeAt(index);
+        notifyListeners();
         await box.put("eduInfo_$email", existingList);
         notifyListeners();
         print("🗑️ Deleted education entry at index $index");

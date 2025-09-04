@@ -4,12 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/models/education/education_model.dart';
 import 'package:infoklub/services/firebase_services/splash_services.dart';
+import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/views/education_data/custom_form.dart';
 import 'package:infoklub/widgets/drag_dropfile.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
-import 'widget/custom_form.dart';
 
 class EduInfo extends StatefulWidget {
   final String degreeName;
@@ -273,6 +274,16 @@ class _EducationInfoView extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
+                      // check data is enter than moce to next screen
+                      if (degreeController.text.isEmpty ||
+                          institutionController.text.isEmpty ||
+                          totalGradeController.text.isEmpty ||
+                          scoreGradeController.text.isEmpty ||
+                          startYearController.text.isEmpty ||
+                          endYearController.text.isEmpty) {
+                        Utils().toastMessage("Enter all required fields");
+                      }
+
                       final viewmodel =
                           Provider.of<EduinfoViewmodel>(context, listen: false);
                       final String email = userMail;
