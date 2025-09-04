@@ -17,12 +17,8 @@ class SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-
     _viewModel = SplashScreenViewModel();
-
     _viewModel.initializeAnimation(this);
-    _viewModel.navigateAfterDelay(context);
-
     splashScreen.isLogin(context);
   }
 

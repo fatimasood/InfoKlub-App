@@ -4,17 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/models/user/user_profile_model.dart';
 import 'package:infoklub/services/firebase_services/auth_service.dart';
 import 'package:infoklub/utils/utils.dart';
+import 'package:infoklub/views/authentecation_view/login_screen.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/nav_bar_models/navigation_viewmodel.dart';
 
 class AppDrawer extends StatefulWidget {
-  //final NavigationViewModel viewModel;
-
   const AppDrawer({super.key});
 
   @override
@@ -27,7 +25,11 @@ class _AppDrawerState extends State<AppDrawer> {
     try {
       await FirebaseAuth.instance.signOut();
       // Logout successful - navigate to login
-      Navigator.pushNamed(context, AppRoutes.login);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
     } catch (e) {
       if (kDebugMode) {
         print("Logout error: $e");

@@ -45,6 +45,9 @@ class ReusableForm extends StatelessWidget {
             controller: degreeController,
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter your degree name'
+                : null,
             textColor: Colors.black,
             onChanged: (val) {},
           ),
@@ -62,6 +65,9 @@ class ReusableForm extends StatelessWidget {
             controller: institutionController,
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter institution name'
+                : null,
             textColor: Colors.black,
             onChanged: (val) {},
           ),
@@ -79,6 +85,9 @@ class ReusableForm extends StatelessWidget {
             controller: totalGradeController,
             keyboardType: TextInputType.number,
             backgroundColor: Colors.white,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter your total grade'
+                : null,
             textColor: Colors.black,
             onChanged: (val) {},
           ),
@@ -95,6 +104,9 @@ class ReusableForm extends StatelessWidget {
             hintText: "3.5",
             controller: scoreGradeController,
             keyboardType: TextInputType.number,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter your score grade'
+                : null,
             textColor: Colors.black,
             onChanged: (val) {},
           ),
@@ -112,6 +124,9 @@ class ReusableForm extends StatelessWidget {
             controller: startYearController,
             keyboardType: TextInputType.datetime,
             textColor: Colors.black,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter start year'
+                : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
@@ -128,6 +143,8 @@ class ReusableForm extends StatelessWidget {
             controller: endYearController,
             keyboardType: TextInputType.number,
             textColor: Colors.black,
+            validator: (value) =>
+                value == null || value.isEmpty ? 'Please enter end year' : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
@@ -145,6 +162,9 @@ class ReusableForm extends StatelessWidget {
             controller: achievementsController,
             keyboardType: TextInputType.text,
             textColor: Colors.black,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter your achievements'
+                : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 16.0),

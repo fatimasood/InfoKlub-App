@@ -18,6 +18,7 @@ class CustomInput extends StatefulWidget {
   final Function(String)? onCountrySelected;
   final String? initialValue;
   final Function(String)? onChanged;
+  final Function(String)? validator;
 
   const CustomInput({
     super.key,
@@ -38,6 +39,7 @@ class CustomInput extends StatefulWidget {
     this.textAlign = TextAlign.start,
     this.initialValue,
     this.onChanged,
+    this.validator,
   });
 
   @override
@@ -52,6 +54,16 @@ class _CustomInputState extends State<CustomInput> {
     super.initState();
     _internalController = widget.controller ??
         TextEditingController(text: widget.initialValue ?? '');
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller == null &&
+        widget.initialValue != oldWidget.initialValue &&
+        widget.initialValue != _internalController.text) {
+      _internalController.text = widget.initialValue ?? '';
+    }
   }
 
   @override
@@ -85,7 +97,7 @@ class _CustomInputState extends State<CustomInput> {
               child: widget.leftWidget!,
             ),
           Expanded(
-            child: TextField(
+            child: TextFormField(
               controller: _internalController,
               keyboardType: widget.keyboardType,
               obscureText: widget.obscureText,
@@ -99,6 +111,12 @@ class _CustomInputState extends State<CustomInput> {
                 border: InputBorder.none,
               ),
               onChanged: widget.onChanged,
+              validator: (value) {
+                if (widget.validator != null) {
+                  return widget.validator!(value ?? '');
+                }
+                return null;
+              },
             ),
           ),
           if (widget.rightWidget != null) widget.rightWidget!,

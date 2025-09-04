@@ -43,14 +43,19 @@ class _ProfileSetupState extends State<ProfileSetup> {
         vm.updateCountry(widget.initialFlag, widget.initialCode);
         return vm;
       },
-      child: const _ProfileSetupView(),
+      child: _ProfileSetupView(),
     );
   }
 }
 
-class _ProfileSetupView extends StatelessWidget {
+class _ProfileSetupView extends StatefulWidget {
   const _ProfileSetupView();
 
+  @override
+  State<_ProfileSetupView> createState() => _ProfileSetupViewState();
+}
+
+class _ProfileSetupViewState extends State<_ProfileSetupView> {
   get personImage => Image.asset(
         "lib/assets/Images/person.png",
         fit: BoxFit.cover,
@@ -60,7 +65,7 @@ class _ProfileSetupView extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<ProfileSetupViewModel>(context);
     //final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    //final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: AppTheme.halfwhite,
@@ -96,21 +101,6 @@ class _ProfileSetupView extends StatelessWidget {
                             ? personImage
                             : null,
                       ),
-                      /*Positioned(
-                        bottom: 10,
-                        right: 0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 209, 209, 209),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color.fromARGB(255, 209, 209, 209),
-                              width: 2.0,
-                            ),
-                          ),
-                          //child: const Icon(Icons.edit),
-                        ),
-                      ),*/
                     ],
                   ),
                 ),
@@ -129,7 +119,14 @@ class _ProfileSetupView extends StatelessWidget {
                               },
                               decoration: const InputDecoration(
                                 hintText: 'Enter Name',
-                                border: UnderlineInputBorder(),
+                                border: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: AppTheme.textColor, width: 1.0),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: AppTheme.textColor, width: 1.0),
+                                ),
                               ),
                               style: AppTheme.getResponsiveTextTheme(context)
                                   .labelMedium,
@@ -150,7 +147,7 @@ class _ProfileSetupView extends StatelessWidget {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 20.0, bottom: 15.0),
+                  padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -178,7 +175,7 @@ class _ProfileSetupView extends StatelessWidget {
                         initialValue: viewModel.phone,
                         backgroundColor: AppTheme.halfwhite,
                         keyboardType: TextInputType.phone,
-                        hintText: "${viewModel.selectedCode} 726-0592",
+                        hintText: "${viewModel.selectedCode} 72600000592",
                         textColor: Colors.black,
                         hintTextColor: Colors.grey,
                         leftWidget: GestureDetector(
@@ -219,39 +216,39 @@ class _ProfileSetupView extends StatelessWidget {
                       ),
                       const SizedBox(height: 8.0),
                       Text(
-                        "City",
+                        "Address",
                         style: AppTheme.getResponsiveTextTheme(context)
                             .displaySmall,
                       ),
                       const SizedBox(height: 6.0),
                       CustomInput(
-                        hintText: 'City',
+                        hintText: 'City, Country',
                         backgroundColor: AppTheme.halfwhite,
                         keyboardType: TextInputType.streetAddress,
                         onChanged: (val) => viewModel.updateCity(val),
                       ),
                       const SizedBox(height: 8.0),
                       Text(
-                        "Bio",
+                        "Designation",
                         style: AppTheme.getResponsiveTextTheme(context)
                             .displaySmall,
                       ),
                       const SizedBox(height: 6.0),
                       CustomInput(
-                        height: screenHeight * 0.20,
-                        hintText: 'About',
+                        hintText: 'Software Engineer',
                         backgroundColor: AppTheme.halfwhite,
-                        keyboardType: TextInputType.multiline,
+                        keyboardType: TextInputType.text,
                         textAlign: TextAlign.start,
                         onChanged: (val) => viewModel.updateBio(val),
                       ),
-                      const SizedBox(height: 10.0),
+                      const SizedBox(height: 40.0),
                       CustomButton(
                         text: "Next",
-                        onPressed: () =>
-                            viewModel.navigateToNextScreen(context),
+                        onPressed: () {
+                          viewModel.navigateToNextScreen(context);
+                        },
                         color: AppTheme.secondaryColor,
-                        borderRadius: 10.0,
+                        textColor: Colors.white,
                       ),
                     ],
                   ),

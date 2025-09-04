@@ -6,7 +6,6 @@ import 'package:infoklub/views/home_view/main_home.dart';
 import '../../app/routes.dart';
 import '../../app/theme.dart';
 import '../../widgets/custom_button.dart';
-import '../../widgets/custom_divider.dart';
 import '../../widgets/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 

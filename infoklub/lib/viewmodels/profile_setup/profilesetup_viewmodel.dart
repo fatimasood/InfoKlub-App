@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:infoklub/models/user/user_profile_model.dart';
 import 'package:infoklub/services/firebase_services/auth_service.dart';
+import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/profile_setup/finishprofile_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
@@ -105,7 +106,7 @@ class ProfileSetupViewModel with ChangeNotifier {
       final model = UserProfileModel(
         name: _name.trim(),
         email: _email.trim(),
-        phone: '+$_selectedCode $_phone'.trim(),
+        phone: '$_selectedCode $_phone'.trim(),
         dob: _dob.trim(),
         city: _city.trim(),
         bio: _bio.trim(),
@@ -124,9 +125,24 @@ class ProfileSetupViewModel with ChangeNotifier {
       print('❌ Error saving profile to Hive: $e');
     }
   }
+  // validation check
+
+  bool isProfileComplete() {
+    return _name.trim().isNotEmpty &&
+        _email.trim().isNotEmpty &&
+        _phone.trim().isNotEmpty &&
+        _dob.trim().isNotEmpty &&
+        _city.trim().isNotEmpty &&
+        _bio.trim().isNotEmpty &&
+        _selectedImage != null;
+  }
 
   // Navigate Next
   void navigateToNextScreen(BuildContext context) async {
+    if (!isProfileComplete()) {
+      Utils().toastMessage('All Fields are required');
+      return;
+    }
     final profileProvider =
         Provider.of<FinishprofileViewmodel>(context, listen: false);
 
@@ -139,4 +155,3 @@ class ProfileSetupViewModel with ChangeNotifier {
     Navigator.pushNamed(context, AppRoutes.addlinks);
   }
 }
-// This ViewModel handles the logic for setting up a user profile.

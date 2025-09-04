@@ -44,6 +44,9 @@ class ReusableFormCareer extends StatelessWidget {
             controller: companyNameController,
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter company name'
+                : null,
             textColor: Colors.black,
             onChanged: (val) {},
           ),
@@ -62,6 +65,9 @@ class ReusableFormCareer extends StatelessWidget {
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
             textColor: Colors.black,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter your job title'
+                : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
@@ -79,6 +85,8 @@ class ReusableFormCareer extends StatelessWidget {
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
             textColor: Colors.black,
+            validator: (value) =>
+                value == null || value.isEmpty ? 'Please enter location' : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
@@ -95,6 +103,9 @@ class ReusableFormCareer extends StatelessWidget {
             controller: startDateController,
             keyboardType: TextInputType.datetime,
             textColor: Colors.black,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter start date'
+                : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
@@ -111,6 +122,8 @@ class ReusableFormCareer extends StatelessWidget {
             controller: endDateController,
             keyboardType: TextInputType.datetime,
             textColor: Colors.black,
+            validator: (value) =>
+                value == null || value.isEmpty ? 'Please enter end date' : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
@@ -129,6 +142,9 @@ class ReusableFormCareer extends StatelessWidget {
             controller: responsibilitiesController,
             keyboardType: TextInputType.multiline,
             textColor: Colors.black,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter your responsibilities'
+                : null,
             onChanged: (val) {},
           ),
         ],
