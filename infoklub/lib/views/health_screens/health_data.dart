@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_visible_for_testing_member
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:infoklub/services/firebase_services/splash_services.dart';
@@ -166,6 +168,7 @@ class _HealthDataState extends State<HealthData> {
                               onPressed: () {
                                 viewModel.uploadedDocs.removeAt(index);
 
+                                // ignore: invalid_use_of_protected_member
                                 viewModel.notifyListeners(); // To update the UI
                               },
                             ),
