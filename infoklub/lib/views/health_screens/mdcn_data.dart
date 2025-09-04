@@ -26,8 +26,7 @@ class _MdcnDataState extends State<MdcnData> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      resizeToAvoidBottomInset:
-          false, // Prevent button from moving when the keyboard appears
+      resizeToAvoidBottomInset: false,
       body: Column(
         children: [
           Expanded(
@@ -121,7 +120,9 @@ class _MdcnDataState extends State<MdcnData> {
                               }
                             },
                             decoration: InputDecoration(
-                              hintText: _showHintText ? "Add symptom" : null,
+                              hintText: _showHintText
+                                  ? "Add symptom or medicines"
+                                  : null,
                               hintStyle: const TextStyle(color: Colors.grey),
                               border: InputBorder.none,
                             ),

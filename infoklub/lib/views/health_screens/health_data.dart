@@ -10,9 +10,14 @@ import 'package:infoklub/app/theme.dart';
 
 import '../../app/routes.dart';
 
-class HealthData extends StatelessWidget {
+class HealthData extends StatefulWidget {
   const HealthData({super.key});
 
+  @override
+  State<HealthData> createState() => _HealthDataState();
+}
+
+class _HealthDataState extends State<HealthData> {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<HealthDataViewModel>(context);
