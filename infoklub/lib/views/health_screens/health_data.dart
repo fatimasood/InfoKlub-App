@@ -1,23 +1,48 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/widgets/drag_dropfile.dart';
 import 'package:provider/provider.dart';
 import 'package:infoklub/app/theme.dart';
-
 import '../../app/routes.dart';
 
 class HealthData extends StatefulWidget {
-  const HealthData({super.key});
+  final bool isEdit;
+  const HealthData({super.key, this.isEdit = false});
 
   @override
   State<HealthData> createState() => _HealthDataState();
 }
 
 class _HealthDataState extends State<HealthData> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final vm = context.read<HealthDataViewModel>();
+      vm.initialize(userEmail);
+      if (widget.isEdit) {
+        vm.loadHealthData().then((_) {
+          setState(() {
+            _enteredSymptoms.clear();
+            _enteredSymptoms.addAll(vm.selectedSymptoms);
+          });
+        });
+      }
+    });
+  }
+
+  //sympotoms medicines
+
+  final TextEditingController _textController = TextEditingController();
+  final List<String> _enteredSymptoms = [];
+  bool _showHintText = true;
+
+  String get userEmail => userMail;
+
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<HealthDataViewModel>(context);
@@ -36,7 +61,7 @@ class _HealthDataState extends State<HealthData> {
           ),
         ),
         title: Text(
-          "Add Health Information",
+          widget.isEdit ? "Edit Health Info" : "Add Health Info",
           style: AppTheme.getResponsiveTextTheme(context).labelLarge,
         ),
         centerTitle: true,
@@ -307,6 +332,95 @@ class _HealthDataState extends State<HealthData> {
                             ))
                         .toList(),
                   ),
+                const SizedBox(height: 30),
+
+                // for sympotoms
+
+                const Text(
+                  "Do you have any symptoms/allergy?",
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter',
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(10.0),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppTheme.tealAccent, width: 2),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Wrap(
+                    spacing: 4.0,
+                    children: [
+                      // Display the entered symptoms as chips
+                      ..._enteredSymptoms.map((symptom) {
+                        return Chip(
+                          label: Text(
+                            symptom,
+                            style: const TextStyle(
+                                color: AppTheme.tealAccent,
+                                fontSize: 14,
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w700),
+                          ),
+                          backgroundColor: AppTheme.backgreen,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: const BorderSide(color: AppTheme.backgreen),
+                          ),
+                          deleteIcon: const Icon(Icons.close,
+                              size: 18, color: AppTheme.tealAccent),
+                          onDeleted: () {
+                            setState(() {
+                              _enteredSymptoms.remove(symptom);
+                              if (_enteredSymptoms.isEmpty) {
+                                _showHintText = true;
+                              }
+                            });
+                          },
+                        );
+                      }),
+                      // Input field for adding symptoms
+                      SizedBox(
+                        width: 150,
+                        child: TextField(
+                          controller: _textController,
+                          style: const TextStyle(
+                            color: Colors.black,
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              _showHintText = false; // Hide hint when typing
+                            });
+                          },
+                          onSubmitted: (value) {
+                            if (value.isNotEmpty) {
+                              setState(() {
+                                final symptomVM =
+                                    Provider.of<HealthDataViewModel>(context,
+                                        listen: false);
+                                symptomVM.addSymptom(value);
+                                _enteredSymptoms.add(value);
+                                _textController.clear();
+                              });
+                            }
+                          },
+                          decoration: InputDecoration(
+                            hintText: _showHintText
+                                ? "Add symptom or medicines"
+                                : null,
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 100),
               ],
             ),
@@ -321,7 +435,7 @@ class _HealthDataState extends State<HealthData> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (viewModel.selectedBloodType == null ||
                         viewModel.selectedMedications.isEmpty) {
                       Utils().toastMessage(
@@ -330,7 +444,26 @@ class _HealthDataState extends State<HealthData> {
                       return;
                     }
 
-                    Navigator.pushNamed(context, AppRoutes.mdcndata);
+                    if (widget.isEdit) {
+                      // 🔹 Update existing
+                      await viewModel.updateHealthData();
+                      Utils()
+                          .toastMessage("Health record updated successfully!");
+                      Navigator.pop(context, true); // return back after editing
+                    } else {
+                      // 🔹 Save new
+                      await viewModel.saveHealthData();
+                      Utils().toastMessage(
+                          "Your health record saved successfully...");
+                      await Future.delayed(const Duration(milliseconds: 500));
+
+                      if (!mounted) return;
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRoutes.infodashboard,
+                        arguments: viewModel.userEmail,
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.tealAccent,
@@ -340,7 +473,7 @@ class _HealthDataState extends State<HealthData> {
                     ),
                   ),
                   child: const Text(
-                    "Continue",
+                    "Save Information",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,

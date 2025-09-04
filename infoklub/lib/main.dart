@@ -26,7 +26,6 @@ import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/viewmodels/goal_viewmodel/goal_viemodel.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
-import 'package:infoklub/viewmodels/health/mdcn_viewmodel.dart';
 import 'package:infoklub/viewmodels/nav_bar_models/navigation_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/finishprofile_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/link_add_viewmodel.dart';
@@ -105,7 +104,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
         ChangeNotifierProvider(create: (_) => RatingViewModel()),
         ChangeNotifierProvider(create: (_) => HealthDataViewModel()),
-        ChangeNotifierProvider(create: (_) => MdcnDataViewModel()),
         ChangeNotifierProvider(create: (_) => EduinfoViewmodel()),
         ChangeNotifierProvider(create: (_) => FinishprofileViewmodel()),
         ChangeNotifierProvider(

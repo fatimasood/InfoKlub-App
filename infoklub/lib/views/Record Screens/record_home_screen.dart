@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
+import 'package:infoklub/views/health_screens/health_data.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/custom_card.dart';
 
 class RecordsPage extends StatelessWidget {
@@ -8,9 +11,6 @@ class RecordsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final screenWidth = MediaQuery.of(context).size.width;
-    //  final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: AppTheme.halfwhite,
       resizeToAvoidBottomInset: false,
@@ -35,12 +35,23 @@ class RecordsPage extends StatelessWidget {
                   if (kDebugMode) {
                     print("Edit tapped!");
                   }
+
+                  //move on health screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const HealthData(isEdit: true),
+                    ),
+                  );
                 },
                 downloadAction: () {
                   // Handle download action
                   if (kDebugMode) {
                     print("Download tapped!");
                   }
+
+                  final vm = context.read<HealthDataViewModel>();
+                  vm.downloadHealthDocs(context);
                 },
               ),
               const SizedBox(height: 15.0),
@@ -60,6 +71,9 @@ class RecordsPage extends StatelessWidget {
                   if (kDebugMode) {
                     print("Edit tapped!");
                   }
+                  //move to education
+
+                  Navigator.pushReplacementNamed(context, '/eduSave');
                 },
                 downloadAction: () {
                   // Handle download action
@@ -85,6 +99,9 @@ class RecordsPage extends StatelessWidget {
                   if (kDebugMode) {
                     print("Edit tapped!");
                   }
+                  //move to career
+
+                  Navigator.pushReplacementNamed(context, '/careerInfo');
                 },
                 downloadAction: () {
                   // Handle download action

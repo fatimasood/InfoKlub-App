@@ -1,10 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:infoklub/models/health/health_model.dart';
 import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
+import 'package:infoklub/utils/utils.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 class HealthDataViewModel extends ChangeNotifier {
   late String userEmail;
+  final TextEditingController symptomController = TextEditingController();
+  final List<String> _selectedSymptoms = [];
 
   void initialize(String email) {
     userEmail = email;
@@ -78,6 +86,10 @@ class HealthDataViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> updateHealthData() async {
+    await saveHealthData();
+  }
+
   Future<void> captureWithCamera() async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.camera);
@@ -85,6 +97,42 @@ class HealthDataViewModel extends ChangeNotifier {
       uploadedDocs.add(pickedImage.path);
       notifyListeners();
     }
+  }
+
+  // Getter to access the selected symptoms
+  List<String> get selectedSymptoms => _selectedSymptoms;
+
+  // Method to add a symptom
+  void addSymptom(String symptom) {
+    if (symptom.isNotEmpty && _selectedSymptoms.length < 10) {
+      _selectedSymptoms.add(symptom);
+      symptomController.clear();
+      notifyListeners();
+    }
+  }
+
+// Method to remove a symptom
+  void removeSymptom(String symptom) {
+    _selectedSymptoms.remove(symptom);
+    notifyListeners();
+  }
+
+// Method to save symptoms (you can add your save logic here)
+  void saveSymptoms() {
+    if (_selectedSymptoms.isNotEmpty) {
+      // Example logic for saving symptoms
+      print("Saved Symptoms: $_selectedSymptoms");
+      // Add your saving logic here (e.g., API call, local storage, etc.)
+    } else {
+      print("No symptoms to save.");
+    }
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the controller when the ViewModel is no longer in use
+    symptomController.dispose();
+    super.dispose();
   }
 
   bool hasData() {
@@ -116,7 +164,7 @@ class HealthDataViewModel extends ChangeNotifier {
       bloodType: selectedBloodType ?? "Unknown",
       medications: List.from(selectedMedications),
       documentPaths: List.from(uploadedDocs),
-      allergies: allergies,
+      allergies: List.from(_selectedSymptoms),
     );
     await box.put('user_health', healthData);
 
@@ -135,5 +183,27 @@ class HealthDataViewModel extends ChangeNotifier {
     if (kDebugMode) {
       print("Allergies: ${healthData.allergies}");
     }
+  }
+
+  // download documents
+
+  Future<void> downloadHealthDocs(BuildContext context) async {
+    final vm = context.read<HealthDataViewModel>();
+    final docs = vm.uploadedDocs;
+
+    final dir = await getExternalStorageDirectory();
+    final downloadPath = "${dir!.path}/HealthDocs";
+    await Directory(downloadPath).create(recursive: true);
+
+    for (final path in docs) {
+      final file = File(path);
+      if (file.existsSync()) {
+        final newFile =
+            await file.copy("$downloadPath/${path.split('/').last}");
+        debugPrint("Saved to ${newFile.path}");
+      }
+    }
+
+    Utils().toastMessage("All health docs downloaded in your device");
   }
 }

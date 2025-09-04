@@ -12,7 +12,6 @@ import '../views/career_screens/carrer_all_info.dart';
 import '../views/create_profile/profile_setup.dart';
 import '../views/authentecation_view/login_screen.dart';
 import '../views/education_data/edu_save.dart';
-import '../views/health_screens/mdcn_data.dart';
 import '../views/onboarding_screens_view/onboarding_screen_one.dart';
 import '../views/splash_view/splash_screens.dart';
 
@@ -21,20 +20,15 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String login = '/login';
   static const String signup = '/signup';
-  static const String phone = '/phone';
   static const String forgotpsd = '/forgotpsd';
   static const String onboardfirst = '/onboardfirst';
   static const String addlinks = '/addlinks';
   static const String infodashboard = '/infodashboard';
   static const String health = '/health';
-  static const String mdcndata = '/mdcndata';
   static const String eduData = '/eduData';
   static const String career = '/career';
   static const String eduSave = '/eduSave';
   static const String feedback = '/feedback';
-
-  //dashboard
-  static const String careerdashboard = '/careerdashboard';
   static const String careerInfo = '/careerallinfo';
   static const String finishScreen = '/dataEnter';
 
@@ -68,8 +62,6 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const ProfileOptions());
       case health:
         return MaterialPageRoute(builder: (_) => const HealthData());
-      case mdcndata:
-        return MaterialPageRoute(builder: (_) => const MdcnData());
 
       case eduData:
         return MaterialPageRoute(
