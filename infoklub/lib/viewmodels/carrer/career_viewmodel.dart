@@ -1,17 +1,17 @@
+import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:infoklub/models/career/career_model.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
+import 'package:infoklub/utils/utils.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CareerViewmodel extends ChangeNotifier {
   List<String> uploadedDocs = [];
-  late String _email;
-
-  String get userEmail => _email;
 
   void initialize(String email) {
-    _email = email;
-    print("CareerViewmodel initialized for: $_email");
+    print("CareerViewmodel initialized for: $userMail");
   }
 
   String jobTitle = '';
@@ -81,10 +81,10 @@ class CareerViewmodel extends ChangeNotifier {
 
   // 🔥 Load & assign to internal list
   Future<void> loadCareerList() async {
-    final box = await HiveHelper.openCareerBox(_email);
+    final box = await HiveHelper.openCareerBox(userMail);
     careerList = box.values.toList();
     notifyListeners();
-    print("🔁 Loaded ${careerList.length} career entries for $_email");
+    print("🔁 Loaded ${careerList.length} career entries for $userMail");
   }
 
   // ❌ Delete
@@ -151,5 +151,34 @@ class CareerViewmodel extends ChangeNotifier {
     location = '';
     uploadedDocs.clear();
     notifyListeners();
+  }
+
+  // download all career documents
+
+  Future<void> downloadCareerDocs(BuildContext context) async {
+    final box = await HiveHelper.openCareerBox(userMail);
+    final entries = box.values.toList();
+
+    if (entries.isEmpty) {
+      Utils().toastMessage("No career docs found.");
+      return;
+    }
+
+    final dir = await getExternalStorageDirectory();
+    final downloadPath = "${dir!.path}/CareerDocs";
+    await Directory(downloadPath).create(recursive: true);
+
+    for (final entry in entries) {
+      for (final path in entry.documentPaths) {
+        final file = File(path);
+        if (file.existsSync()) {
+          final newFile =
+              await file.copy("$downloadPath/${path.split('/').last}");
+          debugPrint("Saved to ${newFile.path}");
+        }
+      }
+    }
+
+    Utils().toastMessage("All career docs downloaded in your device ");
   }
 }

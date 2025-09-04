@@ -30,8 +30,7 @@ class _ProfileOptionsState extends State<ProfileOptions> {
     final healthVM = Provider.of<HealthDataViewModel>(context, listen: false);
     final eduVM = Provider.of<EduinfoViewmodel>(context, listen: false);
     //final careerVM = Provider.of<CareerViewModel>(context, listen: false);
-    healthVM.initialize(email);
-    eduVM.initialize(email);
+
     await healthVM.loadHealthData(); //load from HIve
     await eduVM.loadEducationData(email);
     setState(() {

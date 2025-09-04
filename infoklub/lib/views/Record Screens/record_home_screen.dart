@@ -1,7 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
+import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
+import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
+import 'package:infoklub/views/career_screens/carrer_all_info.dart';
+import 'package:infoklub/views/education_data/edu_save.dart';
 import 'package:infoklub/views/health_screens/health_data.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/custom_card.dart';
@@ -33,7 +38,7 @@ class RecordsPage extends StatelessWidget {
                 editAction: () {
                   // Handle edit action
                   if (kDebugMode) {
-                    print("Edit tapped!");
+                    print("Medical Edit tapped!");
                   }
 
                   //move on health screen
@@ -47,7 +52,7 @@ class RecordsPage extends StatelessWidget {
                 downloadAction: () {
                   // Handle download action
                   if (kDebugMode) {
-                    print("Download tapped!");
+                    print("Medical Download tapped!");
                   }
 
                   final vm = context.read<HealthDataViewModel>();
@@ -69,17 +74,25 @@ class RecordsPage extends StatelessWidget {
                 editAction: () {
                   // Handle edit action
                   if (kDebugMode) {
-                    print("Edit tapped!");
+                    print("Education Edit tapped!");
                   }
                   //move to education
 
-                  Navigator.pushReplacementNamed(context, '/eduSave');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const EduSave(),
+                    ),
+                  );
                 },
                 downloadAction: () {
                   // Handle download action
                   if (kDebugMode) {
-                    print("Download tapped!");
+                    print("Education Download tapped!");
                   }
+
+                  final vm = context.read<EduinfoViewmodel>();
+                  vm.downloadEducationDocs(context);
                 },
               ),
               const SizedBox(height: 15.0),
@@ -97,17 +110,25 @@ class RecordsPage extends StatelessWidget {
                 editAction: () {
                   // Handle edit action
                   if (kDebugMode) {
-                    print("Edit tapped!");
+                    print("Career Edit tapped!");
                   }
                   //move to career
 
-                  Navigator.pushReplacementNamed(context, '/careerInfo');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const CarrerAllInfo(),
+                    ),
+                  );
                 },
                 downloadAction: () {
                   // Handle download action
                   if (kDebugMode) {
-                    print("Download tapped!");
+                    print("Carrer Download tapped!");
                   }
+
+                  final vm = context.read<CareerViewmodel>();
+                  vm.downloadCareerDocs(context);
                 },
               ),
             ],

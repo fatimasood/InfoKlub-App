@@ -4,19 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:infoklub/models/health/health_model.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
 import 'package:infoklub/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 
 class HealthDataViewModel extends ChangeNotifier {
-  late String userEmail;
   final TextEditingController symptomController = TextEditingController();
   final List<String> _selectedSymptoms = [];
-
-  void initialize(String email) {
-    userEmail = email;
-  }
 
   final List<String> bloodTypes = [
     "A+",
@@ -144,7 +139,7 @@ class HealthDataViewModel extends ChangeNotifier {
 
 //fetch health data
   Future<void> loadHealthData() async {
-    final box = await HiveHelper.openHealthBox(userEmail);
+    final box = await HiveHelper.openHealthBox(userMail);
 
     final healthData = box.get('user_health');
 
@@ -159,7 +154,7 @@ class HealthDataViewModel extends ChangeNotifier {
 
 //save data
   Future<void> saveHealthData() async {
-    final box = await HiveHelper.openHealthBox(userEmail);
+    final box = await HiveHelper.openHealthBox(userMail);
     final healthData = HealthModel(
       bloodType: selectedBloodType ?? "Unknown",
       medications: List.from(selectedMedications),
@@ -188,8 +183,16 @@ class HealthDataViewModel extends ChangeNotifier {
   // download documents
 
   Future<void> downloadHealthDocs(BuildContext context) async {
-    final vm = context.read<HealthDataViewModel>();
-    final docs = vm.uploadedDocs;
+    final box = await HiveHelper.openHealthBox(userMail);
+
+    final healthData = box.get('user_health');
+
+    if (healthData == null || healthData.documentPaths.isEmpty) {
+      Utils().toastMessage("No health docs found.");
+      return;
+    }
+
+    final docs = List<String>.from(healthData.documentPaths);
 
     final dir = await getExternalStorageDirectory();
     final downloadPath = "${dir!.path}/HealthDocs";
@@ -204,6 +207,6 @@ class HealthDataViewModel extends ChangeNotifier {
       }
     }
 
-    Utils().toastMessage("All health docs downloaded in your device");
+    Utils().toastMessage("All health docs downloaded in your device.");
   }
 }

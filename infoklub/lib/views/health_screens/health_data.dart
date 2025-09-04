@@ -25,7 +25,7 @@ class _HealthDataState extends State<HealthData> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final vm = context.read<HealthDataViewModel>();
-      vm.initialize(userEmail);
+
       if (widget.isEdit) {
         vm.loadHealthData().then((_) {
           setState(() {
@@ -464,7 +464,7 @@ class _HealthDataState extends State<HealthData> {
                       Navigator.pushReplacementNamed(
                         context,
                         AppRoutes.infodashboard,
-                        arguments: viewModel.userEmail,
+                        arguments: userMail,
                       );
                     }
                   },

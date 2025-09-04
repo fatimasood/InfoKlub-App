@@ -1,17 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:infoklub/models/education/education_model.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:infoklub/services/firebase_services/splash_services.dart';
+import 'package:infoklub/utils/utils.dart';
+import 'package:path_provider/path_provider.dart';
 
 class EduinfoViewmodel extends ChangeNotifier {
   List<String> uploadedDocs = [];
-  late String Email;
-
-  void initialize(String email) {
-    Email = email;
-    print("mail");
-    print(userEmail);
-  }
 
   String degree = '';
   String institution = '';
@@ -20,8 +18,6 @@ class EduinfoViewmodel extends ChangeNotifier {
   String achievements = '';
   String startYear = '';
   String endYear = '';
-
-  String get userEmail => Email;
 
   void degreeName(String val) => degree = val;
   void institutionName(String val) => institution = val;
@@ -124,7 +120,7 @@ class EduinfoViewmodel extends ChangeNotifier {
 
   bool hasData() {
     final box = Hive.box('userBox');
-    final rawList = box.get("eduInfo_$Email", defaultValue: []);
+    final rawList = box.get("eduInfo_$userMail", defaultValue: []);
     return rawList.isNotEmpty;
   }
 
@@ -154,5 +150,35 @@ class EduinfoViewmodel extends ChangeNotifier {
     } catch (e) {
       print("❌ Error loading education data: $e");
     }
+  }
+
+  //download all documents
+
+  Future<void> downloadEducationDocs(BuildContext context) async {
+    final box = Hive.box('userBox');
+    final rawList = box.get("eduInfo_$userMail", defaultValue: []);
+    final eduList = List<EducationInfo>.from(rawList);
+
+    if (eduList.isEmpty) {
+      Utils().toastMessage("No education docs found.");
+      return;
+    }
+
+    final dir = await getExternalStorageDirectory();
+    final downloadPath = "${dir!.path}/EducationDocs";
+    await Directory(downloadPath).create(recursive: true);
+
+    for (final edu in eduList) {
+      for (final path in edu.uploadedDocs) {
+        final file = File(path);
+        if (file.existsSync()) {
+          final newFile =
+              await file.copy("$downloadPath/${path.split('/').last}");
+          debugPrint("Saved to ${newFile.path}");
+        }
+      }
+    }
+
+    Utils().toastMessage("All education docs downloaded in your device.");
   }
 }

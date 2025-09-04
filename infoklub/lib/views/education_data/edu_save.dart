@@ -148,8 +148,7 @@ class _EduSaveState extends State<EduSave> {
                   width: double.infinity,
                   child: CustomButton(
                     onPressed: () async {
-                      viewModel.initialize(
-                          userMail); // Correctly initialize the ViewModel
+                      (userMail); // Correctly initialize the ViewModel
 
                       Utils().toastMessage(
                           "Your education record saved successfully...");
@@ -158,7 +157,7 @@ class _EduSaveState extends State<EduSave> {
                       if (!mounted) return;
                       Navigator.pushReplacementNamed(
                           context, AppRoutes.infodashboard,
-                          arguments: viewModel.userEmail);
+                          arguments: userMail);
                     },
                     width: double.infinity,
                     text: "Save Information",
