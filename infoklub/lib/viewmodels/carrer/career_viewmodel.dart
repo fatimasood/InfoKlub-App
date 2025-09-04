@@ -58,7 +58,6 @@ class CareerViewmodel extends ChangeNotifier {
       return;
     }
 
-    uploadedDocs.clear();
     await loadCareerList(); // 🔄 Refresh local list after save
     notifyListeners();
 

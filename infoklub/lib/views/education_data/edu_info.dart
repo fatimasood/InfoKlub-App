@@ -282,6 +282,7 @@ class _EducationInfoView extends StatelessWidget {
                           startYearController.text.isEmpty ||
                           endYearController.text.isEmpty) {
                         Utils().toastMessage("Enter all required fields");
+                        return;
                       }
 
                       final viewmodel =

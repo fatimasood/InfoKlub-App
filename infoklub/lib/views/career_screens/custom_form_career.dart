@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/theme.dart';
-import '../../../widgets/custom_input.dart';
+import '../../app/theme.dart';
+import '../../widgets/custom_input.dart';
 
-class ReusableFormCareer extends StatelessWidget {
+class ReusableFormCareer extends StatefulWidget {
   final TextEditingController companyNameController;
   final TextEditingController jobTitleController;
   final TextEditingController addressController;
@@ -24,6 +24,12 @@ class ReusableFormCareer extends StatelessWidget {
   });
 
   @override
+  State<ReusableFormCareer> createState() => _ReusableFormCareerState();
+}
+
+class _ReusableFormCareerState extends State<ReusableFormCareer> {
+  bool isCurrentlyEmployed = false;
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding:
@@ -41,12 +47,9 @@ class ReusableFormCareer extends StatelessWidget {
           ),
           CustomInput(
             hintText: "Vivasoft",
-            controller: companyNameController,
+            controller: widget.companyNameController,
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
-            validator: (value) => value == null || value.isEmpty
-                ? 'Please enter company name'
-                : null,
             textColor: Colors.black,
             onChanged: (val) {},
           ),
@@ -61,13 +64,10 @@ class ReusableFormCareer extends StatelessWidget {
           // Institution Name
           CustomInput(
             hintText: "Software Developer",
-            controller: jobTitleController,
+            controller: widget.jobTitleController,
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
             textColor: Colors.black,
-            validator: (value) => value == null || value.isEmpty
-                ? 'Please enter your job title'
-                : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
@@ -81,12 +81,10 @@ class ReusableFormCareer extends StatelessWidget {
           // Total Grade
           CustomInput(
             hintText: "Bangladesh",
-            controller: addressController,
+            controller: widget.addressController,
             keyboardType: TextInputType.text,
             backgroundColor: Colors.white,
             textColor: Colors.black,
-            validator: (value) =>
-                value == null || value.isEmpty ? 'Please enter location' : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
@@ -100,30 +98,51 @@ class ReusableFormCareer extends StatelessWidget {
           // Score Grade
           CustomInput(
             hintText: "12 Oct 2024",
-            controller: startDateController,
+            controller: widget.startDateController,
             keyboardType: TextInputType.datetime,
             textColor: Colors.black,
-            validator: (value) => value == null || value.isEmpty
-                ? 'Please enter start date'
-                : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
-          Text(
-            "End Date*",
-            style: AppTheme.getResponsiveTextTheme(context).displaySmall,
+          Row(
+            children: [
+              Checkbox(
+                  checkColor: Colors.white,
+                  activeColor: AppTheme.primaryColor,
+                  value: isCurrentlyEmployed,
+                  onChanged: (value) {
+                    setState(() {
+                      isCurrentlyEmployed = value ?? false;
+                      if (isCurrentlyEmployed) {
+                        widget.endDateController.text = "Employed";
+                      } else {
+                        widget.endDateController.clear();
+                      }
+                    });
+                  }),
+              const Text(
+                "Currently Employed",
+                style: TextStyle(
+                  color: AppTheme.blackColor,
+                ),
+              )
+            ],
           ),
+          if (!isCurrentlyEmployed) ...[
+            Text(
+              "End Date*",
+              style: AppTheme.getResponsiveTextTheme(context).displaySmall,
+            ),
+          ],
           const SizedBox(
             height: 5.0,
           ),
           // Score Grade
           CustomInput(
             hintText: "01 Dec 2024",
-            controller: endDateController,
+            controller: widget.endDateController,
             keyboardType: TextInputType.datetime,
             textColor: Colors.black,
-            validator: (value) =>
-                value == null || value.isEmpty ? 'Please enter end date' : null,
             onChanged: (val) {},
           ),
           const SizedBox(height: 12.0),
@@ -138,13 +157,10 @@ class ReusableFormCareer extends StatelessWidget {
           // responsibilities
           CustomInput(
             hintText:
-                " Develop and execute comprehensive marketing strategies and campaigns that align with the company's goals and objectives",
-            controller: responsibilitiesController,
+                "Develop and execute comprehensive marketing strategies and campaigns that align with the company's goals and objectives.",
+            controller: widget.responsibilitiesController,
             keyboardType: TextInputType.multiline,
             textColor: Colors.black,
-            validator: (value) => value == null || value.isEmpty
-                ? 'Please enter your responsibilities'
-                : null,
             onChanged: (val) {},
           ),
         ],

@@ -5,8 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/models/career/career_model.dart';
 import 'package:infoklub/services/firebase_services/splash_services.dart';
+import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
-import 'package:infoklub/views/career_screens/widget/custom_form_career.dart';
+import 'package:infoklub/views/career_screens/custom_form_career.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/widgets/drag_dropfile.dart';
 import 'package:provider/provider.dart';
@@ -49,10 +50,6 @@ class _CareerDataState extends State<CareerData> {
   @override
   void initState() {
     super.initState();
-    careerViewmodel = Provider.of<CareerViewmodel>(context, listen: false);
-    email = FirebaseAuth.instance.currentUser?.email ?? 'unknown@example.com';
-    careerViewmodel.initialize(email);
-    careerViewmodel.uploadedDocs = [];
 
     companyNameController = TextEditingController(text: widget.companyName);
     jobTitleController = TextEditingController(text: widget.jobTitle);
@@ -61,6 +58,17 @@ class _CareerDataState extends State<CareerData> {
     endDateController = TextEditingController(text: widget.endDate);
     responsibilitiesController =
         TextEditingController(text: widget.responsibilities);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final careerViewmodel = context.read<CareerViewmodel>();
+      careerViewmodel.initialize(
+        FirebaseAuth.instance.currentUser?.email ?? 'unknown@example.com',
+      );
+      careerViewmodel.uploadedDocs = [];
+      setState(() {
+        this.careerViewmodel = careerViewmodel;
+      });
+    });
   }
 
   @override
@@ -76,8 +84,8 @@ class _CareerDataState extends State<CareerData> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-        value: careerViewmodel,
+    return ChangeNotifierProvider(
+        create: (_) => CareerViewmodel()..initialize(email),
         child: _CareerInfoView(
           companyNameController: companyNameController,
           jobTitleController: jobTitleController,
@@ -267,6 +275,16 @@ class _CareerInfoView extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
+                      // check data entered '
+
+                      if (companyNameController.text.isEmpty ||
+                          jobTitleController.text.isEmpty ||
+                          addressController.text.isEmpty ||
+                          startDateController.text.isEmpty ||
+                          responsibilitiesController.text.isEmpty) {
+                        Utils().toastMessage("Enter all required fields");
+                        return;
+                      }
                       final viewModel =
                           Provider.of<CareerViewmodel>(context, listen: false);
                       final String email = userMail;
@@ -281,11 +299,13 @@ class _CareerInfoView extends StatelessWidget {
                         responsibilities:
                             responsibilitiesController.text.trim(),
                         location: addressController.text.trim(),
-                        documentPaths: viewModel.uploadedDocs,
+                        documentPaths:
+                            List<String>.from(viewModel.uploadedDocs),
                       );
 
                       await viewModel.saveCareerInfo(email, info);
                       if (kDebugMode) {
+                        print("yaha gr barrrr lgti ha");
                         print("Company Name: ${viewModel.companyName}");
                         print("Job Title: ${viewModel.jobTitle}");
                         print("Address: ${viewModel.location}");
