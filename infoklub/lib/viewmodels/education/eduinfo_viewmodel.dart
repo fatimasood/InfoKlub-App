@@ -9,6 +9,18 @@ import 'package:infoklub/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
 
 class EduinfoViewmodel extends ChangeNotifier {
+  bool isEditMode = false;
+
+  void enableEditMode() {
+    isEditMode = true;
+    notifyListeners();
+  }
+
+  void disableEditMode() {
+    isEditMode = false;
+    notifyListeners();
+  }
+
   List<String> uploadedDocs = [];
 
   String degree = '';
@@ -91,6 +103,28 @@ class EduinfoViewmodel extends ChangeNotifier {
       }
     } catch (e) {
       print("❌ Error deleting education info: $e");
+    }
+  }
+
+  // update at index
+
+  Future<void> updateEducationInfoAt(
+      String email, int index, EducationInfo updatedInfo) async {
+    final box = Hive.box('userBox');
+    try {
+      final rawList = box.get("eduInfo_$email", defaultValue: []);
+      List<EducationInfo> existingList = List<EducationInfo>.from(rawList);
+
+      if (index >= 0 && index < existingList.length) {
+        existingList[index] = updatedInfo; // replace instead of remove
+        await box.put("eduInfo_$email", existingList);
+        notifyListeners();
+        print("✅ Updated education entry at index $index");
+      } else {
+        print("⚠️ Invalid index: $index");
+      }
+    } catch (e) {
+      print("❌ Error Updating education info: $e");
     }
   }
 

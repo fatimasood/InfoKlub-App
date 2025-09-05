@@ -11,14 +11,26 @@ import 'package:infoklub/app/theme.dart';
 import '../../widgets/app_drawer.dart';
 
 class MainHome extends StatelessWidget {
-  const MainHome({super.key});
+  final int initialIndex;
+  const MainHome({super.key, this.initialIndex = 0});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => NavigationViewModel(initialIndex: initialIndex),
+      child: const _MainHomeContent(),
+    );
+  }
+}
+
+class _MainHomeContent extends StatelessWidget {
+  const _MainHomeContent();
 
   @override
   Widget build(BuildContext context) {
     final userBox = Hive.box('userBox');
     final String userKey = 'localUser_${AuthService.getCurrentUserKey()}';
     final UserProfileModel? user = userBox.get(userKey);
-
     return Scaffold(
       backgroundColor: AppTheme.halfwhite,
       appBar: AppBar(

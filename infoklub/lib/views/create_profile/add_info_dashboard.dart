@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/services/firebase_services/splash_services.dart';
+import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -29,14 +30,14 @@ class _ProfileOptionsState extends State<ProfileOptions> {
   Future<void> _checkCompletionStatus(String email) async {
     final healthVM = Provider.of<HealthDataViewModel>(context, listen: false);
     final eduVM = Provider.of<EduinfoViewmodel>(context, listen: false);
-    //final careerVM = Provider.of<CareerViewModel>(context, listen: false);
+    final careerVM = Provider.of<CareerViewmodel>(context, listen: false);
 
     await healthVM.loadHealthData(); //load from HIve
     await eduVM.loadEducationData(email);
     setState(() {
       healthCompleted = healthVM.hasData(); // true if data exists
       educationCompleted = eduVM.hasData(); // true if data exists
-      //careerCompleted = careerVM.hasData(); // true if data exists
+      careerCompleted = careerVM.hasData(); // true if data exists
     });
   }
 

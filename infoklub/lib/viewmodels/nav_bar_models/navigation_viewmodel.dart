@@ -6,7 +6,12 @@ import '../../views/Record Screens/record_home_screen.dart';
 
 class NavigationViewModel with ChangeNotifier {
   int _currentIndex = 0;
-  final PageController _pageController = PageController();
+  late PageController _pageController = PageController();
+
+  NavigationViewModel({int initialIndex = 0}) {
+    _currentIndex = initialIndex;
+    _pageController = PageController(initialPage: initialIndex);
+  }
 
   int get currentIndex => _currentIndex;
   PageController get pageController => _pageController;

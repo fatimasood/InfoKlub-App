@@ -22,6 +22,8 @@ class EduInfo extends StatefulWidget {
   final String achievements;
   final String startYear;
   final String endYear;
+  final String document;
+  final int? editIndex;
   const EduInfo(
       {super.key,
       required this.degreeName,
@@ -30,6 +32,8 @@ class EduInfo extends StatefulWidget {
       required this.scoreGrade,
       required this.startYear,
       required this.endYear,
+      this.document = '',
+      this.editIndex,
       required this.achievements});
 
   @override
@@ -58,7 +62,17 @@ class _EduInfoState extends State<EduInfo> {
     viewModel.achievementsName(widget.achievements);
     viewModel.startYearName(widget.startYear);
     viewModel.endYearName(widget.endYear);
-    viewModel.uploadedDocs = [];
+
+    // fordocs
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel = context.read<EduinfoViewmodel>();
+
+      viewModel.uploadedDocs = [];
+      setState(() {
+        this.viewModel = viewModel;
+      });
+    });
 
     degreeController = TextEditingController(text: widget.degreeName);
     institutionController = TextEditingController(text: widget.institutionName);
@@ -94,6 +108,7 @@ class _EduInfoState extends State<EduInfo> {
         startYearController: startYearController,
         endYearController: endYearController,
         viewModel: viewModel,
+        editIndex: widget.editIndex,
       ),
     );
   }
@@ -108,7 +123,7 @@ class _EducationInfoView extends StatelessWidget {
   final TextEditingController startYearController;
   final TextEditingController endYearController;
   final EduinfoViewmodel viewModel;
-
+  final int? editIndex;
   const _EducationInfoView({
     required this.degreeController,
     required this.institutionController,
@@ -118,6 +133,7 @@ class _EducationInfoView extends StatelessWidget {
     required this.startYearController,
     required this.endYearController,
     required this.viewModel,
+    this.editIndex,
   });
 
   @override
@@ -301,7 +317,7 @@ class _EducationInfoView extends StatelessWidget {
                         achievements: achievementsController.text.trim(),
                         startYear: startYearController.text.trim(),
                         endYear: endYearController.text.trim(),
-                        uploadedDocs: viewmodel.uploadedDocs,
+                        uploadedDocs: List<String>.from(viewModel.uploadedDocs),
                       );
 
                       if (kDebugMode) {
@@ -316,8 +332,12 @@ class _EducationInfoView extends StatelessWidget {
                         print(
                             "📂 Uploaded Docs: ${info.uploadedDocs.join(', ')}");
                       }
-
-                      await viewmodel.saveEducationInfo(email, info);
+                      if (editIndex != null) {
+                        await viewmodel.updateEducationInfoAt(
+                            email, editIndex!, info);
+                      } else {
+                        await viewmodel.saveEducationInfo(email, info);
+                      }
                       viewmodel.clearEduInfo();
 
                       Navigator.pushNamed(context, AppRoutes.eduSave);

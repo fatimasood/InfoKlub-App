@@ -131,7 +131,7 @@ class _AppDrawerState extends State<AppDrawer> {
                       ),
                       _buildDrawerItem(
                         icon: Icons.description_outlined,
-                        title: 'CV',
+                        title: 'Generate CV',
                         isSelected: viewModel.currentIndex == 2,
                         onTap: () {
                           viewModel.changePage(2);
@@ -139,8 +139,8 @@ class _AppDrawerState extends State<AppDrawer> {
                         },
                       ),
                       _buildDrawerItem(
-                        icon: Icons.notifications_outlined,
-                        title: 'Notifications',
+                        icon: Icons.alarm,
+                        title: 'Reminder',
                         isSelected: viewModel.currentIndex == 3,
                         onTap: () {
                           viewModel.changePage(3);

@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
+import 'package:infoklub/views/education_data/edu_info.dart';
+import 'package:infoklub/views/home_view/main_home.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 
 class EduSave extends StatefulWidget {
-  const EduSave({super.key});
+  final bool isEdit;
+  const EduSave({super.key, this.isEdit = false});
 
   @override
   State<EduSave> createState() => _EduSaveState();
@@ -122,12 +125,46 @@ class _EduSaveState extends State<EduSave> {
                                 ),
                               ),
                             ),
+                            if (viewModel.isEditMode)
+                              IconButton(
+                                color: AppTheme.secondaryColor,
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => EduInfo(
+                                        editIndex: i,
+                                        degreeName: educationList[i].degree,
+                                        institutionName:
+                                            educationList[i].institution,
+                                        totalGrade: educationList[i].totalGrade,
+                                        scoreGrade: educationList[i].scoreGrade,
+                                        startYear: educationList[i].startYear,
+                                        endYear: educationList[i].endYear,
+                                        achievements:
+                                            educationList[i].achievements,
+                                        document: educationList[i]
+                                                .uploadedDocs
+                                                .isNotEmpty
+                                            ? educationList[i]
+                                                .uploadedDocs
+                                                .first
+                                            : '',
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            const SizedBox(
+                              width: 5,
+                            ),
                             GestureDetector(
                               onTap: () async => await viewModel
                                   .deleteEducationInfoAt(userMail, i),
                               child: const Icon(
                                 Icons.delete,
-                                color: AppTheme.secondaryColor,
+                                color: AppTheme.redAccent,
                               ),
                             ),
                           ],
@@ -150,14 +187,22 @@ class _EduSaveState extends State<EduSave> {
                     onPressed: () async {
                       (userMail); // Correctly initialize the ViewModel
 
-                      Utils().toastMessage(
-                          "Your education record saved successfully...");
-                      await Future.delayed(const Duration(milliseconds: 500));
+                      if (viewModel.isEditMode) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) =>
+                                    const MainHome(initialIndex: 1)));
+                      } else {
+                        Utils().toastMessage(
+                            "Your education record saved successfully...");
+                        await Future.delayed(const Duration(milliseconds: 500));
 
-                      if (!mounted) return;
-                      Navigator.pushReplacementNamed(
-                          context, AppRoutes.infodashboard,
-                          arguments: userMail);
+                        if (!mounted) return;
+                        Navigator.pushReplacementNamed(
+                            context, AppRoutes.infodashboard,
+                            arguments: userMail);
+                      }
                     },
                     width: double.infinity,
                     text: "Save Information",

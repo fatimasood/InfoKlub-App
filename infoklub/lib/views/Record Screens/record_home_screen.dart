@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
-import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
 import 'package:infoklub/viewmodels/education/eduinfo_viewmodel.dart';
 import 'package:infoklub/viewmodels/health/healthdata_viewmodel.dart';
@@ -77,7 +76,8 @@ class RecordsPage extends StatelessWidget {
                     print("Education Edit tapped!");
                   }
                   //move to education
-
+                  final vm = context.read<EduinfoViewmodel>();
+                  vm.enableEditMode();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
