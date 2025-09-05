@@ -8,6 +8,18 @@ import 'package:infoklub/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CareerViewmodel extends ChangeNotifier {
+  bool isEditMode = false;
+
+  void enableEditMode() {
+    isEditMode = true;
+    notifyListeners();
+  }
+
+  void disableEditMode() {
+    isEditMode = false;
+    notifyListeners();
+  }
+
   List<String> uploadedDocs = [];
 
   void initialize(String email) {
@@ -180,5 +192,56 @@ class CareerViewmodel extends ChangeNotifier {
     }
 
     Utils().toastMessage("All career docs downloaded in your device ");
+  }
+
+  void preloadDocsForEdit(int index) {
+    if (index < careerList.length) {
+      uploadedDocs = List<String>.from(careerList[index].documentPaths);
+      notifyListeners();
+    }
+  }
+
+  // update at index
+  Future<void> loadCareerDataAt(String email, int index) async {
+    final box = await HiveHelper.openCareerBox(email);
+    final careerList = box.values.toList();
+
+    if (careerList.isEmpty || index < 0 || index >= careerList.length) {
+      print("⚠️ No career data found at index $index for $email");
+      return;
+    }
+
+    try {
+      final entry = careerList[index];
+      uploadedDocs = List<String>.from(entry.documentPaths);
+      companyName = entry.companyName;
+      startDate = entry.startDate;
+      endDate = entry.endDate;
+      jobTitle = entry.jobTitle;
+      responsibilities = entry.responsibilities;
+      location = entry.location;
+
+      notifyListeners();
+    } catch (e) {
+      print("❌ Error loading career data at index $index: $e");
+    }
+  }
+
+  Future<void> updateCareerInfoAt(
+      String email, int index, CarrerModel updatedInfo) async {
+    final box = await HiveHelper.openCareerBox(email);
+    try {
+      if (index >= 0 && index < box.length) {
+        await box.putAt(index, updatedInfo);
+        await loadCareerList(); // refresh internal list
+        notifyListeners();
+
+        print("✅ Updated career entry at index $index");
+      } else {
+        print("⚠️ Invalid index: $index");
+      }
+    } catch (e) {
+      print("❌ Error updating career info: $e");
+    }
   }
 }

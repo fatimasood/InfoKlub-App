@@ -114,6 +114,8 @@ class RecordsPage extends StatelessWidget {
                   }
                   //move to career
 
+                  final vm = context.read<CareerViewmodel>();
+                  vm.enableEditMode();
                   Navigator.push(
                     context,
                     MaterialPageRoute(

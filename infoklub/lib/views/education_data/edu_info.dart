@@ -65,12 +65,22 @@ class _EduInfoState extends State<EduInfo> {
 
     // fordocs
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final viewModel = context.read<EduinfoViewmodel>();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final vm = context.read<EduinfoViewmodel>();
+      if (widget.editIndex != null) {
+        await vm.loadEducationDataAt(email, widget.editIndex!);
 
-      viewModel.uploadedDocs = [];
+        // preload into controllers
+        degreeController.text = vm.degree;
+        institutionController.text = vm.institution;
+        totalGradeController.text = vm.totalGrade;
+        scoreGradeController.text = vm.scoreGrade;
+        achievementsController.text = vm.achievements;
+        startYearController.text = vm.startYear;
+        endYearController.text = vm.endYear;
+      }
       setState(() {
-        this.viewModel = viewModel;
+        viewModel = vm;
       });
     });
 
@@ -338,9 +348,8 @@ class _EducationInfoView extends StatelessWidget {
                       } else {
                         await viewmodel.saveEducationInfo(email, info);
                       }
-                      viewmodel.clearEduInfo();
-
                       Navigator.pushNamed(context, AppRoutes.eduSave);
+                      viewmodel.clearEduInfo();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.secondaryColor,

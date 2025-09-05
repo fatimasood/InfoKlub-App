@@ -215,4 +215,31 @@ class EduinfoViewmodel extends ChangeNotifier {
 
     Utils().toastMessage("All education docs downloaded in your device.");
   }
+
+  Future<void> loadEducationDataAt(String email, int index) async {
+    final box = Hive.box('userBox');
+    final rawList = box.get("eduInfo_$email", defaultValue: []);
+    final eduList = List<EducationInfo>.from(rawList);
+
+    if (eduList.isEmpty || index < 0 || index >= eduList.length) {
+      print("⚠️ No education data found at index $index for $email");
+      return;
+    }
+
+    try {
+      final entry = eduList[index];
+      uploadedDocs = List<String>.from(entry.uploadedDocs);
+      degree = entry.degree;
+      institution = entry.institution;
+      totalGrade = entry.totalGrade;
+      scoreGrade = entry.scoreGrade;
+      achievements = entry.achievements;
+      startYear = entry.startYear;
+      endYear = entry.endYear;
+
+      notifyListeners();
+    } catch (e) {
+      print("❌ Error loading education data at index $index: $e");
+    }
+  }
 }

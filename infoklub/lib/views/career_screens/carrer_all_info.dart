@@ -4,6 +4,8 @@ import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/utils/utils.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
+import 'package:infoklub/views/career_screens/career_data.dart';
+import 'package:infoklub/views/home_view/main_home.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
@@ -112,13 +114,39 @@ class _CarrerAllInfoState extends State<CarrerAllInfo> {
                                 ),
                               ),
                             ),
+                            if (viewModel.isEditMode)
+                              IconButton(
+                                color: AppTheme.purpleAccent,
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => CareerData(
+                                        companyName: career.companyName,
+                                        jobTitle: career.jobTitle,
+                                        address: career.location,
+                                        startDate: career.startDate,
+                                        endDate: career.endDate,
+                                        responsibilities:
+                                            career.responsibilities,
+                                        document:
+                                            career.documentPaths.isNotEmpty
+                                                ? career.documentPaths.first
+                                                : '',
+                                        index: i,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             GestureDetector(
                               onTap: () async {
                                 await viewModel.deleteCareerInfoAt(userMail, i);
-                                viewModel.loadCareerList();
+                                await viewModel.loadCareerList();
                               },
                               child: const Icon(Icons.delete,
-                                  color: AppTheme.purpleAccent),
+                                  color: AppTheme.redAccent),
                             ),
                           ],
                         ),
@@ -141,12 +169,19 @@ class _CarrerAllInfoState extends State<CarrerAllInfo> {
                     bottom: 20, left: 10, right: 10, top: 0),
                 child: CustomButton(
                   onPressed: () async {
-                    Utils().toastMessage(
-                        "Your career record saved successfully...");
-                    await Future.delayed(const Duration(milliseconds: 500));
-                    //  if (!mounted) return;
-                    Navigator.pushReplacementNamed(
-                        context, AppRoutes.finishScreen);
+                    if (viewModel.isEditMode) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const MainHome(initialIndex: 1)));
+                    } else {
+                      Utils().toastMessage(
+                          "Your career record saved successfully...");
+                      await Future.delayed(const Duration(milliseconds: 500));
+                      //  if (!mounted) return;
+                      Navigator.pushReplacementNamed(
+                          context, AppRoutes.finishScreen);
+                    }
                   },
                   width: double.infinity,
                   text: "Save Information",
