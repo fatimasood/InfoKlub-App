@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/services/template_services/template_service.dart';
+import 'package:infoklub/views/CV/CV_creation/contact_info_screen.dart';
 import 'package:infoklub/views/CV/cv_templates/template_selection_screen.dart';
 
 class AllTemplaresScreen extends StatefulWidget {
-  const AllTemplaresScreen({super.key});
+  final bool personData;
+  final CVTemplate? initialTemplate;
+  const AllTemplaresScreen(
+      {super.key, required this.personData, this.initialTemplate});
 
   @override
   State<AllTemplaresScreen> createState() => _AllTemplaresScreenState();
@@ -12,6 +16,16 @@ class AllTemplaresScreen extends StatefulWidget {
 
 class _AllTemplaresScreenState extends State<AllTemplaresScreen> {
   CVTemplate _selectedTemplate = TemplateService.getDefaultTemplate();
+
+  @override
+  void initState() {
+    super.initState();
+    // Set initial template if provided
+    if (widget.initialTemplate != null) {
+      _selectedTemplate = widget.initialTemplate!;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,10 +33,10 @@ class _AllTemplaresScreenState extends State<AllTemplaresScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, _selectedTemplate);
           },
         ),
-        title: const Text('Select Template',
+        title: const Text('All CV Templates',
             style: TextStyle(color: AppTheme.primaryColor, fontSize: 20.0)),
       ),
       body: SafeArea(
@@ -47,14 +61,22 @@ class _AllTemplaresScreenState extends State<AllTemplaresScreen> {
     );
   }
 
-//grid card
+  //grid card
   Widget _buildTemplateCard(CVTemplate template) {
     return GestureDetector(
       onTap: () {
         setState(() {
           _selectedTemplate = template;
         });
-        Navigator.pop(context);
+
+        // Return the selected template when navigating back
+
+        if (widget.personData) {
+          Navigator.pop(context, template);
+        } else {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const ContactInfoScreen()));
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Selected template: ${template.name}'),

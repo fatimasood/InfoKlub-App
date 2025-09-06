@@ -58,7 +58,9 @@ class CVPage extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => const AllTemplaresScreen()));
+                                builder: (_) => const AllTemplaresScreen(
+                                      personData: false,
+                                    )));
                       }),
                 ),
               ],

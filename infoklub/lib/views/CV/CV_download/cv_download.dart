@@ -6,6 +6,7 @@ import 'package:infoklub/services/template_services/template_service.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/views/CV/cv_templates/all_templares_screen.dart';
 import 'package:infoklub/views/CV/cv_templates/template_selection_screen.dart';
+import 'package:infoklub/views/home_view/main_home.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,6 @@ class _CvDownloadState extends State<CvDownload> {
   final _formKey = GlobalKey<FormState>();
   bool _isGeneratingPdf = false;
   String? _errorMessage;
-
   CVTemplate _selectedTemplate = TemplateService.getDefaultTemplate();
 
   @override
@@ -35,6 +35,32 @@ class _CvDownloadState extends State<CvDownload> {
         cvViewModel.loadUserDataForCV();
       }
     });
+  }
+
+  // Method to handle template selection
+  Future<void> _selectTemplate() async {
+    final selectedTemplate = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AllTemplaresScreen(
+          personData: true,
+          initialTemplate: _selectedTemplate,
+        ),
+      ),
+    );
+
+    if (selectedTemplate != null && selectedTemplate is CVTemplate) {
+      setState(() {
+        _selectedTemplate = selectedTemplate;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Selected template: ${_selectedTemplate.name}'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   Future<void> _generateAndDownloadPdf(CvViewModel cvViewModel) async {
@@ -221,12 +247,7 @@ class _CvDownloadState extends State<CvDownload> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const AllTemplaresScreen()));
-                    },
+                    onPressed: _selectTemplate,
                     child: const Text(
                       "More Templates",
                       style: TextStyle(
@@ -243,7 +264,12 @@ class _CvDownloadState extends State<CvDownload> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const MainHome(
+                                initialIndex: 2,
+                              ))),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.secondaryColor,
                     foregroundColor: Colors.white,
