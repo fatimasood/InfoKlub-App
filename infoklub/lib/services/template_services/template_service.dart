@@ -1,4 +1,4 @@
-import 'package:infoklub/views/CV/template_selection_screen.dart';
+import 'package:infoklub/views/CV/cv_templates/template_selection_screen.dart';
 
 class TemplateService {
   static final List<CVTemplate> templates = [

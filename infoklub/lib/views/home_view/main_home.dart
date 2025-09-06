@@ -2,13 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:infoklub/app/custom_drawer.dart';
 import 'package:infoklub/models/user/user_profile_model.dart';
 import 'package:infoklub/services/firebase_services/auth_service.dart';
 import 'package:infoklub/viewmodels/nav_bar_models/navigation_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:infoklub/app/theme.dart';
-
-import '../../widgets/app_drawer.dart';
 
 class MainHome extends StatelessWidget {
   final int initialIndex;

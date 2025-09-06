@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
 import 'package:infoklub/views/CV/CV_creation/contact_info_screen.dart';
+import 'package:infoklub/views/CV/cv_templates/all_templares_screen.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
@@ -53,14 +54,12 @@ class CVPage extends StatelessWidget {
                       color: AppTheme.coralAccent,
                       borderRadius: 9.86,
                       height: 40.0,
-                      onPressed:
-                          () {} /* => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CVTemplate(),
-                      ),
-                    ),*/
-                      ),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const AllTemplaresScreen()));
+                      }),
                 ),
               ],
             ),

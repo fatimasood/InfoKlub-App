@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
-import 'package:infoklub/views/CV/CV_creation/cv_widgets/cv_other_details.dart';
+import 'package:infoklub/views/CV/CV_creation/cv_other_details.dart';
 import 'package:infoklub/views/CV/CV_download/cv_download.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:provider/provider.dart';

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/services/template_services/template_service.dart';
 import 'package:infoklub/viewmodels/CV/cv_view_model.dart';
-import 'package:infoklub/views/CV/template_selection_screen.dart';
+import 'package:infoklub/views/CV/cv_templates/all_templares_screen.dart';
+import 'package:infoklub/views/CV/cv_templates/template_selection_screen.dart';
 import 'package:infoklub/widgets/custom_button.dart';
 import 'package:infoklub/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,6 @@ class _CvDownloadState extends State<CvDownload> {
   bool _isGeneratingPdf = false;
   String? _errorMessage;
 
-  // tempalte selection
   CVTemplate _selectedTemplate = TemplateService.getDefaultTemplate();
 
   @override
@@ -121,83 +121,6 @@ class _CvDownloadState extends State<CvDownload> {
         ),
       );
     }
-  }
-
-  void _showTemplateSelection(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Template'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: GridView.builder(
-            shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.7,
-            ),
-            itemCount: TemplateService.templates.length,
-            itemBuilder: (context, index) {
-              final template = TemplateService.templates[index];
-              return _buildTemplateCard(template);
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTemplateCard(CVTemplate template) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedTemplate = template;
-        });
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Selected template: ${template.name}'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: _selectedTemplate.name == template.name
-                ? AppTheme.primaryColor
-                : Colors.grey[300]!,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: Image.asset(
-                template.imageAsset,
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                template.name,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: _selectedTemplate.name == template.name
-                      ? AppTheme.primaryColor
-                      : Colors.black,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   @override
@@ -299,7 +222,10 @@ class _CvDownloadState extends State<CvDownload> {
                   ),
                   TextButton(
                     onPressed: () {
-                      _showTemplateSelection(context);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const AllTemplaresScreen()));
                     },
                     child: const Text(
                       "More Templates",
@@ -333,45 +259,6 @@ class _CvDownloadState extends State<CvDownload> {
     );
   }
 
-  /*Widget _buildDataPreview(CVModel cvData) {
-    // Debug print
-
-    final cvViewModel = context.watch<CvViewModel>();
-    print('Languages in CvViewModel: ${cvViewModel.cvData.languages.length}');
-    print('Languages: ${cvViewModel.cvData.languages}');
-
-    // Also check if there's data in CvCreationViewModel
-    final cvCreationViewModel = context.read<CvViewModel>();
-    print(
-        'Languages in CvCreationViewModel: ${cvCreationViewModel.cvData.languages.length}');
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Your CV Data:',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-        Text('Name: ${cvData.firstName ?? "N/A"} ${cvData.lastName ?? ""}'),
-        Text('Email: ${cvData.email ?? "N/A"}'),
-        Text('Phone: ${cvData.phone ?? "N/A"}'),
-        Text('Work Experiences: ${cvData.workExperience.length}'),
-        Text('Education: ${cvData.education.length} entries'),
-        Text('Skills: ${cvData.skills.length} skills'),
-        Text("Languages: ${cvData.languages.length} languages"),
-        const SizedBox(height: 10),
-        if (cvData.workExperience.isNotEmpty) ...[
-          const Text('Recent Work:',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          ...cvData.workExperience
-              .take(2)
-              .map((work) => Text('  • ${work.position} at ${work.company}'))
-              .toList(),
-        ],
-      ],
-    );
-  }
-*/
   void _showDownloadSuccess(BuildContext context, File pdfFile) {
     // Get a user-friendly path display
     String userVisiblePath = pdfFile.path;
