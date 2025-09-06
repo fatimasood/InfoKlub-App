@@ -204,15 +204,15 @@ class CareerViewmodel extends ChangeNotifier {
   // update at index
   Future<void> loadCareerDataAt(String email, int index) async {
     final box = await HiveHelper.openCareerBox(email);
-    final careerList = box.values.toList();
+    final list = box.values.toList();
 
-    if (careerList.isEmpty || index < 0 || index >= careerList.length) {
+    if (list.isEmpty || index < 0 || index >= list.length) {
       print("⚠️ No career data found at index $index for $email");
       return;
     }
 
     try {
-      final entry = careerList[index];
+      final entry = list[index];
       uploadedDocs = List<String>.from(entry.documentPaths);
       companyName = entry.companyName;
       startDate = entry.startDate;
@@ -220,7 +220,6 @@ class CareerViewmodel extends ChangeNotifier {
       jobTitle = entry.jobTitle;
       responsibilities = entry.responsibilities;
       location = entry.location;
-
       notifyListeners();
     } catch (e) {
       print("❌ Error loading career data at index $index: $e");
@@ -234,6 +233,7 @@ class CareerViewmodel extends ChangeNotifier {
       if (index >= 0 && index < box.length) {
         await box.putAt(index, updatedInfo);
         await loadCareerList(); // refresh internal list
+
         notifyListeners();
 
         print("✅ Updated career entry at index $index");

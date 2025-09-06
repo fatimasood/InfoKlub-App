@@ -41,7 +41,7 @@ class CareerData extends StatefulWidget {
 
 class _CareerDataState extends State<CareerData> {
   String email = userMail;
-
+  late CareerViewmodel careerViewmodel;
   late TextEditingController companyNameController;
   late TextEditingController jobTitleController;
   late TextEditingController addressController;
@@ -52,18 +52,22 @@ class _CareerDataState extends State<CareerData> {
   @override
   void initState() {
     super.initState();
-    companyNameController = TextEditingController(text: widget.companyName);
-    jobTitleController = TextEditingController(text: widget.jobTitle);
-    addressController = TextEditingController(text: widget.address);
-    startDateController = TextEditingController(text: widget.startDate);
-    endDateController = TextEditingController(text: widget.endDate);
-    responsibilitiesController =
-        TextEditingController(text: widget.responsibilities);
+    careerViewmodel = CareerViewmodel();
+
+    careerViewmodel.company(widget.companyName);
+    careerViewmodel.jobTitleName(widget.jobTitle);
+    careerViewmodel.locationName(widget.address);
+    careerViewmodel.startDateName(widget.startDate);
+    careerViewmodel.endDateName(widget.endDate);
+    careerViewmodel.responsibilitiesName(widget.responsibilities);
+
+    // for docs
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final vm = context.read<CareerViewmodel>();
+
       if (widget.index != null) {
-        await vm.loadCareerDataAt(userMail, widget.index!);
+        await vm.loadCareerDataAt(email, widget.index!);
 
         companyNameController.text = vm.companyName;
         jobTitleController.text = vm.jobTitle;
@@ -72,8 +76,18 @@ class _CareerDataState extends State<CareerData> {
         addressController.text = vm.location;
         responsibilitiesController.text = vm.responsibilities;
       }
-      setState(() {});
+      setState(() {
+        careerViewmodel = vm;
+      });
     });
+
+    companyNameController = TextEditingController(text: widget.companyName);
+    jobTitleController = TextEditingController(text: widget.jobTitle);
+    startDateController = TextEditingController(text: widget.startDate);
+    endDateController = TextEditingController(text: widget.endDate);
+    responsibilitiesController =
+        TextEditingController(text: widget.responsibilities);
+    addressController = TextEditingController(text: widget.address);
   }
 
   @override
@@ -89,30 +103,30 @@ class _CareerDataState extends State<CareerData> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => CareerViewmodel()..initialize(email),
-      builder: (context, _) {
-        return _CareerInfoView(
-          companyNameController: companyNameController,
-          jobTitleController: jobTitleController,
-          addressController: addressController,
-          startDateController: startDateController,
-          endDateController: endDateController,
-          responsibilitiesController: responsibilitiesController,
-          editIndex: widget.index,
-        );
-      },
+    return ChangeNotifierProvider.value(
+      value: careerViewmodel,
+      child: _CareerInfoView(
+        companyNameController: companyNameController,
+        jobTitleController: jobTitleController,
+        addressController: addressController,
+        startDateController: startDateController,
+        endDateController: endDateController,
+        responsibilitiesController: responsibilitiesController,
+        editIndex: widget.index,
+        careerViewmodel: careerViewmodel,
+      ),
     );
   }
 }
 
-class _CareerInfoView extends StatefulWidget {
+class _CareerInfoView extends StatelessWidget {
   final TextEditingController companyNameController;
   final TextEditingController jobTitleController;
   final TextEditingController addressController;
   final TextEditingController startDateController;
   final TextEditingController endDateController;
   final TextEditingController responsibilitiesController;
+  final CareerViewmodel careerViewmodel;
   final int? editIndex;
   const _CareerInfoView({
     required this.companyNameController,
@@ -121,18 +135,13 @@ class _CareerInfoView extends StatefulWidget {
     required this.startDateController,
     required this.endDateController,
     required this.responsibilitiesController,
+    required this.careerViewmodel,
     this.editIndex,
   });
 
   @override
-  State<_CareerInfoView> createState() => _CareerInfoViewState();
-}
-
-class _CareerInfoViewState extends State<_CareerInfoView> {
-  @override
   Widget build(BuildContext context) {
-    final careerViewmodel = Provider.of<CareerViewmodel>(context);
-
+    final vm = Provider.of<CareerViewmodel>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final isTablet = screenWidth > 600;
@@ -174,9 +183,9 @@ class _CareerInfoViewState extends State<_CareerInfoView> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     FileUploadWidget(onUploadTap: () {
-                      careerViewmodel.pickDocument();
+                      vm.pickDocument();
                     }),
-                    if (careerViewmodel.uploadedDocs.isNotEmpty) ...[
+                    if (vm.uploadedDocs.isNotEmpty) ...[
                       const SizedBox(height: 20),
                       Text(
                         "Uploaded Documents",
@@ -191,9 +200,9 @@ class _CareerInfoViewState extends State<_CareerInfoView> {
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: careerViewmodel.uploadedDocs.length,
+                        itemCount: vm.uploadedDocs.length,
                         itemBuilder: (context, index) {
-                          final path = careerViewmodel.uploadedDocs[index];
+                          final path = vm.uploadedDocs[index];
                           final isImage = path.endsWith('.jpg') ||
                               path.endsWith('.jpeg') ||
                               path.endsWith('.png');
@@ -207,7 +216,6 @@ class _CareerInfoViewState extends State<_CareerInfoView> {
                               border: Border.all(color: Colors.grey[300]!),
                               boxShadow: [
                                 BoxShadow(
-                                  // ignore: deprecated_member_use
                                   color: Colors.grey.withOpacity(0.1),
                                   blurRadius: 5,
                                   offset: const Offset(0, 2),
@@ -247,10 +255,8 @@ class _CareerInfoViewState extends State<_CareerInfoView> {
                                   icon: const Icon(Icons.delete,
                                       color: Colors.redAccent),
                                   onPressed: () {
-                                    careerViewmodel.uploadedDocs
-                                        .removeAt(index);
-                                    careerViewmodel
-                                        .notifyListeners(); // To update the UI
+                                    vm.uploadedDocs.removeAt(index);
+                                    vm.notifyListeners();
                                   },
                                 ),
                               ],
@@ -261,18 +267,13 @@ class _CareerInfoViewState extends State<_CareerInfoView> {
                     ],
                     const SizedBox(height: 10.0),
                     ReusableFormCareer(
-                      companyNameController: widget.companyNameController,
-                      jobTitleController: widget.jobTitleController,
-                      addressController: widget.addressController,
-                      startDateController: widget.startDateController,
-                      endDateController: widget.endDateController,
-                      responsibilitiesController:
-                          widget.responsibilitiesController,
-                      onFileUpload: () {
-                        if (kDebugMode) {
-                          print("File upload clicked");
-                        }
-                      },
+                      companyNameController: companyNameController,
+                      jobTitleController: jobTitleController,
+                      addressController: addressController,
+                      startDateController: startDateController,
+                      endDateController: endDateController,
+                      responsibilitiesController: responsibilitiesController,
+                      onFileUpload: vm.uploadedDocs.toString,
                     ),
                     const SizedBox(height: 100),
                   ],
@@ -291,62 +292,55 @@ class _CareerInfoViewState extends State<_CareerInfoView> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
-                      // check data entered '
-
-                      if (widget.companyNameController.text.isEmpty ||
-                          widget.jobTitleController.text.isEmpty ||
-                          widget.addressController.text.isEmpty ||
-                          widget.startDateController.text.isEmpty ||
-                          widget.responsibilitiesController.text.isEmpty) {
+                      if (companyNameController.text.isEmpty ||
+                          jobTitleController.text.isEmpty ||
+                          addressController.text.isEmpty ||
+                          startDateController.text.isEmpty ||
+                          responsibilitiesController.text.isEmpty) {
                         Utils().toastMessage("Enter all required fields");
                         return;
                       }
                       final viewModel =
                           Provider.of<CareerViewmodel>(context, listen: false);
                       final String email = userMail;
-                      if (kDebugMode) {
-                        print("Saving for email: $email");
-                      }
+
                       final info = CarrerModel(
-                        jobTitle: widget.jobTitleController.text.trim(),
-                        companyName: widget.companyNameController.text.trim(),
-                        startDate: widget.startDateController.text.trim(),
-                        endDate: widget.endDateController.text.trim(),
+                        jobTitle: jobTitleController.text.trim(),
+                        companyName: companyNameController.text.trim(),
+                        startDate: startDateController.text.trim(),
+                        endDate: endDateController.text.trim(),
                         responsibilities:
-                            widget.responsibilitiesController.text.trim(),
-                        location: widget.addressController.text.trim(),
+                            responsibilitiesController.text.trim(),
+                        location: addressController.text.trim(),
                         documentPaths:
                             List<String>.from(viewModel.uploadedDocs),
                       );
-
                       if (kDebugMode) {
-                        print("yaha gr barrrr lgti ha");
-                        print("Company Name: ${viewModel.companyName}");
-                        print("Job Title: ${viewModel.jobTitle}");
-                        print("Address: ${viewModel.location}");
-                        print("Start Date: ${viewModel.startDate}");
-                        print("End Date: ${viewModel.endDate}");
-                        print(
-                            "responsibilities: ${viewModel.responsibilities}");
-                        print(viewModel.uploadedDocs);
-                      }
+                        print("👤 Saving education info for: $email");
+                        print("📚 Degree: ${info.companyName}");
+                        print("🏫 Institution: ${info.jobTitle}");
+                        print("📊 Total Grade: ${info.startDate}");
+                        print("📈 Score Grade: ${info.endDate}");
+                        print("🏆 Achievements: ${info.location}");
+                        print("📅 Start Year: ${info.responsibilities}");
 
-                      if (widget.editIndex != null) {
-                        // 🔄 Update existing entry
+                        print(
+                            "📂 Uploaded Docs: ${info.documentPaths.join(', ')}");
+                      }
+                      if (editIndex != null) {
                         await viewModel.updateCareerInfoAt(
-                            email, widget.editIndex!, info);
+                            email, editIndex!, info);
                         Utils().toastMessage(
                             "Career record updated successfully...");
                         Navigator.pushNamed(context, AppRoutes.careerInfo);
+                        viewModel.clearCareerData();
                       } else {
-                        // ➕ Add new entry
                         await viewModel.saveCareerInfo(email, info);
                         Utils().toastMessage(
                             "Career record saved successfully...");
                         Navigator.pushNamed(context, AppRoutes.careerInfo);
+                        viewModel.clearCareerData();
                       }
-
-                      viewModel.clearCareerData();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.purpleAccent,

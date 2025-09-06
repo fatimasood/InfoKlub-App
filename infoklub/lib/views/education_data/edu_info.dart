@@ -345,8 +345,12 @@ class _EducationInfoView extends StatelessWidget {
                       if (editIndex != null) {
                         await viewmodel.updateEducationInfoAt(
                             email, editIndex!, info);
+                        Utils().toastMessage(
+                            "Your record updated successfully...");
                       } else {
                         await viewmodel.saveEducationInfo(email, info);
+                        Utils()
+                            .toastMessage("Your record saved successfully...");
                       }
                       Navigator.pushNamed(context, AppRoutes.eduSave);
                       viewmodel.clearEduInfo();
