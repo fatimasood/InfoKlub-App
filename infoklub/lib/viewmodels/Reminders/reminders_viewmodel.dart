@@ -16,7 +16,7 @@ class RemindersViewModel extends ChangeNotifier {
 
   List<Reminder> get reminders => _filtered(_sorted(_reminders));
   int get todayCount => _reminders.where(_isToday).length;
-  int get scheduledCount => _reminders.where((r) => r.dateTime != null).length;
+  int get scheduledCount => _reminders.where(_isScheduled).length;
   int get totalCount => _reminders.length;
   String get currentUserEmail => userEmail;
 
@@ -108,8 +108,24 @@ class RemindersViewModel extends ChangeNotifier {
 
   bool _isToday(Reminder r) {
     if (r.dateTime == null) return false;
+
     final now = DateTime.now();
-    final d = r.dateTime!;
-    return d.year == now.year && d.month == now.month && d.day == now.day;
+    final reminderDate = r.dateTime!;
+
+    // Convert both to date-only strings for comparison
+    final nowDateStr = '${now.year}-${now.month}-${now.day}';
+    final reminderDateStr =
+        '${reminderDate.year}-${reminderDate.month}-${reminderDate.day}';
+
+    return nowDateStr == reminderDateStr;
+  }
+
+  bool _isScheduled(Reminder r) {
+    if (r.dateTime == null) return false;
+
+    final now = DateTime.now();
+    final reminderDate = r.dateTime!;
+
+    return reminderDate.isAfter(now);
   }
 }

@@ -7,7 +7,6 @@ class GoalService {
     try {
       final goals = await HiveHelper.getAllGoals(userEmail);
       final now = DateTime.now();
-      bool needsUpdate = false;
 
       for (final goal in goals) {
         // Use startDate as fallback if lastUpdated is null
@@ -32,7 +31,6 @@ class GoalService {
             );
 
             await HiveHelper.saveGoal(userEmail, updatedGoal);
-            needsUpdate = true;
           }
         }
       }

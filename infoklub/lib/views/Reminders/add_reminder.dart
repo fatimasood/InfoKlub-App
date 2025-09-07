@@ -18,6 +18,14 @@ class _AddReminderState extends State<AddReminder> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill with today’s date
+    _selectedDate = DateTime.now();
+  }
+
   DateTime? _selectedDate;
   TimeOfDay _selectedTime = const TimeOfDay(hour: 9, minute: 0);
   final List<int> _repeatDays = [];
