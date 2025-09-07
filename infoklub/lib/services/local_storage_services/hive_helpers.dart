@@ -116,6 +116,27 @@ class HiveHelper {
         : await Hive.openBox<Goal>(boxName);
   }
 
+  static Future<void> migrateGoals(String email) async {
+    try {
+      final box = await openGoalsBox(email);
+      final goals = box.values.toList();
+
+      for (final goal in goals) {
+        // If lastUpdated is null, update it with startDate
+        if (goal.lastUpdated == null) {
+          final updatedGoal = goal.copyWith(
+            lastUpdated: goal.startDate,
+          );
+          await box.put(updatedGoal.id, updatedGoal);
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error migrating goals: $e');
+      }
+    }
+  }
+
   // goal CURD
 
   // Add to the switch statement in generic methods

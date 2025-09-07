@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
@@ -31,7 +30,10 @@ class Goal {
   final DateTime startDate;
 
   @HiveField(8)
-  final DateTime endDate;
+  final DateTime? endDate;
+
+  @HiveField(9)
+  final DateTime? lastUpdated;
 
   // Hive-compatible constructor
   Goal({
@@ -43,7 +45,8 @@ class Goal {
     required this.completedToday,
     required this.colorValue, // Use colorValue instead of Color
     required this.startDate,
-    required this.endDate,
+    this.endDate,
+    this.lastUpdated,
   });
 
   // Factory constructor for easy creation from Color
@@ -56,7 +59,8 @@ class Goal {
     required bool completedToday,
     required Color color,
     required DateTime startDate,
-    required DateTime endDate,
+    DateTime? endDate,
+    DateTime? lastUpdated,
   }) {
     return Goal(
       id: id,
@@ -68,6 +72,7 @@ class Goal {
       colorValue: color.value,
       startDate: startDate,
       endDate: endDate,
+      lastUpdated: lastUpdated,
     );
   }
 
@@ -84,6 +89,7 @@ class Goal {
     Color? color,
     DateTime? startDate,
     DateTime? endDate,
+    DateTime? lastUpdated,
   }) {
     return Goal(
       id: id ?? this.id,
@@ -95,6 +101,7 @@ class Goal {
       colorValue: color?.value ?? this.colorValue,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
     );
   }
 
@@ -109,6 +116,7 @@ class Goal {
     Color? color,
     DateTime? startDate,
     DateTime? endDate,
+    DateTime? lastUpdated,
   }) {
     return Goal(
       id: id ?? DateTime.now().millisecondsSinceEpoch.toString(),
@@ -120,6 +128,7 @@ class Goal {
       colorValue: color?.value ?? Colors.blue.value,
       startDate: startDate ?? DateTime.now(),
       endDate: endDate ?? DateTime.now().add(const Duration(days: 30)),
+      lastUpdated: lastUpdated,
     );
   }
 }

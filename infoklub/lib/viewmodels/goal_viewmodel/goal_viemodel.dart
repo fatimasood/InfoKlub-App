@@ -19,7 +19,9 @@ class HomeViewModel with ChangeNotifier {
   String? get selectedGoalId => _selectedGoalId;
 
   HomeViewModel({required this.userEmail}) {
-    loadGoals();
+    loadGoals().then((_) {
+      checkAndResetDailyStreaks();
+    });
   }
 
   Future<void> loadGoals() async {
@@ -89,12 +91,23 @@ class HomeViewModel with ChangeNotifier {
     try {
       final index = _goals.indexWhere((goal) => goal.id == goalId);
       if (index != -1) {
-        final updatedGoal = _goals[index].copyWith(
-          completedToday: !_goals[index].completedToday,
-          currentStreak: _goals[index].completedToday
-              ? _goals[index].currentStreak - 1
-              : _goals[index].currentStreak + 1,
+        final goal = _goals[index];
+        final newCompletedState = !goal.completedToday;
+
+        var updatedGoal = goal.copyWith(
+          completedToday: newCompletedState,
+          currentStreak: newCompletedState
+              ? goal.currentStreak + 1
+              : (goal.currentStreak > 0 ? goal.currentStreak - 1 : 0),
+          lastUpdated: DateTime.now(), // Update the lastUpdated timestamp
         );
+
+        // Update longest streak if needed
+        if (updatedGoal.currentStreak > updatedGoal.longestStreak) {
+          updatedGoal = updatedGoal.copyWith(
+            longestStreak: updatedGoal.currentStreak,
+          );
+        }
 
         await HiveHelper.saveGoal(userEmail, updatedGoal);
         _goals[index] = updatedGoal;
@@ -103,6 +116,50 @@ class HomeViewModel with ChangeNotifier {
     } catch (e) {
       if (kDebugMode) {
         print('Error toggling goal completion: $e');
+      }
+    }
+  }
+
+  Future<void> checkAndResetDailyStreaks() async {
+    try {
+      final now = DateTime.now();
+      bool needsUpdate = false;
+
+      for (int i = 0; i < _goals.length; i++) {
+        final goal = _goals[i];
+        // Use startDate as fallback if lastUpdated is null
+        final lastUpdated = goal.lastUpdated ?? goal.startDate;
+        // Check if it's a new day (after midnight)
+        if (now.day != lastUpdated.day ||
+            now.month != lastUpdated.month ||
+            now.year != lastUpdated.year) {
+          // Check if goal has ended (use null-aware operator)
+          if (goal.endDate != null && now.isAfter(goal.endDate!)) {
+            // Goal period has ended, delete it after 1 day
+            if (now.isAfter(goal.endDate!.add(const Duration(days: 1)))) {
+              await deleteGoal(goal.id);
+              continue; // Skip to next goal as this one is deleted
+            }
+          } else {
+            // Reset completedToday for the new day
+            final updatedGoal = goal.copyWith(
+              completedToday: false,
+              lastUpdated: now,
+            );
+
+            await HiveHelper.saveGoal(userEmail, updatedGoal);
+            _goals[i] = updatedGoal;
+            needsUpdate = true;
+          }
+        }
+      }
+
+      if (needsUpdate) {
+        notifyListeners();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error resetting daily streaks: $e');
       }
     }
   }

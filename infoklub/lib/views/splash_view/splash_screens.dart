@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infoklub/app/theme.dart';
 import 'package:infoklub/services/firebase_services/splash_services.dart';
+import 'package:infoklub/services/goals_services/goalservice.dart';
+import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -20,6 +23,31 @@ class SplashScreenState extends State<SplashScreen>
     _viewModel = SplashScreenViewModel();
     _viewModel.initializeAnimation(this);
     splashScreen.isLogin(context);
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    await _handleGoalOperations();
+  }
+
+  Future<void> _handleGoalOperations() async {
+    try {
+      // Get user email
+      final userEmail = userMail;
+
+      if (userEmail.isNotEmpty) {
+        // Migrate existing goals
+        await HiveHelper.migrateGoals(userEmail);
+
+        // Check daily streaks
+        await GoalService.checkDailyStreaks(userEmail);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error during goal operations: $e');
+      }
+      // Continue even if there's an error with goals
+    }
   }
 
   @override
