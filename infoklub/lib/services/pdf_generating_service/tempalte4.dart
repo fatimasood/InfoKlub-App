@@ -208,7 +208,7 @@ class Tempalte4PdfService {
           color: PdfColors.grey200,
         ),
         child: pw.Padding(
-          padding: pw.EdgeInsets.all(20.0),
+          padding: const pw.EdgeInsets.all(20.0),
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [

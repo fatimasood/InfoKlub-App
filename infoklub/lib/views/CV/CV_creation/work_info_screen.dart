@@ -147,7 +147,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
 
                   // Display existing career entries with dividers
                   if (cvViewModel.cvData.workExperience.isNotEmpty) ...[
-                    Text(
+                    const Text(
                       'Your Work Experiences',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -191,7 +191,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                       Divider(thickness: 2, color: Colors.grey[300]),
                       const SizedBox(height: 20),
                     ],
-                    Text(
+                    const Text(
                       'Add New Experience',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -215,7 +215,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                           ),
                           const SizedBox(height: 3.0),
                           TextFormField(
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                             controller: _companyController,
                             cursorColor: AppTheme.blackColor,
                             decoration: const InputDecoration(
@@ -288,9 +288,10 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                                                         DropdownMenuItem(
                                                           value: month,
                                                           child: Text(month,
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      12)),
+                                                              style:
+                                                                  const TextStyle(
+                                                                      fontSize:
+                                                                          12)),
                                                         ))
                                                     .toList(),
                                                 onChanged: (value) {
@@ -336,9 +337,10 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                                                         DropdownMenuItem(
                                                           value: year,
                                                           child: Text(year,
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      12)),
+                                                              style:
+                                                                  const TextStyle(
+                                                                      fontSize:
+                                                                          12)),
                                                         ))
                                                     .toList(),
                                                 onChanged: (value) {
@@ -412,9 +414,10 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                                                           DropdownMenuItem(
                                                             value: month,
                                                             child: Text(month,
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12)),
+                                                                style:
+                                                                    const TextStyle(
+                                                                        fontSize:
+                                                                            12)),
                                                           ))
                                                       .toList(),
                                                   onChanged: (value) {
@@ -460,9 +463,10 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                                                           DropdownMenuItem(
                                                             value: year,
                                                             child: Text(year,
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12)),
+                                                                style:
+                                                                    const TextStyle(
+                                                                        fontSize:
+                                                                            12)),
                                                           ))
                                                       .toList(),
                                                   onChanged: (value) {
@@ -491,8 +495,8 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                                             ],
                                           )
                                         else
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(
                                                 vertical: 4.0),
                                             child: Text(
                                               "Present",
@@ -541,7 +545,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                           ),
                           const SizedBox(height: 3.0),
                           TextFormField(
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                             controller: _jobTitleController,
                             cursorColor: AppTheme.blackColor,
                             decoration: const InputDecoration(
@@ -568,7 +572,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                           ),
                           const SizedBox(height: 3.0),
                           TextFormField(
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                             controller: _locationController,
                             cursorColor: AppTheme.blackColor,
                             decoration: const InputDecoration(
@@ -595,7 +599,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                           ),
                           const SizedBox(height: 3.0),
                           TextFormField(
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                             controller: _descriptionController,
                             maxLines: 5,
                             cursorColor: AppTheme.blackColor,
@@ -661,7 +665,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EducationInfoScreen(),
+                    builder: (context) => const EducationInfoScreen(),
                   ),
                 );
               },
@@ -697,7 +701,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
         children: [
           Text(
             experience.company,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -758,7 +762,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
       // Add divider if not the last item
       if (i < experiences.length - 1) {
         widgets.add(Divider(thickness: 1, color: Colors.grey[300]));
-        widgets.add(SizedBox(height: 16));
+        widgets.add(const SizedBox(height: 16));
       }
     }
 
@@ -768,18 +772,18 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
   void _addWorkExperience(CvViewModel cvViewModel) {
     if (_companyController.text.isEmpty || _jobTitleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Please enter company and job title")));
+          const SnackBar(content: Text("Please enter company and job title")));
       return;
     }
 
     if (_startMonth == null || _startYear == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Please select start date")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select start date")));
       return;
     }
 
     if (!_isCurrentJob && (_endMonth == null || _endYear == null)) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Please select end date or mark as current job")));
       return;
     }
@@ -814,7 +818,7 @@ class _WorkInfoScreenState extends State<WorkInfoScreen> {
     });
 
     ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Work experience added")));
+        .showSnackBar(const SnackBar(content: Text("Work experience added")));
   }
 
   void _addWorkExperienceToViewModel(

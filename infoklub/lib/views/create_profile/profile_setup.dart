@@ -43,7 +43,7 @@ class _ProfileSetupState extends State<ProfileSetup> {
         vm.updateCountry(widget.initialFlag, widget.initialCode);
         return vm;
       },
-      child: _ProfileSetupView(),
+      child: const _ProfileSetupView(),
     );
   }
 }
