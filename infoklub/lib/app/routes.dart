@@ -7,6 +7,7 @@ import 'package:infoklub/views/create_profile/add_info_dashboard.dart';
 import 'package:infoklub/views/create_profile/addlink.dart';
 import 'package:infoklub/views/education_data/edu_info.dart';
 import 'package:infoklub/views/health_screens/health_data.dart';
+import 'package:infoklub/views/settings/settings_screen.dart';
 import '../views/career_screens/career_data.dart';
 import '../views/career_screens/carrer_all_info.dart';
 import '../views/create_profile/profile_setup.dart';
@@ -31,6 +32,7 @@ class AppRoutes {
   static const String feedback = '/feedback';
   static const String careerInfo = '/careerallinfo';
   static const String finishScreen = '/dataEnter';
+  static const String settingsApp = '/settings';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -62,6 +64,9 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const ProfileOptions());
       case health:
         return MaterialPageRoute(builder: (_) => const HealthData());
+
+      case settingsApp:
+        return MaterialPageRoute(builder: (_) => const SettingsScreen());
 
       case eduData:
         return MaterialPageRoute(

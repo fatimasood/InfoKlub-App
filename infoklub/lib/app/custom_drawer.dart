@@ -148,18 +148,17 @@ class _AppDrawerState extends State<AppDrawer> {
                         },
                       ),
                       _buildDrawerItem(
-                        icon: Icons.feedback_outlined,
-                        title: 'Feedback',
-                        onTap: () {
-                          //feedback
-                          Navigator.pushNamed(context, '/feedback');
-                        },
-                      ),
-                      _buildDrawerItem(
                         icon: Icons.settings_outlined,
                         title: 'Settings',
                         onTap: () {
-                          //move to settings screen
+                          Navigator.pushNamed(context, '/settings');
+                        },
+                      ),
+                      _buildDrawerItem(
+                        icon: Icons.feedback_outlined,
+                        title: 'Feedback',
+                        onTap: () {
+                          Navigator.pushNamed(context, '/feedback');
                         },
                       ),
                       _buildDrawerItem(

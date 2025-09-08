@@ -98,7 +98,7 @@ class Goal {
       currentStreak: currentStreak ?? this.currentStreak,
       longestStreak: longestStreak ?? this.longestStreak,
       completedToday: completedToday ?? this.completedToday,
-      colorValue: color?.value ?? this.colorValue,
+      colorValue: color?.value ?? colorValue,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       lastUpdated: lastUpdated ?? this.lastUpdated,
