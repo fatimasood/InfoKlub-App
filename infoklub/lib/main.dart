@@ -31,7 +31,6 @@ import 'package:infoklub/viewmodels/nav_bar_models/navigation_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/finishprofile_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/link_add_viewmodel.dart';
 import 'package:infoklub/viewmodels/profile_setup/profilesetup_viewmodel.dart';
-import 'package:infoklub/viewmodels/rating/rating_viewmodel.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -147,7 +146,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ChangeNotifierProvider(create: (_) => AddLinkViewModel()),
         ChangeNotifierProvider(create: (_) => ProfileSetupViewModel()),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
-        ChangeNotifierProvider(create: (_) => RatingViewModel()),
         ChangeNotifierProvider(create: (_) => HealthDataViewModel()),
         ChangeNotifierProvider(create: (_) => EduinfoViewmodel()),
         ChangeNotifierProvider(create: (_) => FinishprofileViewmodel()),

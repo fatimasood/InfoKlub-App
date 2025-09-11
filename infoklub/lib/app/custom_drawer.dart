@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -152,13 +151,6 @@ class _AppDrawerState extends State<AppDrawer> {
                         title: 'Settings',
                         onTap: () {
                           Navigator.pushNamed(context, '/settings');
-                        },
-                      ),
-                      _buildDrawerItem(
-                        icon: Icons.feedback_outlined,
-                        title: 'Feedback',
-                        onTap: () {
-                          Navigator.pushNamed(context, '/feedback');
                         },
                       ),
                       _buildDrawerItem(

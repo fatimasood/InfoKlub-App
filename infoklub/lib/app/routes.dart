@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:infoklub/views/Rating/rating.dart';
 import 'package:infoklub/views/authentecation_view/forgot_password.dart';
 import 'package:infoklub/views/authentecation_view/signup_screen.dart';
 import 'package:infoklub/views/career_screens/finish_screen.dart';
@@ -29,7 +28,6 @@ class AppRoutes {
   static const String eduData = '/eduData';
   static const String career = '/career';
   static const String eduSave = '/eduSave';
-  static const String feedback = '/feedback';
   static const String careerInfo = '/careerallinfo';
   static const String finishScreen = '/dataEnter';
   static const String settingsApp = '/settings';
@@ -90,8 +88,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const CarrerAllInfo());
       case finishScreen:
         return MaterialPageRoute(builder: (_) => const FinishScreen());
-      case feedback:
-        return MaterialPageRoute(builder: (_) => const RatingScreen());
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

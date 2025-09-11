@@ -473,7 +473,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Developer: thejuniordeve@gmail.com\nOwner: therimon25@gmail.com',
+              'therimon25@gmail.com',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
