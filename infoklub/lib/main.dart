@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:infoklub/models/career/career_model.dart';
 import 'package:infoklub/models/goals/goal_model.dart';
+import 'package:infoklub/models/notifications/notification_model.dart';
 import 'package:infoklub/models/reminder/reminder_model.dart';
 import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/services/goals_services/goalservice.dart';
@@ -42,6 +43,7 @@ Future<void> main() async {
 
   await Hive.initFlutter();
   await initHive();
+  // await NotificationService.init();
 
   runApp(const MyApp());
 }
@@ -83,6 +85,10 @@ Future<void> initHive() async {
 
   if (!Hive.isAdapterRegistered(5)) {
     Hive.registerAdapter(GoalAdapter());
+  }
+
+  if (!Hive.isAdapterRegistered(9)) {
+    Hive.registerAdapter(NotificationModelAdapter());
   }
 
   await Hive.openBox(

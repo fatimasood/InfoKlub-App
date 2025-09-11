@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:infoklub/models/goals/goal_model.dart';
 import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
+import 'package:infoklub/services/notifications_service/notifications_services.dart';
 
 class HomeViewModel with ChangeNotifier {
   List<Goal> _goals = [];
@@ -133,6 +134,35 @@ class HomeViewModel with ChangeNotifier {
         if (now.day != lastUpdated.day ||
             now.month != lastUpdated.month ||
             now.year != lastUpdated.year) {
+          NotificationService.showNotification(
+            id: goal.hashCode,
+            title: "Reminder",
+            body: "You need to complete your ${goal.title} challenge today.",
+          );
+
+          // one day left case
+
+          if (goal.endDate != null &&
+              now.difference(goal.endDate!).inDays == -1) {
+            NotificationService.showNotification(
+              id: goal.hashCode + 1,
+              title: "Almost There",
+              body: "You are close to your ${goal.title} challenge!",
+            );
+          }
+
+          // goal fully completed
+
+          if (goal.endDate != null &&
+              now.isAfter(goal.endDate!) &&
+              goal.currentStreak == goal.longestStreak) {
+            NotificationService.showNotification(
+              id: goal.hashCode + 2,
+              title: "Congratulations!",
+              body: "You achieved your ${goal.title} challenge 🎉",
+            );
+          }
+
           // Check if goal has ended (use null-aware operator)
           if (goal.endDate != null && now.isAfter(goal.endDate!)) {
             // Goal period has ended, delete it after 1 day

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infoklub/app/notifications.dart';
 import 'package:infoklub/views/authentecation_view/forgot_password.dart';
 import 'package:infoklub/views/authentecation_view/signup_screen.dart';
 import 'package:infoklub/views/career_screens/finish_screen.dart';
@@ -31,6 +32,7 @@ class AppRoutes {
   static const String careerInfo = '/careerallinfo';
   static const String finishScreen = '/dataEnter';
   static const String settingsApp = '/settings';
+  static const String notifications = '/notifications';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -65,6 +67,9 @@ class AppRoutes {
 
       case settingsApp:
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
+
+      case notifications:
+        return MaterialPageRoute(builder: (_) => const Notifications());
 
       case eduData:
         return MaterialPageRoute(

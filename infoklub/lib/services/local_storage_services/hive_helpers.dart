@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:infoklub/models/career/career_model.dart';
 import 'package:infoklub/models/goals/goal_model.dart';
 import 'package:infoklub/models/health/health_model.dart';
+import 'package:infoklub/models/notifications/notification_model.dart';
 import 'package:infoklub/models/reminder/reminder_model.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -162,6 +163,51 @@ class HiveHelper {
 
   static Future<void> clearAllGoals(String email) async {
     final box = await openGoalsBox(email);
+    await box.clear();
+  }
+// NOTIFICATIONS ________________________________________
+
+  static String getNotificationBoxName(String email) {
+    return "notifications_${email.replaceAll('@', '_').replaceAll('.', '_')}";
+  }
+
+  static Future<Box<NotificationModel>> openNotificationBox(
+      String email) async {
+    final boxName = getNotificationBoxName(email);
+
+    return Hive.isBoxOpen(boxName)
+        ? Hive.box<NotificationModel>(boxName)
+        : await Hive.openBox<NotificationModel>(boxName);
+  }
+
+// Save a new notification
+  static Future<void> saveNotification(
+      String email, String title, String message) async {
+    final box = await openNotificationBox(email);
+    final notification = NotificationModel(
+      title: title,
+      message: message,
+      time: DateTime.now(),
+    );
+    await box.add(notification);
+  }
+
+// Get all notifications
+  static Future<List<NotificationModel>> getAllNotifications(
+      String email) async {
+    final box = await openNotificationBox(email);
+    return box.values.toList();
+  }
+
+// Delete a single notification
+  static Future<void> deleteNotification(String email, int index) async {
+    final box = await openNotificationBox(email);
+    await box.deleteAt(index);
+  }
+
+// Clear all notifications
+  static Future<void> clearAllNotifications(String email) async {
+    final box = await openNotificationBox(email);
     await box.clear();
   }
 }
