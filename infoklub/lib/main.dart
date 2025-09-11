@@ -11,12 +11,14 @@ import 'package:infoklub/models/notifications/notification_model.dart';
 import 'package:infoklub/models/reminder/reminder_model.dart';
 import 'package:infoklub/services/firebase_services/splash_services.dart';
 import 'package:infoklub/services/goals_services/goalservice.dart';
+import 'package:infoklub/services/notifications_service/notifications_services.dart';
 import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
 import 'package:infoklub/views/splash_view/splash_screens.dart';
 import 'package:provider/provider.dart';
 import 'package:infoklub/app/routes.dart';
 import 'package:infoklub/app/theme.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // Models
 import 'package:infoklub/models/user/user_profile_model.dart';
@@ -43,9 +45,17 @@ Future<void> main() async {
 
   await Hive.initFlutter();
   await initHive();
-  // await NotificationService.init();
+  await NotificationService.init();
+  await requestNotificationPermission();
 
   runApp(const MyApp());
+}
+
+Future<void> requestNotificationPermission() async {
+  var status = await Permission.notification.status;
+  if (!status.isGranted) {
+    await Permission.notification.request();
+  }
 }
 
 Future<void> initHive() async {

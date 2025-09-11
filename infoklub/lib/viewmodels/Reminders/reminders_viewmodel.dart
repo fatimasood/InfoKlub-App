@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infoklub/services/notifications_service/notifications_services.dart';
 import 'package:infoklub/views/Reminders/reminder_mapper.dart';
 import 'package:infoklub/views/Reminders/reminder_repository.dart';
 import 'package:uuid/uuid.dart';
@@ -54,6 +55,23 @@ class RemindersViewModel extends ChangeNotifier {
 
     _reminders.add(toSave);
     notifyListeners();
+
+    // Notification schedule
+    if (toSave.repeatDays != null && toSave.repeatDays!.isNotEmpty) {
+      await NotificationService.scheduleForMultipleDays(
+        title: toSave.title,
+        body: toSave.notes ?? "Reminder",
+        days: toSave.repeatDays!, // List<int> = [1,3,5] type
+        time: toSave.dateTime ?? DateTime.now(),
+      );
+    } else if (toSave.dateTime != null) {
+      await NotificationService.scheduleNotification(
+        id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        title: toSave.title,
+        body: toSave.notes ?? "Reminder",
+        scheduledTime: toSave.dateTime!,
+      );
+    }
   }
 
   Future<void> updateReminder(String id, Reminder updated) async {
@@ -66,6 +84,24 @@ class RemindersViewModel extends ChangeNotifier {
 
     _reminders[idx] = toSave;
     notifyListeners();
+
+    // ✅ Pehle purana cancel karo (future: cancelNotification(id))
+    // Fir naya schedule karo
+    if (toSave.repeatDays != null && toSave.repeatDays!.isNotEmpty) {
+      await NotificationService.scheduleForMultipleDays(
+        title: toSave.title,
+        body: toSave.notes ?? "Reminder",
+        days: toSave.repeatDays!,
+        time: toSave.dateTime ?? DateTime.now(),
+      );
+    } else if (toSave.dateTime != null) {
+      await NotificationService.scheduleNotification(
+        id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        title: toSave.title,
+        body: toSave.notes ?? "Reminder",
+        scheduledTime: toSave.dateTime!,
+      );
+    }
   }
 
   Future<void> deleteReminder(String id) async {
