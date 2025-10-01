@@ -81,6 +81,15 @@ class HomeViewModel with ChangeNotifier {
       _selectedGoalId = goal.id;
       // Schedule notifications for the new goal
       await NotificationService().scheduleGoalNotifications(userEmail);
+
+      // Show immediate test notification (handle error gracefully)
+      /*try {
+        await NotificationService().showTestNotification();
+      } catch (e) {
+        print('Test notification failed but continuing: $e');
+      } // Show immediate test notification
+      await NotificationService().showTestNotification();*/
+
       notifyListeners();
     } catch (e) {
       if (kDebugMode) {

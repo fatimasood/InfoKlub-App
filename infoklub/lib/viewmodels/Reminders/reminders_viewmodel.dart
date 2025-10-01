@@ -53,8 +53,13 @@ class RemindersViewModel extends ChangeNotifier {
 
     _reminders.add(toSave);
 
+    // Schedule notification for the new reminder
     await NotificationService()
         .scheduleReminderNotifications(userEmail, [model]);
+
+    // Show immediate test notification
+    // await NotificationService().showTestNotification();
+
     notifyListeners();
   }
 
