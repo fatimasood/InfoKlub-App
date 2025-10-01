@@ -79,7 +79,8 @@ class HomeViewModel with ChangeNotifier {
 
       // Select the new goal
       _selectedGoalId = goal.id;
-
+      // Schedule notifications for the new goal
+      await NotificationService().scheduleGoalNotifications(userEmail);
       notifyListeners();
     } catch (e) {
       if (kDebugMode) {
@@ -134,34 +135,16 @@ class HomeViewModel with ChangeNotifier {
         if (now.day != lastUpdated.day ||
             now.month != lastUpdated.month ||
             now.year != lastUpdated.year) {
-          NotificationService.showNotification(
-            id: goal.hashCode,
-            title: "Reminder",
-            body: "You need to complete your ${goal.title} challenge today.",
-          );
-
           // one day left case
 
           if (goal.endDate != null &&
-              now.difference(goal.endDate!).inDays == -1) {
-            NotificationService.showNotification(
-              id: goal.hashCode + 1,
-              title: "Almost There",
-              body: "You are close to your ${goal.title} challenge!",
-            );
-          }
+              now.difference(goal.endDate!).inDays == -1) {}
 
           // goal fully completed
 
           if (goal.endDate != null &&
               now.isAfter(goal.endDate!) &&
-              goal.currentStreak == goal.longestStreak) {
-            NotificationService.showNotification(
-              id: goal.hashCode + 2,
-              title: "Congratulations!",
-              body: "You achieved your ${goal.title} challenge 🎉",
-            );
-          }
+              goal.currentStreak == goal.longestStreak) {}
 
           // Check if goal has ended (use null-aware operator)
           if (goal.endDate != null && now.isAfter(goal.endDate!)) {

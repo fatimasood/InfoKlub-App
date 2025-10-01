@@ -34,10 +34,11 @@ dependencies:
   syncfusion_flutter_datepicker: ^30.2.5
   shared_preferences: ^2.5.3
   url_launcher: ^6.3.2
-  flutter_local_notifications: ^19.4.1
   awesome_notifications: ^0.10.1
   permission_handler: ^12.0.1
-  
+  flutter_launcher_icons: ^0.14.4 
+  flutter_local_notifications: ^19.4.2
+  timezone: ^0.10.1
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +49,24 @@ dev_dependencies:
   json_serializable: ^6.7.1
   flutter_native_splash: ^2.3.1
 
+# flutter launcher icons
+flutter_launcher_icons:
+  android: true 
+  ios: true
+  image_path: "lib/assets/icon/infoKlubLogo.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "lib/assets/icon/infoKlubLogo.png"
+ 
+
+
+# flutter nayive splash
+flutter_native_splash:
+  color: "#ffffff"
+  android: true
+  ios: true
+  web: false
+  android_gravity: center
+
 
 
 flutter:
@@ -57,11 +76,6 @@ flutter:
   assets:
     - lib/assets/Images/
     - lib/assets/cv_tem/
+    - lib/assets/icon/
 
-# flutter nayive splash
-flutter_native_splash:
-  color: "#164863"
-  android: true
-  ios: true
-  web: false
-  ios_content_mode: scaleAspectFill
+

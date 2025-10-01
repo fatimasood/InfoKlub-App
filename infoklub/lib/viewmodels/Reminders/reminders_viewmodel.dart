@@ -36,8 +36,6 @@ class RemindersViewModel extends ChangeNotifier {
   Future<void> addReminder(Reminder reminder) async {
     // ensure id
     final id = (reminder.id.isEmpty) ? const Uuid().v4() : reminder.id;
-    // ignore: unused_local_variable
-    final withId = reminder.copyWith()..id; // ignore; copy keeps same id
 
     final toSave = Reminder(
       id: id,
@@ -54,24 +52,10 @@ class RemindersViewModel extends ChangeNotifier {
     await _repo.upsert(userEmail, model);
 
     _reminders.add(toSave);
-    notifyListeners();
 
-    // Notification schedule
-    if (toSave.repeatDays != null && toSave.repeatDays!.isNotEmpty) {
-      await NotificationService.scheduleForMultipleDays(
-        title: toSave.title,
-        body: toSave.notes ?? "Reminder",
-        days: toSave.repeatDays!, // List<int> = [1,3,5] type
-        time: toSave.dateTime ?? DateTime.now(),
-      );
-    } else if (toSave.dateTime != null) {
-      await NotificationService.scheduleNotification(
-        id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-        title: toSave.title,
-        body: toSave.notes ?? "Reminder",
-        scheduledTime: toSave.dateTime!,
-      );
-    }
+    await NotificationService()
+        .scheduleReminderNotifications(userEmail, [model]);
+    notifyListeners();
   }
 
   Future<void> updateReminder(String id, Reminder updated) async {
@@ -84,24 +68,6 @@ class RemindersViewModel extends ChangeNotifier {
 
     _reminders[idx] = toSave;
     notifyListeners();
-
-    // ✅ Pehle purana cancel karo (future: cancelNotification(id))
-    // Fir naya schedule karo
-    if (toSave.repeatDays != null && toSave.repeatDays!.isNotEmpty) {
-      await NotificationService.scheduleForMultipleDays(
-        title: toSave.title,
-        body: toSave.notes ?? "Reminder",
-        days: toSave.repeatDays!,
-        time: toSave.dateTime ?? DateTime.now(),
-      );
-    } else if (toSave.dateTime != null) {
-      await NotificationService.scheduleNotification(
-        id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-        title: toSave.title,
-        body: toSave.notes ?? "Reminder",
-        scheduledTime: toSave.dateTime!,
-      );
-    }
   }
 
   Future<void> deleteReminder(String id) async {

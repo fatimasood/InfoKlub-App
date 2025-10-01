@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
@@ -61,13 +62,13 @@ class Tempalte4PdfService {
       final bytes = await pdf.save();
       await file.writeAsBytes(bytes);
 
-      print('PDF saved successfully at: ${file.path}');
-      print('File size: ${bytes.length} bytes');
+      debugPrint('PDF saved successfully at: ${file.path}');
+      debugPrint('File size: ${bytes.length} bytes');
 
       return file;
     } catch (e, stackTrace) {
-      print('Error generating PDF: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error generating PDF: $e');
+      debugPrint('Stack trace: $stackTrace');
       rethrow;
     }
   }

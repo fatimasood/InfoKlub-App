@@ -180,9 +180,12 @@ class HiveHelper {
         : await Hive.openBox<NotificationModel>(boxName);
   }
 
-// Save a new notification
+// Save a notification
   static Future<void> saveNotification(
-      String email, String title, String message) async {
+    String email,
+    String title,
+    String message,
+  ) async {
     final box = await openNotificationBox(email);
     final notification = NotificationModel(
       title: title,
@@ -199,7 +202,7 @@ class HiveHelper {
     return box.values.toList();
   }
 
-// Delete a single notification
+// Delete a notification by index
   static Future<void> deleteNotification(String email, int index) async {
     final box = await openNotificationBox(email);
     await box.deleteAt(index);

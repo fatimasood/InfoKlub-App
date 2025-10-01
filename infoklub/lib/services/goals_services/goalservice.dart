@@ -1,4 +1,3 @@
-// In goalservice.dart
 import 'package:flutter/foundation.dart';
 import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
 

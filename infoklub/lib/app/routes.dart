@@ -69,7 +69,7 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
 
       case notifications:
-        return MaterialPageRoute(builder: (_) => const Notifications());
+        return MaterialPageRoute(builder: (_) => NotificationScreen());
 
       case eduData:
         return MaterialPageRoute(

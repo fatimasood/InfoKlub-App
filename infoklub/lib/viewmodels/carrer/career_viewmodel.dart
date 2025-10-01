@@ -23,7 +23,7 @@ class CareerViewmodel extends ChangeNotifier {
   List<String> uploadedDocs = [];
 
   void initialize(String email) {
-    print("CareerViewmodel initialized for: $userMail");
+    debugPrint("CareerViewmodel initialized for: $userMail");
   }
 
   String jobTitle = '';
@@ -66,23 +66,23 @@ class CareerViewmodel extends ChangeNotifier {
     try {
       await box.put(existing.length, info);
     } catch (e) {
-      print("Error saving career info: $e");
+      debugPrint("Error saving career info: $e");
       return;
     }
 
     await loadCareerList(); // 🔄 Refresh local list after save
     notifyListeners();
 
-    print("✅ Career entry saved:");
-    print("──────────────────────────────");
-    print("Job Title: ${info.jobTitle}");
-    print("Company: ${info.companyName}");
-    print("Start: ${info.startDate}");
-    print("End: ${info.endDate}");
-    print("responsibilities: ${info.responsibilities}");
-    print("Location: ${info.location}");
-    print("Docs: ${info.documentPaths}");
-    print("──────────────────────────────");
+    debugPrint("✅ Career entry saved:");
+    debugPrint("──────────────────────────────");
+    debugPrint("Job Title: ${info.jobTitle}");
+    debugPrint("Company: ${info.companyName}");
+    debugPrint("Start: ${info.startDate}");
+    debugPrint("End: ${info.endDate}");
+    debugPrint("responsibilities: ${info.responsibilities}");
+    debugPrint("Location: ${info.location}");
+    debugPrint("Docs: ${info.documentPaths}");
+    debugPrint("──────────────────────────────");
   }
 
   // 🔍 Return all entries (on demand)
@@ -96,7 +96,7 @@ class CareerViewmodel extends ChangeNotifier {
     final box = await HiveHelper.openCareerBox(userMail);
     careerList = box.values.toList();
     notifyListeners();
-    print("🔁 Loaded ${careerList.length} career entries for $userMail");
+    debugPrint("🔁 Loaded ${careerList.length} career entries for $userMail");
   }
 
   // ❌ Delete
@@ -108,12 +108,12 @@ class CareerViewmodel extends ChangeNotifier {
         await box.deleteAt(index);
         await loadCareerList(); // Refresh list after delete
         notifyListeners();
-        print("Deleted career entry at index $index");
+        debugPrint("Deleted career entry at index $index");
       } else {
-        print("Invalid index: $index");
+        debugPrint("Invalid index: $index");
       }
     } catch (e) {
-      print("Error deleting career info: $e");
+      debugPrint("Error deleting career info: $e");
     }
   }
 
@@ -123,7 +123,7 @@ class CareerViewmodel extends ChangeNotifier {
     final entries = box.values.toList();
 
     if (entries.isEmpty) {
-      print("No career data found for $email");
+      debugPrint("No career data found for $email");
       return;
     }
 
@@ -140,7 +140,7 @@ class CareerViewmodel extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print("❌ Error loading career data: $e");
+      debugPrint("❌ Error loading career data: $e");
     }
   }
 
@@ -207,7 +207,7 @@ class CareerViewmodel extends ChangeNotifier {
     final list = box.values.toList();
 
     if (list.isEmpty || index < 0 || index >= list.length) {
-      print("⚠️ No career data found at index $index for $email");
+      debugPrint("⚠️ No career data found at index $index for $email");
       return;
     }
 
@@ -222,7 +222,7 @@ class CareerViewmodel extends ChangeNotifier {
       location = entry.location;
       notifyListeners();
     } catch (e) {
-      print("❌ Error loading career data at index $index: $e");
+      debugPrint("❌ Error loading career data at index $index: $e");
     }
   }
 
@@ -236,12 +236,12 @@ class CareerViewmodel extends ChangeNotifier {
 
         notifyListeners();
 
-        print("✅ Updated career entry at index $index");
+        debugPrint("✅ Updated career entry at index $index");
       } else {
-        print("⚠️ Invalid index: $index");
+        debugPrint("⚠️ Invalid index: $index");
       }
     } catch (e) {
-      print("❌ Error updating career info: $e");
+      debugPrint("❌ Error updating career info: $e");
     }
   }
 }

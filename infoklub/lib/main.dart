@@ -45,7 +45,7 @@ Future<void> main() async {
 
   await Hive.initFlutter();
   await initHive();
-  await NotificationService.init();
+  await NotificationService().initialize();
   await requestNotificationPermission();
 
   runApp(const MyApp());

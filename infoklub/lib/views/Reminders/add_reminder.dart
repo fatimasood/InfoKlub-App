@@ -23,7 +23,15 @@ class _AddReminderState extends State<AddReminder> {
   void initState() {
     super.initState();
     // Pre-fill with today’s date
+    // Always set a default date
     _selectedDate = DateTime.now();
+    // Set time to next hour by default
+    final now = DateTime.now();
+    _selectedTime = TimeOfDay(hour: now.hour, minute: 0);
+    // If current time is 2:30, set to 3:00
+    if (now.minute > 0) {
+      _selectedTime = TimeOfDay(hour: (now.hour + 1) % 24, minute: 0);
+    }
   }
 
   DateTime? _selectedDate;
@@ -184,7 +192,7 @@ class _AddReminderState extends State<AddReminder> {
       // ignore: deprecated_member_use
       colorValue: _selectedColor.value,
       repeatDays: _repeatDays.isNotEmpty ? List<int>.from(_repeatDays) : null,
-      userEmail: vm.currentUserEmail, // ✅ from VM
+      userEmail: vm.currentUserEmail, // from VM
     );
 
     if (kDebugMode) {

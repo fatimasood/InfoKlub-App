@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- White background -->
     <item>
-        <bitmap android:gravity="fill" android:src="@drawable/background"/>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white"/>
+        </shape>
     </item>
+
+    <!-- Icon in the middle -->
+    <item
+        android:drawable="@drawable/infoklublogo"
+        android:gravity="center"/>
 </layer-list>

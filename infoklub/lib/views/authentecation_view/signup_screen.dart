@@ -54,7 +54,7 @@ class _SignupScreenState extends State<SignupScreen> {
       Utils().toastMessage(value.user!.email.toString());
       userMail = emailController.text;
 
-      print(userMail);
+      debugPrint(userMail);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -280,7 +280,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 ),
                                 onSelect: (Country country) {
                                   if (kDebugMode) {
-                                    print(
+                                    debugPrint(
                                         'Selected country: ${country.displayName}');
                                   }
                                   setState(() {

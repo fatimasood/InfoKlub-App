@@ -48,7 +48,7 @@ class EduinfoViewmodel extends ChangeNotifier {
 
       for (int i = 0; i < rawList.length; i++) {
         final edu = rawList[i] as EducationInfo;
-        print("📂 Uploaded Docs: ${edu.uploadedDocs.join(', ')}");
+        debugPrint("📂 Uploaded Docs: ${edu.uploadedDocs.join(', ')}");
       }
 
       final List<EducationInfo> existingList =
@@ -56,7 +56,7 @@ class EduinfoViewmodel extends ChangeNotifier {
       existingList.add(info);
       await box.put("eduInfo_$email", existingList);
     } catch (e) {
-      print("❌ Hive saving error: $e");
+      debugPrint("❌ Hive saving error: $e");
       return;
     }
 
@@ -66,22 +66,22 @@ class EduinfoViewmodel extends ChangeNotifier {
     final savedList = box.get("eduInfo_$email", defaultValue: []) as List;
 
     if (savedList.isEmpty) {
-      print("📭 No education data found.");
+      debugPrint("📭 No education data found.");
       return;
     }
 
     for (int i = 0; i < savedList.length; i++) {
       final edu = savedList[i] as EducationInfo;
-      print("🔍 Entry #$i:");
-      print("🎓 Degree: ${edu.degree}");
-      print("🏛️ Institution: ${edu.institution}");
-      print("📊 Total Grade: ${edu.totalGrade}");
-      print("📈 Score Grade: ${edu.scoreGrade}");
-      print("🏆 Achievements: ${edu.achievements}");
-      print("📅 Start Year: ${edu.startYear}");
-      print("📅 End Year: ${edu.endYear}");
-      print("📂 Uploaded Docs: ${edu.uploadedDocs.join(', ')}");
-      print("──────────────────────────────");
+      debugPrint("🔍 Entry #$i:");
+      debugPrint("🎓 Degree: ${edu.degree}");
+      debugPrint("🏛️ Institution: ${edu.institution}");
+      debugPrint("📊 Total Grade: ${edu.totalGrade}");
+      debugPrint("📈 Score Grade: ${edu.scoreGrade}");
+      debugPrint("🏆 Achievements: ${edu.achievements}");
+      debugPrint("📅 Start Year: ${edu.startYear}");
+      debugPrint("📅 End Year: ${edu.endYear}");
+      debugPrint("📂 Uploaded Docs: ${edu.uploadedDocs.join(', ')}");
+      debugPrint("──────────────────────────────");
     }
   }
 
@@ -97,12 +97,12 @@ class EduinfoViewmodel extends ChangeNotifier {
         notifyListeners();
         await box.put("eduInfo_$email", existingList);
         notifyListeners();
-        print("🗑️ Deleted education entry at index $index");
+        debugPrint("🗑️ Deleted education entry at index $index");
       } else {
-        print("⚠️ Invalid index: $index");
+        debugPrint("⚠️ Invalid index: $index");
       }
     } catch (e) {
-      print("❌ Error deleting education info: $e");
+      debugPrint("❌ Error deleting education info: $e");
     }
   }
 
@@ -119,12 +119,12 @@ class EduinfoViewmodel extends ChangeNotifier {
         existingList[index] = updatedInfo; // replace instead of remove
         await box.put("eduInfo_$email", existingList);
         notifyListeners();
-        print("✅ Updated education entry at index $index");
+        debugPrint("✅ Updated education entry at index $index");
       } else {
-        print("⚠️ Invalid index: $index");
+        debugPrint("⚠️ Invalid index: $index");
       }
     } catch (e) {
-      print("❌ Error Updating education info: $e");
+      debugPrint("❌ Error Updating education info: $e");
     }
   }
 
@@ -164,7 +164,7 @@ class EduinfoViewmodel extends ChangeNotifier {
 
     final rawList = box.get("eduInfo_$email", defaultValue: []);
     if (rawList == null || rawList.isEmpty) {
-      print("📭 No education data found for $email");
+      debugPrint("📭 No education data found for $email");
       return;
     }
 
@@ -182,7 +182,7 @@ class EduinfoViewmodel extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print("❌ Error loading education data: $e");
+      debugPrint("❌ Error loading education data: $e");
     }
   }
 
@@ -222,7 +222,7 @@ class EduinfoViewmodel extends ChangeNotifier {
     final eduList = List<EducationInfo>.from(rawList);
 
     if (eduList.isEmpty || index < 0 || index >= eduList.length) {
-      print("⚠️ No education data found at index $index for $email");
+      debugPrint("⚠️ No education data found at index $index for $email");
       return;
     }
 
@@ -239,7 +239,7 @@ class EduinfoViewmodel extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print("❌ Error loading education data at index $index: $e");
+      debugPrint("❌ Error loading education data at index $index: $e");
     }
   }
 }

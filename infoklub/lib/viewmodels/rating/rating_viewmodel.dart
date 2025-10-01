@@ -19,8 +19,8 @@ class RatingViewModel with ChangeNotifier {
 
   Future<void> submitRating() async {
     // Here you would typically send the data to your backend
-    // For now, we'll just print it
-    print(
+    // For now, we'll just debugPrint it
+    debugPrint(
         'Submitting rating: ${_ratingData.rating}, comment: ${_ratingData.comment}');
 
     // Simulate network request

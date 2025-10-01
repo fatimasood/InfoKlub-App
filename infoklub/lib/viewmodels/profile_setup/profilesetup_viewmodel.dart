@@ -118,11 +118,11 @@ class ProfileSetupViewModel with ChangeNotifier {
       await box.put(userKey, model);
 
       if (kDebugMode) {
-        print('✅ Saved user profile with key: $userKey');
-        print('✅ User data: ${model.toJson()}');
+        debugPrint('✅ Saved user profile with key: $userKey');
+        debugPrint('✅ User data: ${model.toJson()}');
       }
     } catch (e) {
-      print('❌ Error saving profile to Hive: $e');
+      debugPrint('❌ Error saving profile to Hive: $e');
     }
   }
   // validation check

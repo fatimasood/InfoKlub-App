@@ -116,10 +116,10 @@ class HealthDataViewModel extends ChangeNotifier {
   void saveSymptoms() {
     if (_selectedSymptoms.isNotEmpty) {
       // Example logic for saving symptoms
-      print("Saved Symptoms: $_selectedSymptoms");
+      debugPrint("Saved Symptoms: $_selectedSymptoms");
       // Add your saving logic here (e.g., API call, local storage, etc.)
     } else {
-      print("No symptoms to save.");
+      debugPrint("No symptoms to save.");
     }
   }
 
@@ -164,19 +164,19 @@ class HealthDataViewModel extends ChangeNotifier {
     await box.put('user_health', healthData);
 
     if (kDebugMode) {
-      print("✅ Saved Health Record:");
+      debugPrint("✅ Saved Health Record:");
     }
     if (kDebugMode) {
-      print("Blood Type: ${healthData.bloodType}");
+      debugPrint("Blood Type: ${healthData.bloodType}");
     }
     if (kDebugMode) {
-      print("Medications: ${healthData.medications}");
+      debugPrint("Medications: ${healthData.medications}");
     }
     if (kDebugMode) {
-      print("Documents: ${healthData.documentPaths}");
+      debugPrint("Documents: ${healthData.documentPaths}");
     }
     if (kDebugMode) {
-      print("Allergies: ${healthData.allergies}");
+      debugPrint("Allergies: ${healthData.allergies}");
     }
   }
 
