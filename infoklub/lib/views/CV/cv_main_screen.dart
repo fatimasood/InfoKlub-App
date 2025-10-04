@@ -35,7 +35,7 @@ class CVPage extends StatelessWidget {
                   height: 330,
                   fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.only(left: 75, right: 75),
                   child: CustomButton(
@@ -46,7 +46,7 @@ class CVPage extends StatelessWidget {
                     onPressed: () => _createNewCV(context),
                   ),
                 ),
-                const SizedBox(height: 5.0),
+                /*const SizedBox(height: 5.0),
                 Padding(
                   padding: const EdgeInsets.only(left: 75, right: 75),
                   child: CustomButton(
@@ -62,7 +62,7 @@ class CVPage extends StatelessWidget {
                                       personData: false,
                                     )));
                       }),
-                ),
+                ),*/
               ],
             ),
           ),

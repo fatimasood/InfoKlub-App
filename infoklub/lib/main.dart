@@ -10,8 +10,7 @@ import 'package:infoklub/models/goals/goal_model.dart';
 import 'package:infoklub/models/notifications/notification_model.dart';
 import 'package:infoklub/models/reminder/reminder_model.dart';
 import 'package:infoklub/services/firebase_services/splash_services.dart';
-import 'package:infoklub/services/goals_services/goalservice.dart';
-import 'package:infoklub/services/notifications_service/notifications_services.dart';
+import 'package:infoklub/services/notifications_service/notification_manager.dart';
 import 'package:infoklub/viewmodels/Reminders/reminders_viewmodel.dart';
 import 'package:infoklub/viewmodels/carrer/career_viewmodel.dart';
 import 'package:infoklub/views/splash_view/splash_screens.dart';
@@ -45,7 +44,7 @@ Future<void> main() async {
 
   await Hive.initFlutter();
   await initHive();
-  await NotificationService().initialize();
+
   await requestNotificationPermission();
 
   runApp(const MyApp());
@@ -119,6 +118,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    await NotificationManager().initializeAppNotifications();
   }
 
   @override
@@ -130,27 +134,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Check streaks when app comes to foreground
-      _checkStreaksOnResume();
-    }
-  }
-
-  Future<void> _checkStreaksOnResume() async {
-    try {
-      final userEmail = userMail;
-      if (userEmail.isNotEmpty) {
-        await GoalService.checkDailyStreaks(userEmail);
-
-        // If we're on a screen that uses HomeViewModel, refresh it
-        if (mounted) {
-          final viewModel = Provider.of<HomeViewModel>(context, listen: false);
-          await viewModel.loadGoals();
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error checking streaks on resume: $e');
-      }
+      NotificationManager().handleAppResumed();
     }
   }
 

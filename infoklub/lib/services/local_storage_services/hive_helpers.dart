@@ -213,4 +213,33 @@ class HiveHelper {
     final box = await openNotificationBox(email);
     await box.clear();
   }
+
+  // remove duplicate notifications
+
+  static Future<void> cleanupDuplicateNotifications(String email) async {
+    try {
+      final box = await openNotificationBox(email);
+      final notifications = box.values.toList();
+
+      // Remove duplicate goal notifications (keep only unique titles+messages)
+      final uniqueNotifications = <String, NotificationModel>{};
+
+      for (final notification in notifications) {
+        final key = '${notification.title}-${notification.message}';
+        if (!uniqueNotifications.containsKey(key)) {
+          uniqueNotifications[key] = notification;
+        }
+      }
+
+      // Clear and re-add unique notifications
+      await box.clear();
+      for (final notification in uniqueNotifications.values) {
+        await box.add(notification);
+      }
+
+      print('🧹 Cleaned up duplicate notifications');
+    } catch (e) {
+      print('Error cleaning up notifications: $e');
+    }
+  }
 }

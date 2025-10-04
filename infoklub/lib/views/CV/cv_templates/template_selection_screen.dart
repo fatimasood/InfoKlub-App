@@ -19,7 +19,7 @@ class Template1 implements CVTemplate {
   String get name => "Professional";
 
   @override
-  String get imageAsset => "lib/assets/cv_tem/cvtemp1.png";
+  String get imageAsset => "lib/assets/cv_tem/cv1info.jpg";
 
   @override
   Future<File> generateCV(CVModel cvData) async {
@@ -33,7 +33,7 @@ class Template2 implements CVTemplate {
   String get name => "Modern";
 
   @override
-  String get imageAsset => "lib/assets/cv_tem/cvtemp1.png";
+  String get imageAsset => "lib/assets/cv_tem/cv2info.jpg";
 
   @override
   Future<File> generateCV(CVModel cvData) async {
@@ -47,7 +47,7 @@ class Template3 implements CVTemplate {
   String get name => "Creative";
 
   @override
-  String get imageAsset => "lib/assets/cv_tem/cvtemp1.png";
+  String get imageAsset => "lib/assets/cv_tem/cv5info.jpg";
 
   @override
   Future<File> generateCV(CVModel cvData) async {
@@ -61,7 +61,7 @@ class Template4 implements CVTemplate {
   String get name => "Minimalist";
 
   @override
-  String get imageAsset => "lib/assets/cv_tem/cvtemp1.png";
+  String get imageAsset => "lib/assets/cv_tem/cv3info.jpg";
 
   @override
   Future<File> generateCV(CVModel cvData) async {
@@ -75,7 +75,7 @@ class Template5 implements CVTemplate {
   String get name => "Executive";
 
   @override
-  String get imageAsset => "lib/assets/cv_tem/cvtemp1.png";
+  String get imageAsset => "lib/assets/cv_tem/cv4info.jpg";
 
   @override
   Future<File> generateCV(CVModel cvData) async {

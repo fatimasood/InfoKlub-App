@@ -13,7 +13,7 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  static final FlutterLocalNotificationsPlugin _notifications =
+  final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
 
   final StreamController<NotificationResponse> _notificationStreamController =
@@ -51,8 +51,25 @@ class NotificationService {
 
     await _notifications.initialize(
       settings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
         _notificationStreamController.add(response);
+
+        if (response.payload != null) {
+          try {
+            final payload = jsonDecode(response.payload!);
+            if (payload['type'] == 'goal') {
+              final goalId = payload['goalId'];
+              final userEmail = payload['userEmail'];
+              final isCompletionDay = payload['isCompletionDay'] ?? false;
+
+              // Handle goal notification trigger
+              await handleGoalNotificationTrigger(
+                  goalId, userEmail, isCompletionDay);
+            }
+          } catch (e) {
+            print('Error parsing notification payload: $e');
+          }
+        }
       },
     );
 
@@ -97,7 +114,6 @@ class NotificationService {
     print('✅ Test notification shown');
   }
 
-  // Goal Notifications
   Future<void> scheduleGoalNotifications(String userEmail) async {
     try {
       final goals = await HiveHelper.getAllGoals(userEmail);
@@ -116,46 +132,81 @@ class NotificationService {
     try {
       final now = DateTime.now();
 
+      // Cancel existing notifications for this goal first
+      await _cancelGoalNotifications(goal.id);
+
       // Check if goal is completed or expired
       if (goal.endDate != null && now.isAfter(goal.endDate!)) {
         print('⏰ Goal "${goal.title}" has ended, cancelling notifications');
-        await _cancelGoalNotifications(goal.id);
         return;
       }
 
-      // Calculate remaining days
-      final daysRemaining = goal.endDate != null
-          ? goal.endDate!.difference(now).inDays
-          : goal.longestStreak - goal.currentStreak;
+      // Schedule only the NEXT notification, not all future ones
+      DateTime nextNotificationTime;
 
-      print('📅 Goal "${goal.title}" - $daysRemaining days remaining');
-
-      if (daysRemaining <= 0) {
-        // Schedule completion notification for tomorrow 9 AM
-        final completionTime = DateTime(now.year, now.month, now.day + 1, 9, 0);
-        await _scheduleGoalCompletionNotification(
-            goal, userEmail, completionTime);
+      if (goal.endDate != null && now.isAfter(goal.endDate!)) {
+        // Goal already ended, no need for daily reminders
         return;
-      }
-
-      // Schedule daily notifications at 9 AM
-      for (int i = 0; i <= daysRemaining; i++) {
-        final notificationTime =
-            DateTime(now.year, now.month, now.day + i, 9, 0);
-
-        if (notificationTime.isAfter(now)) {
+      } else if (goal.endDate != null) {
+        // Schedule for completion day
+        final completionTime = DateTime(
+            goal.endDate!.year, goal.endDate!.month, goal.endDate!.day, 9, 0);
+        if (completionTime.isAfter(now)) {
           await _scheduleSingleGoalNotification(
             goal: goal,
-            scheduledTime: notificationTime,
+            scheduledTime: completionTime,
             userEmail: userEmail,
-            isLastDay: i == daysRemaining,
+            isCompletionDay: true,
           );
-          print(
-              '⏰ Scheduled goal notification for ${notificationTime.toString()}');
         }
+      }
+
+      // Schedule next daily reminder (tomorrow at 9 AM)
+      nextNotificationTime = DateTime(now.year, now.month, now.day + 1, 9, 0);
+
+      // Make sure we're not scheduling past the end date
+      if (goal.endDate == null ||
+          nextNotificationTime.isBefore(goal.endDate!) ||
+          nextNotificationTime.isAtSameMomentAs(goal.endDate!)) {
+        await _scheduleSingleGoalNotification(
+          goal: goal,
+          scheduledTime: nextNotificationTime,
+          userEmail: userEmail,
+          isCompletionDay: false,
+        );
+        print(
+            '⏰ Scheduled next goal notification for ${nextNotificationTime.toString()}');
       }
     } catch (e) {
       print('❌ Error scheduling daily goal notification: $e');
+    }
+  }
+
+  Future<void> rescheduleNextDailyNotification(
+      Goal goal, String userEmail) async {
+    try {
+      final now = DateTime.now();
+
+      // Cancel existing daily notifications for this goal
+      await _cancelGoalNotifications(goal.id);
+
+      // Schedule next daily reminder (tomorrow at 9 AM)
+      final nextNotificationTime =
+          DateTime(now.year, now.month, now.day + 1, 9, 0);
+
+      // Check if we need to schedule (goal not ended)
+      if (goal.endDate == null ||
+          nextNotificationTime.isBefore(goal.endDate!)) {
+        await _scheduleSingleGoalNotification(
+          goal: goal,
+          scheduledTime: nextNotificationTime,
+          userEmail: userEmail,
+          isCompletionDay: false,
+        );
+        print('⏰ Rescheduled next daily notification for ${goal.title}');
+      }
+    } catch (e) {
+      print('❌ Error rescheduling daily notification: $e');
     }
   }
 
@@ -163,7 +214,7 @@ class NotificationService {
     required Goal goal,
     required DateTime scheduledTime,
     required String userEmail,
-    required bool isLastDay,
+    required bool isCompletionDay,
   }) async {
     try {
       const androidPlatformChannelSpecifics = AndroidNotificationDetails(
@@ -186,35 +237,122 @@ class NotificationService {
         iOS: iosPlatformChannelSpecifics,
       );
 
+      String title;
+      String message;
+
+      if (isCompletionDay) {
+        // For completion day, we'll check the actual status when the notification triggers
+        title = 'Goal Period Ended';
+        message =
+            'Your goal "${goal.title}" period has ended. Check your progress!';
+      } else {
+        title = 'Daily Goal Reminder';
+        message = 'Don\'t forget to work on "${goal.title}".';
+      }
+
       await _notifications.zonedSchedule(
         _generateGoalNotificationId(goal.id, scheduledTime),
-        isLastDay ? 'Goal Completed! 🎉' : 'Daily Goal Reminder',
-        isLastDay
-            ? 'Congratulations! You completed "${goal.title}" successfully!'
-            : 'Don\'t forget to work on "${goal.title}". ${goal.currentStreak}/${goal.longestStreak} days completed.',
+        title,
+        message,
         tz.TZDateTime.from(scheduledTime, tz.local),
         platformChannelSpecifics,
         payload: jsonEncode({
           'type': 'goal',
           'goalId': goal.id,
           'userEmail': userEmail,
-          'isLastDay': isLastDay,
+          'isCompletionDay': isCompletionDay,
+          'scheduledTime': scheduledTime.millisecondsSinceEpoch,
         }),
         androidScheduleMode: AndroidScheduleMode.alarmClock,
+      );
+
+      // REMOVED: Don't save to history immediately
+      // Only save when notification actually triggers
+
+      print('✅ Goal notification scheduled: $title at $scheduledTime');
+    } catch (e) {
+      print('❌ Error scheduling single goal notification: $e');
+    }
+  }
+// handle notification trigger time
+
+  Future<void> handleGoalNotificationTrigger(
+      String goalId, String userEmail, bool isCompletionDay) async {
+    try {
+      final goal = await HiveHelper.getGoal(userEmail, goalId);
+      if (goal == null) {
+        print('❌ Goal not found for notification: $goalId');
+        return;
+      }
+
+      String title;
+      String message;
+
+      if (isCompletionDay) {
+        // Check actual completion status when notification triggers
+        final isCompleted = goal.currentStreak >= goal.longestStreak;
+
+        if (isCompleted) {
+          title = 'Goal Completed! 🎉';
+          message =
+              'Congratulations! You successfully completed "${goal.title}"! ${goal.currentStreak}/${goal.longestStreak} days achieved!';
+        } else {
+          title = 'Goal Challenge Ended';
+          message =
+              'You may challenge yourself again for "${goal.title}". ${goal.currentStreak}/${goal.longestStreak} days completed.';
+        }
+      } else {
+        title = 'Daily Goal Reminder';
+        message =
+            'Don\'t forget to work on "${goal.title}". ${goal.currentStreak}/${goal.longestStreak} days completed.';
+      }
+
+      // Save to notification history ONLY when actually triggered
+      await HiveHelper.saveNotification(userEmail, title, message);
+
+      print('✅ Goal notification triggered and saved: $title');
+    } catch (e) {
+      print('❌ Error handling goal notification: $e');
+    }
+  }
+
+  Future<void> showGoalStartedNotification(Goal goal, String userEmail) async {
+    try {
+      const androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'goal_channel',
+        'Goal Reminders',
+        channelDescription: 'Notifications for your daily goals',
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
+      );
+
+      const DarwinNotificationDetails iosPlatformChannelSpecifics =
+          DarwinNotificationDetails();
+
+      const NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iosPlatformChannelSpecifics,
+      );
+
+      await _notifications.show(
+        _generateGoalNotificationId(goal.id, DateTime.now()),
+        'Goal Started! 🚀',
+        'You started "${goal.title}" goal. Good luck!',
+        platformChannelSpecifics,
       );
 
       // Save to notification history
       await HiveHelper.saveNotification(
         userEmail,
-        isLastDay ? 'Goal Completed! 🎉' : 'Daily Goal Reminder',
-        isLastDay
-            ? 'Congratulations! You completed "${goal.title}" successfully!'
-            : 'Don\'t forget to work on "${goal.title}". ${goal.currentStreak}/${goal.longestStreak} days completed.',
+        'Goal Started! 🚀',
+        'You started "${goal.title}" goal. Good luck!',
       );
 
-      print('✅ Goal notification scheduled: ${goal.title} at $scheduledTime');
+      print('✅ Goal started notification shown');
     } catch (e) {
-      print('❌ Error scheduling single goal notification: $e');
+      print('❌ Error showing goal started notification: $e');
     }
   }
 

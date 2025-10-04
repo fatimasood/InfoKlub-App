@@ -154,6 +154,13 @@ class _AppDrawerState extends State<AppDrawer> {
                         },
                       ),
                       _buildDrawerItem(
+                        icon: Icons.notifications_outlined,
+                        title: 'Notifications',
+                        onTap: () {
+                          Navigator.pushNamed(context, '/notifications');
+                        },
+                      ),
+                      _buildDrawerItem(
                         icon: Icons.logout_outlined,
                         title: 'Logout',
                         onTap: () {

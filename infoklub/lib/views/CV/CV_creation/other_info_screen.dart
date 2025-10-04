@@ -166,81 +166,6 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Extracurricular Activities
-                    AddDetailsbtn(
-                      text: "Extracurricular Activities",
-                      icon: const Icon(Icons.arrow_forward_ios),
-                      isExpanded: showActivities,
-                      onPressed: () {
-                        setState(() {
-                          showActivities = !showActivities;
-                        });
-                      },
-                    ),
-                    _buildExpandableSection(
-                      visible: showActivities,
-                      child: Column(
-                        children: [
-                          _buildTextField(
-                            controller: _activityNameController,
-                            label: "Activity Name",
-                            hint: "e.g., Football Team Captain",
-                          ),
-                          const SizedBox(height: 10),
-                          _buildTextField(
-                            controller: _activityDescController,
-                            label: "Description",
-                            hint:
-                                "Brief description of your role and achievements",
-                            maxLines: 3,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 5.0),
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: CustomButton(
-                                text: "Add Activity",
-                                height: 45,
-                                borderRadius: 15,
-                                color: AppTheme.primaryColor,
-                                textColor: AppTheme.skyBlue,
-                                onPressed: () {
-                                  if (_activityNameController.text.isNotEmpty) {
-                                    viewModel.addActivity(
-                                      name: _activityNameController.text,
-                                      description: _activityDescController.text,
-                                    );
-                                    _activityNameController.clear();
-                                    _activityDescController.clear();
-                                    setState(() {});
-                                  }
-                                },
-                              ),
-                            ),
-                          ),
-                          _buildAddedItemsList(
-                            items: viewModel.cvData.activities,
-                            itemBuilder: (activity) => ListTile(
-                              title: Text(activity.name),
-                              subtitle: activity.description.isNotEmpty
-                                  ? Text(activity.description)
-                                  : null,
-                              trailing: IconButton(
-                                icon:
-                                    const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  viewModel.removeActivity(activity);
-                                  setState(() {});
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5.0,
-                    ),
                     // Languages
                     AddDetailsbtn(
                       icon: const Icon(Icons.arrow_forward_ios),
@@ -567,6 +492,8 @@ class _OtherInfoScreenState extends State<OtherInfoScreen> {
                 if (_formKey.currentState!.validate()) {
                   viewModel.nextStep();
                   _saveDataToPreferences(); // Save all data before navigating
+
+                  _summaryController.clear();
 
                   Navigator.push(
                     context,

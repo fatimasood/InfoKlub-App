@@ -204,7 +204,7 @@ class _CvDownloadState extends State<CvDownload> {
                         'Selected Template: ${_selectedTemplate.name}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 13,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -212,7 +212,7 @@ class _CvDownloadState extends State<CvDownload> {
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(
-                              color: AppTheme.primaryColor, width: 2),
+                              color: AppTheme.primaryColor, width: 1.5),
                         ),
                         child: Image.asset(
                           _selectedTemplate.imageAsset,

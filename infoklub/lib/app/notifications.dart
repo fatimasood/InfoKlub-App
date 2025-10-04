@@ -21,8 +21,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   void initState() {
     super.initState();
-    _loadNotifications();
+    _cleanupAndLoadNotifications();
+
     _setupNotificationListener();
+  }
+
+  Future<void> _cleanupAndLoadNotifications() async {
+    try {
+      // Clean up duplicates first
+      await HiveHelper.cleanupDuplicateNotifications(widget.userEmail);
+      await _loadNotifications();
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _loadNotifications() async {

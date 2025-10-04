@@ -105,8 +105,8 @@ class Template3PdfService {
               if (profileImage != null)
                 pw.Center(
                   child: pw.Container(
-                    width: 150,
-                    height: 150,
+                    width: 100,
+                    height: 100,
                     decoration: pw.BoxDecoration(
                       shape: pw.BoxShape.circle,
                       image: pw.DecorationImage(
@@ -202,28 +202,8 @@ class Template3PdfService {
                     fontSize: 9.5,
                     color: PdfColors.grey800,
                   )),
-            if (cvData.address != null)
-              pw.Text('${cvData.address}',
-                  style: const pw.TextStyle(
-                    fontSize: 9.5,
-                    color: PdfColors.grey800,
-                  )),
-          ],
-        ),
-        pw.SizedBox(height: 8),
-
-        pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
             if (cvData.phone != null)
               pw.Text('${cvData.phone}',
-                  style: const pw.TextStyle(
-                    fontSize: 9.5,
-                    color: PdfColors.grey800,
-                  )),
-            if (cvData.linkedIn != null)
-              pw.Text('${cvData.linkedIn}',
                   style: const pw.TextStyle(
                     fontSize: 9.5,
                     color: PdfColors.grey800,

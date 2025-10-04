@@ -89,6 +89,9 @@ class HomeViewModel with ChangeNotifier {
         print('Test notification failed but continuing: $e');
       } // Show immediate test notification
       await NotificationService().showTestNotification();*/
+      Future.delayed(const Duration(seconds: 5), () {
+        NotificationService().showGoalStartedNotification(goal, userEmail);
+      });
 
       notifyListeners();
     } catch (e) {
@@ -110,7 +113,7 @@ class HomeViewModel with ChangeNotifier {
           currentStreak: newCompletedState
               ? goal.currentStreak + 1
               : (goal.currentStreak > 0 ? goal.currentStreak - 1 : 0),
-          lastUpdated: DateTime.now(), // Update the lastUpdated timestamp
+          lastUpdated: DateTime.now(),
         );
 
         // Update longest streak if needed
@@ -122,6 +125,11 @@ class HomeViewModel with ChangeNotifier {
 
         await HiveHelper.saveGoal(userEmail, updatedGoal);
         _goals[index] = updatedGoal;
+
+        // Reschedule notifications after goal state change
+        await NotificationService()
+            .rescheduleNextDailyNotification(updatedGoal, userEmail);
+
         notifyListeners();
       }
     } catch (e) {
@@ -138,29 +146,18 @@ class HomeViewModel with ChangeNotifier {
 
       for (int i = 0; i < _goals.length; i++) {
         final goal = _goals[i];
-        // Use startDate as fallback if lastUpdated is null
         final lastUpdated = goal.lastUpdated ?? goal.startDate;
+
         // Check if it's a new day (after midnight)
         if (now.day != lastUpdated.day ||
             now.month != lastUpdated.month ||
             now.year != lastUpdated.year) {
-          // one day left case
-
-          if (goal.endDate != null &&
-              now.difference(goal.endDate!).inDays == -1) {}
-
-          // goal fully completed
-
-          if (goal.endDate != null &&
-              now.isAfter(goal.endDate!) &&
-              goal.currentStreak == goal.longestStreak) {}
-
-          // Check if goal has ended (use null-aware operator)
+          // Check if goal period has ended
           if (goal.endDate != null && now.isAfter(goal.endDate!)) {
-            // Goal period has ended, delete it after 1 day
+            // Give one extra day before deleting
             if (now.isAfter(goal.endDate!.add(const Duration(days: 1)))) {
               await deleteGoal(goal.id);
-              continue; // Skip to next goal as this one is deleted
+              continue;
             }
           } else {
             // Reset completedToday for the new day
