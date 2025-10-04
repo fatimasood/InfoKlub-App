@@ -65,6 +65,12 @@ class NotificationService {
               // Handle goal notification trigger
               await handleGoalNotificationTrigger(
                   goalId, userEmail, isCompletionDay);
+            } else if (payload['type'] == 'reminder') {
+              final reminderId = payload['reminderId'];
+              final userEmail = payload['userEmail'];
+
+              // Handle reminder notification trigger
+              await handleReminderNotificationTrigger(reminderId, userEmail);
             }
           } catch (e) {
             print('Error parsing notification payload: $e');
@@ -403,7 +409,6 @@ class NotificationService {
     }
   }
 
-  // Reminder Notifications
   Future<void> scheduleReminderNotifications(
       String userEmail, List<ReminderModel> reminders) async {
     try {
@@ -429,6 +434,9 @@ class NotificationService {
           DateTime.fromMillisecondsSinceEpoch(reminder.dateUtcMs!);
       final hour = reminder.timeMinutes! ~/ 60;
       final minute = reminder.timeMinutes! % 60;
+
+      // Cancel existing notifications for this reminder first
+      await cancelReminderNotifications(reminder.id);
 
       // Handle repeat days
       if (reminder.repeatDays != null && reminder.repeatDays!.isNotEmpty) {
@@ -469,39 +477,58 @@ class NotificationService {
     String userEmail,
   ) async {
     try {
-      final nextOccurrence = _getNextWeekday(day, hour, minute);
+      // Schedule for the next 4 occurrences to avoid bulk scheduling
+      for (int i = 0; i < 4; i++) {
+        final nextOccurrence = _getNextWeekdayOccurrence(day, hour, minute, i);
 
-      if (nextOccurrence.isAfter(DateTime.now())) {
-        await _scheduleSingleReminder(
-          reminder: reminder,
-          scheduledTime: nextOccurrence,
-          userEmail: userEmail,
-          isRepeating: true,
-        );
-        print(
-            '⏰ Scheduled repeating reminder: ${reminder.title} on day $day at $hour:$minute');
+        if (nextOccurrence.isAfter(DateTime.now())) {
+          await _scheduleSingleReminder(
+            reminder: reminder,
+            scheduledTime: nextOccurrence,
+            userEmail: userEmail,
+            isRepeating: true,
+          );
+          print(
+              '⏰ Scheduled repeating reminder: ${reminder.title} on ${_getWeekdayName(day)} at $hour:$minute');
+        }
       }
     } catch (e) {
       print('❌ Error scheduling repeating reminder: $e');
     }
   }
 
-  DateTime _getNextWeekday(int weekday, int hour, int minute) {
+  DateTime _getNextWeekdayOccurrence(
+      int weekday, int hour, int minute, int occurrenceIndex) {
     final now = DateTime.now();
     var date = DateTime(now.year, now.month, now.day, hour, minute);
 
-    // Adjust to next occurrence of the specified weekday (0=Sunday, 6=Saturday)
+    // Find the next occurrence
+    int daysToAdd = 0;
     while (date.weekday != _convertToSystemWeekday(weekday) ||
         date.isBefore(now)) {
-      date = date.add(const Duration(days: 1));
+      daysToAdd++;
+      date = DateTime(now.year, now.month, now.day + daysToAdd, hour, minute);
+    }
+
+    // Add weeks for subsequent occurrences
+    if (occurrenceIndex > 0) {
+      date = date.add(Duration(days: occurrenceIndex * 7));
     }
 
     return date;
   }
 
-  int _convertToSystemWeekday(int appWeekday) {
-    // Convert from app's weekday (0=Sunday, 6=Saturday) to system weekday (1=Monday, 7=Sunday)
-    return appWeekday == 6 ? 7 : appWeekday + 1;
+  String _getWeekdayName(int appWeekday) {
+    const weekdays = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ];
+    return weekdays[appWeekday];
   }
 
   Future<void> _scheduleSingleReminder({
@@ -541,20 +568,67 @@ class NotificationService {
           'type': 'reminder',
           'reminderId': reminder.id,
           'userEmail': userEmail,
+          'scheduledTime': scheduledTime.millisecondsSinceEpoch,
         }),
         androidScheduleMode: AndroidScheduleMode.alarmClock,
       );
 
+      // REMOVED: Don't save to history immediately when scheduling
+      // Only save when notification actually triggers
+
+      print(
+          '✅ Reminder notification scheduled: ${reminder.title} at $scheduledTime');
+    } catch (e) {
+      print('❌ Error scheduling single reminder: $e');
+    }
+  }
+
+  int _convertToSystemWeekday(int appWeekday) {
+    // Convert from app's weekday (0=Sunday, 6=Saturday) to system weekday (1=Monday, 7=Sunday)
+    // Your app uses: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
+    // System uses: 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday, 7=Sunday
+
+    switch (appWeekday) {
+      case 0:
+        return 7; // Sunday
+      case 1:
+        return 1; // Monday
+      case 2:
+        return 2; // Tuesday
+      case 3:
+        return 3; // Wednesday
+      case 4:
+        return 4; // Thursday
+      case 5:
+        return 5; // Friday
+      case 6:
+        return 6; // Saturday
+      default:
+        return 1; // Default to Monday
+    }
+  }
+
+  Future<void> handleReminderNotificationTrigger(
+      String reminderId, String userEmail) async {
+    try {
+      final reminders = await HiveHelper.openReminderBox(userEmail);
+      final reminder = reminders.get(reminderId);
+
+      if (reminder == null) {
+        print('❌ Reminder not found for notification: $reminderId');
+        return;
+      }
+
+      // Save to notification history ONLY when actually triggered
       await HiveHelper.saveNotification(
         userEmail,
         'Reminder: ${reminder.title}',
         reminder.notes ?? 'Don\'t forget about this!',
       );
 
-      print(
-          '✅ Reminder notification scheduled: ${reminder.title} at $scheduledTime');
+      print('✅ Reminder notification triggered and saved: ${reminder.title}');
     } catch (e) {
-      print('❌ Error scheduling single reminder: $e');
+      print('❌ Error handling reminder notification: $e');
     }
   }
 

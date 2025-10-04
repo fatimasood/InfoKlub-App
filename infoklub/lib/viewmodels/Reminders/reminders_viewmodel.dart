@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infoklub/services/local_storage_services/hive_helpers.dart';
 import 'package:infoklub/services/notifications_service/notifications_services.dart';
 import 'package:infoklub/views/Reminders/reminder_mapper.dart';
 import 'package:infoklub/views/Reminders/reminder_repository.dart';
@@ -59,8 +60,74 @@ class RemindersViewModel extends ChangeNotifier {
 
     // Show immediate test notification
     // await NotificationService().showTestNotification();
+    // Show immediate "reminder set" notification
+    await _showReminderSetNotification(reminder);
+    notifyListeners();
+  }
+
+  Future<void> _showReminderSetNotification(Reminder reminder) async {
+    try {
+      String message;
+
+      if (reminder.repeatDays != null && reminder.repeatDays!.isNotEmpty) {
+        final dayNames =
+            reminder.repeatDays!.map((day) => _getWeekdayName(day)).join(', ');
+        message =
+            'Repeating reminder set for $dayNames at ${_formatTime(reminder.dateTime!)}';
+      } else if (reminder.dateTime != null) {
+        message = 'Reminder set for ${_formatDateTime(reminder.dateTime!)}';
+      } else {
+        message = 'Reminder created';
+      }
+
+      // Save to notification history immediately for confirmation
+      await HiveHelper.saveNotification(
+        userEmail,
+        'Reminder Set ✅',
+        message,
+      );
+
+      print('✅ Reminder set notification saved');
+    } catch (e) {
+      print('❌ Error showing reminder set notification: $e');
+    }
+  }
+
+  Future<void> updateReminderWithReschedule(String id, Reminder updated) async {
+    final idx = _reminders.indexWhere((r) => r.id == id);
+    if (idx == -1) return;
+
+    // Cancel existing notifications
+    await NotificationService().cancelReminderNotifications(id);
+
+    final toSave = updated.copyWith();
+    final model = ReminderMapper.toModel(toSave);
+    await _repo.upsert(userEmail, model);
+
+    _reminders[idx] = toSave;
+
+    // Reschedule notifications with updated data
+    await NotificationService()
+        .scheduleReminderNotifications(userEmail, [model]);
 
     notifyListeners();
+  }
+
+  String _formatDateTime(DateTime dt) {
+    final hh = dt.hour.toString().padLeft(2, '0');
+    final mm = dt.minute.toString().padLeft(2, '0');
+    return '$hh:$mm • ${dt.day}/${dt.month}/${dt.year}';
+  }
+
+  String _formatTime(DateTime dt) {
+    final hh = dt.hour.toString().padLeft(2, '0');
+    final mm = dt.minute.toString().padLeft(2, '0');
+    return '$hh:$mm';
+  }
+
+  String _getWeekdayName(int appWeekday) {
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return weekdays[appWeekday];
   }
 
   Future<void> updateReminder(String id, Reminder updated) async {
